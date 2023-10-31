@@ -72,7 +72,7 @@ extern "C" {
 #include "task.h"
 #include "semphr.h"
 
-#if PMGDUINO_BOARD
+#if PMGDUINO_BOARD || CY7113_BOARD
 #include <Arduino.h>
 #endif
 
@@ -124,8 +124,10 @@ TaskHandle_t gl_CyGpioTaskHandle = NULL;
 
 TaskHandle_t gl_DuinoTaskHandle = NULL;
 
+#if APP_FW_LED_ENABLE
 /* LED blink rate in milliseconds */
 static uint16_t gl_LedBlinkRate = LED_TIMER_PERIOD_DETACHED;
+#endif
 
 cy_stc_pdutils_sw_timer_t        gl_TimerCtx;
 cy_stc_usbpd_context_t   gl_UsbPdPort0Ctx;
@@ -741,7 +743,7 @@ void Instrumentation_Task(void *param)
     }
 }
 
-#if !PMGDUINO_BOARD
+#if !PMGDUINO_BOARD && !CY7113_BOARD
 void setup()
 {
 
@@ -816,7 +818,9 @@ int main(void)
         CY_ASSERT(0);
     }
 
+#if DEBUG_LOG
     debug_init(&uartContext);
+#endif
 
     /*
      * Register the interrupt handler for the watchdog timer. This timer is used to
@@ -963,12 +967,14 @@ int main(void)
 	Cy_GPIO_ClearInterrupt(APP_SWITCH_PORT, APP_SWITCH_NUM);
 	Cy_GPIO_SetInterruptEdge(APP_SWITCH_PORT, APP_SWITCH_NUM, CY_GPIO_INTR_FALLING);
 
+#if PMGDUINO_BOARD
     if (Cy_SAR_Init(SAR0, &pass_0_sar_0_config) != CY_SAR_SUCCESS)
     {
         CY_ASSERT(0);
     }    
 
     Cy_SAR_Enable(SAR0);
+#endif
 
     setup();
 
@@ -996,9 +1002,10 @@ int main(void)
      * Since this application does not have any other function, the PMG1 device can be placed in "deep sleep"
      * mode for power saving whenever the PD stack and drivers are idle.
      */
-    //Cy_SCB_UART_PutString(CYBSP_UART_HW, string);
+#if DEBUG_LOG
     debug_print_byte(0xAA);
     debug_print("FW");
+#endif
 
     vTaskStartScheduler();
 

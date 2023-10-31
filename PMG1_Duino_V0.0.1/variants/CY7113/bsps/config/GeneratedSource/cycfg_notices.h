@@ -31,13 +31,13 @@
 #define CYCFG_NOTICES_H
 
 #ifdef CY_SUPPORTS_DEVICE_VALIDATION
-#ifndef CYPM1322_97BZXIT
+#ifndef CYPM1311_48LQXI
     #error "Unexpected MPN; expected DEVICE:=CYPM1322-97BZXIT. There may be an inconsistency between the *.modus file and the makefile target configuration device sets."
 #endif
 #endif
 
 #ifdef CY_SUPPORTS_COMPLETE_DEVICE_VALIDATION
-#ifndef CYPM1322_97BZXIT
+#ifndef CYPM1311_48LQXI
     #error "Unexpected MPN; expected DEVICE:=CYPM1322-97BZXIT. There may be an inconsistency between the *.modus file and the makefile target configuration device sets."
 #endif
 #endif

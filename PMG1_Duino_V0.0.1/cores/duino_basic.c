@@ -37,10 +37,12 @@ void digitalWrite(uint8_t pin, uint8_t value)
     {
         Cy_GPIO_Write(LED_BUILTIN_PORT, LED_BUILTIN_PIN_NUM, value);    
     }
+#if PMGDUINO_BOARD
     else if (pin == LED1)
     {
         Cy_GPIO_Write(LED1_PORT, LED1_PIN_NUM, value);    
     }
+#endif
     else if (pin < IFX_DUINO_MAX_NUM_GPIO)
     {
         Cy_GPIO_Write(gpio_pin_mapping[pin].port, gpio_pin_mapping[pin].pin, value);
