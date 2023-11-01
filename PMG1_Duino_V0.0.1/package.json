@@ -1,6 +1,0 @@
-{
-    "name": "framework-PMGDuino",
-    "description": "Integration of Infineon's PMG1 microcontrollers with the Arduino framework",
-    "url": "https://www.infineon.com/cms/en/product/universal-serial-bus/usb-c-high-voltage-microcontrollers/",
-    "version": "0.0.1"
-}
