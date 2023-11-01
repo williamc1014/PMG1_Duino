@@ -276,11 +276,11 @@ const ifx_adc_vplus_t adc_VPLUS_mapping[IFX_DUINO_MAX_NUM_ADC] =
 #endif
 
 #ifndef LED_BUILTIN_PORT
-#define LED_BUILTIN_PORT  GPIO_PRT3
+#define LED_BUILTIN_PORT  GPIO_PRT5
 #endif
 
 #ifndef LED_BUILTIN_PIN_NUM
-#define LED_BUILTIN_PIN_NUM   3
+#define LED_BUILTIN_PIN_NUM   5
 #endif
 
 #ifndef LED_BUILTIN

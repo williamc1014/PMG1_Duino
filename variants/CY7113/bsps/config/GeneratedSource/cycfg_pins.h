@@ -196,16 +196,16 @@ extern "C" {
 #endif
 
 #define CYBSP_USER_LED_ENABLED 1U
-#define CYBSP_USER_LED_PORT GPIO_PRT7
-#define CYBSP_USER_LED_PORT_NUM 7U
+#define CYBSP_USER_LED_PORT GPIO_PRT5
+#define CYBSP_USER_LED_PORT_NUM 5U
 #define CYBSP_USER_LED_PIN 5U
 #define CYBSP_USER_LED_NUM 5U
 #define CYBSP_USER_LED_DRIVEMODE CY_GPIO_DM_STRONG
 #define CYBSP_USER_LED_INIT_DRIVESTATE 1
-#ifndef ioss_0_port_7_pin_5_HSIOM
-    #define ioss_0_port_7_pin_5_HSIOM HSIOM_SEL_GPIO
+#ifndef ioss_0_port_5_pin_5_HSIOM
+    #define ioss_0_port_5_pin_5_HSIOM HSIOM_SEL_GPIO
 #endif
-#define CYBSP_USER_LED_HSIOM ioss_0_port_7_pin_5_HSIOM
+#define CYBSP_USER_LED_HSIOM ioss_0_port_5_pin_5_HSIOM
 #define CYBSP_USER_LED_IRQ ioss_interrupt_gpio_IRQn
 #if defined (CY_USING_HAL)
     #define CYBSP_USER_LED_HAL_PORT_PIN P7_5
