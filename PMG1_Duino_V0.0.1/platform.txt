@@ -12,7 +12,7 @@ version=0.0.1
 # ---------
 build.core.path ={runtime.platform.path}/cores
 build.variant.path ={runtime.platform.path}/variants/{build.variant}
-build.commlib.path ={build.variant.path}/mtb_shared
+build.commlib.path ={runtime.platform.path}/cores/mtb_shared
 build.variant.config_path ={runtime.platform.path}/variants/{build.variant}/bsps/config/GeneratedSource
 build.flash_ld_path ={build.variant.path}/bsps/{build.flash_ld}
 build.assembly_file ={build.commlib.path}/mtb-pdl-cat2/release-v2.5.0/drivers/source/COMPONENT_CM0P/TOOLCHAIN_GCC_ARM/cy_syslib_gcc.S

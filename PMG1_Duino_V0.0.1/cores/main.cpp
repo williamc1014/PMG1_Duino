@@ -963,8 +963,8 @@ int main(void)
 	Cy_TCPWM_Counter_Init(TCPWM, 6, &CYBSP_SYS_TCNT_config);
     Cy_TCPWM_Counter_Enable(TCPWM, 6);
     Cy_TCPWM_TriggerStart(TCPWM, (1UL << 6));
-
-	Cy_GPIO_ClearInterrupt(APP_SWITCH_PORT, APP_SWITCH_NUM);
+	
+    Cy_GPIO_ClearInterrupt(APP_SWITCH_PORT, APP_SWITCH_NUM);
 	Cy_GPIO_SetInterruptEdge(APP_SWITCH_PORT, APP_SWITCH_NUM, CY_GPIO_INTR_FALLING);
 
 #if PMGDUINO_BOARD

@@ -41,20 +41,20 @@ extern "C" {
 #endif
 
 #define APP_SWITCH_ENABLED 1U
-#define APP_SWITCH_PORT GPIO_PRT1
-#define APP_SWITCH_PORT_NUM 1U
-#define APP_SWITCH_PIN 0U
-#define APP_SWITCH_NUM 0U
+#define APP_SWITCH_PORT GPIO_PRT3
+#define APP_SWITCH_PORT_NUM 3U
+#define APP_SWITCH_PIN 3U
+#define APP_SWITCH_NUM 3U
 #define APP_SWITCH_DRIVEMODE CY_GPIO_DM_PULLUP
 #define APP_SWITCH_INIT_DRIVESTATE 1
-#ifndef ioss_0_port_1_pin_0_HSIOM
-    #define ioss_0_port_1_pin_0_HSIOM HSIOM_SEL_GPIO
+#ifndef ioss_0_port_3_pin_3_HSIOM
+    #define ioss_0_port_3_pin_3_HSIOM HSIOM_SEL_GPIO
 #endif
-#define APP_SWITCH_HSIOM ioss_0_port_1_pin_0_HSIOM
+#define APP_SWITCH_HSIOM ioss_0_port_3_pin_3_HSIOM
 #define APP_SWITCH_IRQ ioss_interrupt_gpio_IRQn
 #if defined (CY_USING_HAL)
-    #define APP_SWITCH_HAL_PORT_PIN P1_0
-    #define APP_SWITCH P1_0
+    #define APP_SWITCH_HAL_PORT_PIN P3_3
+    #define APP_SWITCH P3_3
     #define APP_SWITCH_HAL_IRQ CYHAL_GPIO_IRQ_NONE
     #define APP_SWITCH_HAL_DIR CYHAL_GPIO_DIR_BIDIRECTIONAL 
     #define APP_SWITCH_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_PULLUP
