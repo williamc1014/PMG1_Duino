@@ -50,87 +50,37 @@ extern "C" {
 #define pass_0_sar_0_ENABLED 1U
 #define pass_0_sar_0_HW SAR0
 #define pass_0_sar_0_IRQ pass_0_interrupt_sar_IRQn
-#define pass_0_sar_0_VREF_MV 1200UL
+#define pass_0_sar_0_VREF_MV 1650UL
 #define pass_0_sarmux_0_tempsensor_0_ENABLED 1U
-#define CYBSP_DBG_UART_ENABLED 1U
-#define CYBSP_DBG_UART_HW SCB0
-#define CYBSP_DBG_UART_IRQ scb_0_interrupt_IRQn
-#define pwm0_ENABLED 1U
-#define pwm0_HW TCPWM
-#define pwm0_NUM 0UL
-#define pwm0_MASK (1UL << 0)
-#define pwm1_ENABLED 1U
-#define pwm1_HW TCPWM
-#define pwm1_NUM 1UL
-#define pwm1_MASK (1UL << 1)
-#define pwm2_ENABLED 1U
-#define pwm2_HW TCPWM
-#define pwm2_NUM 2UL
-#define pwm2_MASK (1UL << 2)
-#define pwm3_ENABLED 1U
-#define pwm3_HW TCPWM
-#define pwm3_NUM 3UL
-#define pwm3_MASK (1UL << 3)
-#define pwm4_ENABLED 1U
-#define pwm4_HW TCPWM
-#define pwm4_NUM 4UL
-#define pwm4_MASK (1UL << 4)
-#define pwm5_ENABLED 1U
-#define pwm5_HW TCPWM
-#define pwm5_NUM 5UL
-#define pwm5_MASK (1UL << 5)
-#define CYBSP_SYS_TCNT_ENABLED 1U
 #define CYBSP_SYS_TCNT_HW TCPWM
 #define CYBSP_SYS_TCNT_NUM 6UL
 #define CYBSP_SYS_TCNT_MASK (1UL << 6)
-#define pwm6_ENABLED 1U
-#define pwm6_HW TCPWM
-#define pwm6_NUM 7UL
-#define pwm6_MASK (1UL << 7)
+#define CYBSP_SYS_TCNT_IRQ tcpwm_interrupts_6_IRQn
+#define CYBSP_SYS_TCNT_INPUT_DISABLED 0x7U
 #define PD_PORT0_ENABLED 1U
 #define mtb_usbpd_port0_HW PDSS0
 #define mtb_usbpd_port0_HW_TRIM PDSS_TRIMS0
 #define mtb_usbpd_port0_IRQ usbpd_0_interrupt_IRQn
 #define mtb_usbpd_port0_DS_IRQ usbpd_0_interrupt_wakeup_IRQn
-#define PD_PORT1_ENABLED 1U
-#define mtb_usbpd_port1_HW PDSS1
-#define mtb_usbpd_port1_HW_TRIM PDSS_TRIMS1
-#define mtb_usbpd_port1_IRQ usbpd_1_interrupt_IRQn
-#define mtb_usbpd_port1_DS_IRQ usbpd_1_interrupt_wakeup_IRQn
 
-#if (0)
 extern const cy_stc_sar_channel_config_t pass_0_sar_0_channel_0_config;
+extern const cy_stc_sar_channel_config_t pass_0_sar_0_channel_1_config;
+extern const cy_stc_sar_channel_config_t pass_0_sar_0_channel_2_config;
 extern const cy_stc_sar_channel_config_t pass_0_sar_0_inj_channel_config;
 extern const cy_stc_sar_config_t pass_0_sar_0_config;
 #if defined (CY_USING_HAL)
     extern const cyhal_resource_inst_t pass_0_sar_0_obj;
 #endif //defined (CY_USING_HAL)
-
-extern const cy_stc_scb_uart_config_t CYBSP_DBG_UART_config;
-#if defined (CY_USING_HAL)
-    extern const cyhal_resource_inst_t CYBSP_DBG_UART_obj;
-#endif //defined (CY_USING_HAL)
-#endif
-
 extern const cy_stc_tcpwm_counter_config_t CYBSP_SYS_TCNT_config;
 #if defined (CY_USING_HAL)
     extern const cyhal_resource_inst_t CYBSP_SYS_TCNT_obj;
 #endif //defined (CY_USING_HAL)
-
 extern const cy_stc_fault_vbus_ovp_cfg_t mtb_usbpd_port0_ovp_config;
 extern const cy_stc_fault_vbus_ocp_cfg_t mtb_usbpd_port0_ocp_config;
 extern const cy_stc_fault_vbus_scp_cfg_t mtb_usbpd_port0_scp_config;
 extern const cy_stc_fault_vbus_rcp_cfg_t mtb_usbpd_port0_rcp_config;
 extern const cy_stc_fault_vconn_ocp_cfg_t mtb_usbpd_port0_vconn_ocp_config;
 extern const cy_stc_usbpd_config_t mtb_usbpd_port0_config;
-
-#if (0)
-extern const cy_stc_fault_vbus_ovp_cfg_t mtb_usbpd_port1_ovp_config;
-extern const cy_stc_fault_vbus_ocp_cfg_t mtb_usbpd_port1_ocp_config;
-extern const cy_stc_fault_vbus_scp_cfg_t mtb_usbpd_port1_scp_config;
-extern const cy_stc_fault_vbus_rcp_cfg_t mtb_usbpd_port1_rcp_config;
-extern const cy_stc_usbpd_config_t mtb_usbpd_port1_config;
-#endif
 
 void init_cycfg_peripherals(void);
 void reserve_cycfg_peripherals(void);

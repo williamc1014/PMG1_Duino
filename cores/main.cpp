@@ -233,6 +233,11 @@ const cy_stc_sysint_t gpio_intr_config = {
     .intrPriority = 3u
 };
 
+const cy_stc_sysint_t sys_fw_tick_intr_config = {
+    .intrSrc = tcpwm_interrupts_6_IRQn,
+    .intrPriority = 3u
+};
+
 cy_stc_pdstack_context_t *get_pdstack_context(uint8_t portIdx)
 {
     return (gl_PdStackContexts[portIdx]);
@@ -362,6 +367,14 @@ static void cy_gpio_intr_handler(void)
 	// Trigger an OS event
 	xSemaphoreGiveFromISR( gl_GpioSemaHandle, &xHigherPriorityTaskWoken);
 	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+}
+
+extern uint32_t millSecondCnt;
+
+static void cy_fw_tick_handler(void)
+{
+    millSecondCnt ++;    
+    Cy_TCPWM_ClearInterrupt(TCPWM, 6, CY_TCPWM_INT_ON_TC);
 }
 
 #if APP_FW_LED_ENABLE
@@ -905,6 +918,11 @@ int main(void)
     NVIC_ClearPendingIRQ(gpio_intr_config.intrSrc);
     NVIC_EnableIRQ(gpio_intr_config.intrSrc);
 
+    // register system firmware tick handler here
+    Cy_SysInt_Init(&sys_fw_tick_intr_config, cy_fw_tick_handler);
+    NVIC_ClearPendingIRQ(sys_fw_tick_intr_config.intrSrc);
+    NVIC_EnableIRQ(sys_fw_tick_intr_config.intrSrc);
+
     /* Initialize the USBPD driver */
 #if defined(CY_DEVICE_CCG3)
     Cy_USBPD_Init(&gl_UsbPdPort0Ctx, 0, mtb_usbpd_port0_HW, NULL,
@@ -962,19 +980,18 @@ int main(void)
     // timer counter for mills API
 	Cy_TCPWM_Counter_Init(TCPWM, 6, &CYBSP_SYS_TCNT_config);
     Cy_TCPWM_Counter_Enable(TCPWM, 6);
+    Cy_TCPWM_SetInterrupt(TCPWM, 6, CY_TCPWM_INT_ON_TC);
     Cy_TCPWM_TriggerStart(TCPWM, (1UL << 6));
 	
     Cy_GPIO_ClearInterrupt(APP_SWITCH_PORT, APP_SWITCH_NUM);
 	Cy_GPIO_SetInterruptEdge(APP_SWITCH_PORT, APP_SWITCH_NUM, CY_GPIO_INTR_FALLING);
 
-#if PMGDUINO_BOARD
     if (Cy_SAR_Init(SAR0, &pass_0_sar_0_config) != CY_SAR_SUCCESS)
     {
         CY_ASSERT(0);
     }    
 
     Cy_SAR_Enable(SAR0);
-#endif
 
     setup();
 

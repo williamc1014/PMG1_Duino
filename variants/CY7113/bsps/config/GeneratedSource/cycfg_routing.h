@@ -38,30 +38,13 @@ void init_cycfg_routing(void);
 
 #define ioss_0_port_1_pin_1_HSIOM P1_1_CPUSS_SWD_CLK
 #define ioss_0_port_1_pin_2_HSIOM P1_2_CPUSS_SWD_DATA
-#define ioss_0_port_2_pin_0_ANALOG P2_0_PASS0_SARMUX_PADS0
+#define ioss_0_port_2_pin_1_ANALOG P2_1_PASS0_SARMUX_PADS1
 #define ioss_0_port_2_pin_2_ANALOG P2_2_PASS0_SARMUX_PADS2
-#define ioss_0_port_2_pin_3_ANALOG P2_3_PASS0_SARMUX_PADS3
-#define ioss_0_port_2_pin_4_ANALOG P2_4_PASS0_SARMUX_PADS4
-#define ioss_0_port_2_pin_5_ANALOG P2_5_PASS0_SARMUX_PADS5
-#define ioss_0_port_2_pin_6_ANALOG P2_6_PASS0_SARMUX_PADS6
-#define ioss_0_port_2_pin_7_ANALOG P2_7_PASS0_SARMUX_PADS7
-#define ioss_0_port_4_pin_0_HSIOM P4_0_SCB0_UART_RX
-#define ioss_0_port_4_pin_1_HSIOM P4_1_SCB0_UART_TX
 
-#define SAR0_VPLUS0_PIN 4
+#define SAR0_VPLUS0_PIN 2
 #define SAR0_VPLUS0_PORT 0
-#define SAR0_VPLUS1_PIN 7
+#define SAR0_VPLUS1_PIN 1
 #define SAR0_VPLUS1_PORT 0
-#define SAR0_VPLUS2_PIN 2
-#define SAR0_VPLUS2_PORT 0
-#define SAR0_VPLUS3_PIN 5
-#define SAR0_VPLUS3_PORT 0
-#define SAR0_VPLUS4_PIN 3
-#define SAR0_VPLUS4_PORT 0
-#define SAR0_VPLUS5_PIN 0
-#define SAR0_VPLUS5_PORT 0
-#define SAR0_VPLUS6_PIN 6
-#define SAR0_VPLUS6_PORT 0
 #define SAR0_VPLUS16_PIN 0
 #define SAR0_VPLUS16_PORT 7
 

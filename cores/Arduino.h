@@ -57,6 +57,30 @@ typedef struct
   uint8_t vplus_pin;
 } ifx_adc_vplus_t;
 
+const cy_stc_gpio_pin_config_t ioss_adc_pin_config = 
+{
+  .outVal = 1,
+  .driveMode = CY_GPIO_DM_ANALOG,
+  .hsiom = HSIOM_SEL_GPIO,
+  .intEdge = CY_GPIO_INTR_DISABLE,
+  .vtrip = CY_GPIO_VTRIP_CMOS,
+  .slewRate = CY_GPIO_SLEW_FAST,
+};
+
+#ifndef HSIOM_SEL_PWM
+#define HSIOM_SEL_PWM (en_hsiom_sel_t)8
+#endif
+
+const cy_stc_gpio_pin_config_t ioss_pwm_pin_config = 
+{
+  .outVal = 1,
+  .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+  .hsiom = HSIOM_SEL_PWM,
+  .intEdge = CY_GPIO_INTR_DISABLE,
+  .vtrip = CY_GPIO_VTRIP_CMOS,
+  .slewRate = CY_GPIO_SLEW_FAST,
+};
+
 #if PMGDUINO_BOARD
 
 #define D0    0
@@ -211,13 +235,14 @@ const uint32_t adc_routing_mask[7] = {1, 4, 8, 16, 32, 64, 128};
 
 const ifx_adc_vplus_t adc_VPLUS_mapping[IFX_DUINO_MAX_NUM_ADC] = 
 {
-  {SAR0_VPLUS0_PORT, SAR0_VPLUS0_PIN},
-  {SAR0_VPLUS1_PORT, SAR0_VPLUS1_PIN},
-  {SAR0_VPLUS2_PORT, SAR0_VPLUS2_PIN},
-  {SAR0_VPLUS3_PORT, SAR0_VPLUS3_PIN},
-  {SAR0_VPLUS4_PORT, SAR0_VPLUS4_PIN},
-  {SAR0_VPLUS5_PORT, SAR0_VPLUS5_PIN},
-  {SAR0_VPLUS6_PORT, SAR0_VPLUS6_PIN}
+//{VPLUS_PORT, VPLUS_PIN}  
+  {0, 4},
+  {0, 7},
+  {0, 2},
+  {0, 5},
+  {0, 3},
+  {0, 0},
+  {0, 6}
 };
 
 #endif
@@ -332,7 +357,6 @@ const ifx_pwm_port_pin_t pwm_pin_mapping[IFX_DUINO_MAX_NUM_PWM] =
   {15, 0},   // D15, PWM0
   {17, 4},   // D17, PWM4
   {18, 5}    // D18, PWM5
-
 };
 
 #ifndef pwm_INPUT_DISABLED
@@ -372,8 +396,9 @@ const uint32_t adc_routing_mask[7] = {1, 4, 8, 16, 32, 64, 128};
 
 const ifx_adc_vplus_t adc_VPLUS_mapping[IFX_DUINO_MAX_NUM_ADC] = 
 {
-  {SAR0_VPLUS0_PORT, SAR0_VPLUS0_PIN},
-  {SAR0_VPLUS1_PORT, SAR0_VPLUS1_PIN}
+//{VPLUS_PORT, VPLUS_PIN}    
+  {0, 2},
+  {0, 1}
 };
 
 #endif

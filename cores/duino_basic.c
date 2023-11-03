@@ -10,12 +10,12 @@ void pinMode(uint8_t pin, uint8_t mode)
     Cy_GPIO_SetHSIOM(gpio_pin_mapping[pin].port, gpio_pin_mapping[pin].pin, HSIOM_SEL_GPIO);
     Cy_GPIO_SetVtrip(gpio_pin_mapping[pin].port, CY_GPIO_VTRIP_CMOS);
     Cy_GPIO_SetSlewRate(gpio_pin_mapping[pin].port, CY_GPIO_SLEW_FAST);
+    Cy_GPIO_Write(gpio_pin_mapping[pin].port, gpio_pin_mapping[pin].pin, 1);
 
     switch(mode)
     {
         case INPUT:
         case INPUT_PULLUP:
-            Cy_GPIO_Write(gpio_pin_mapping[pin].port, gpio_pin_mapping[pin].pin, 1);
         case OUTPUT:
             Cy_GPIO_SetDrivemode(gpio_pin_mapping[pin].port, gpio_pin_mapping[pin].pin, mode);
         default:
@@ -195,11 +195,7 @@ void tone(uint8_t pin, unsigned int frequency)
         return;
     
     // configure pin
-    Cy_GPIO_SetDrivemode(gpio_pin_mapping[pin].port, gpio_pin_mapping[pin].pin, CY_GPIO_DM_STRONG_IN_OFF);
-    Cy_GPIO_Write(gpio_pin_mapping[pin].port, gpio_pin_mapping[pin].pin, 1);
-    Cy_GPIO_SetHSIOM(gpio_pin_mapping[pin].port, gpio_pin_mapping[pin].pin, HSIOM_SEL_PWM);
-    Cy_GPIO_SetVtrip(gpio_pin_mapping[pin].port, CY_GPIO_VTRIP_CMOS);
-    Cy_GPIO_SetSlewRate(gpio_pin_mapping[pin].port, CY_GPIO_SLEW_FAST);
+    Cy_GPIO_Pin_Init(gpio_pin_mapping[pin].port, gpio_pin_mapping[pin].pin, &ioss_pwm_pin_config);
 
     // configure clocks
     Cy_SysClk_PeriphAssignDivider((PCLK_TCPWM_CLOCKS0 + pwmNum), CY_SYSCLK_DIV_8_BIT, 4U);
@@ -254,48 +250,37 @@ void noTone(uint8_t pin)
 uint16_t analogRead(uint8_t pin)
 {
     uint8_t adcPin = 0;
+    uint16_t val;
 
     if (pin < A0 || pin > (A0 + IFX_DUINO_MAX_NUM_ADC))
         return 0;
     
     adcPin = pin - A0;
-
+    
     // configure pin
-    /*Cy_GPIO_SetDrivemode(gpio_pin_mapping[pin].port, gpio_pin_mapping[pin].pin, CY_GPIO_DM_ANALOG);
-    Cy_GPIO_Write(gpio_pin_mapping[pin].port, gpio_pin_mapping[pin].pin, 1);
-    Cy_GPIO_SetHSIOM(gpio_pin_mapping[pin].port, gpio_pin_mapping[pin].pin, HSIOM_SEL_GPIO);
-    Cy_GPIO_SetVtrip(gpio_pin_mapping[pin].port, CY_GPIO_VTRIP_CMOS);
-    Cy_GPIO_SetSlewRate(gpio_pin_mapping[pin].port, CY_GPIO_SLEW_FAST);
-    */
-    
-
-    // configure clocks
-    Cy_SysClk_PeriphAssignDivider(PCLK_PASS0_CLOCK_SAR, CY_SYSCLK_DIV_8_BIT, 8U);
-
-    // configure channel config register
-    /*SAR0->CHAN_CONFIG[adcPin] = (cy_en_sar_chan_config_port_pin_addr_t)(adc_VPLUS_mapping[adcPin].vplus_pin | (adc_VPLUS_mapping[adcPin].vplus_port << SAR_CHAN_CONFIG_PORT_ADDR_Pos)) |
-                                _BOOL2FLD(SAR_CHAN_CONFIG_DIFFERENTIAL_EN, false) |
-                                _VAL2FLD(SAR_CHAN_CONFIG_RESOLUTION, CY_SAR_MAX_RES) |
-                                _BOOL2FLD(SAR_CHAN_CONFIG_AVG_EN, true) |
-                                _VAL2FLD(SAR_CHAN_CONFIG_SAMPLE_TIME_SEL, (adcPin == 0) ? CY_SAR_SAMPLE_TIME_0 : CY_SAR_SAMPLE_TIME_1);
-    
-    // configure MUX
-    SAR0->MUX_SWITCH_HW_CTRL |= adc_routing_mask[adcPin];
-    SAR0->MUX_SWITCH0 |= adc_routing_mask[adcPin];
+    Cy_GPIO_Pin_Init(gpio_pin_mapping[pin].port, gpio_pin_mapping[pin].pin, &ioss_adc_pin_config);
 
     // enable channel
     SAR0->CHAN_EN |= (1UL << adcPin); 
-
     
-    */
     Cy_SAR_StartConvert(SAR0, CY_SAR_START_CONVERT_SINGLE_SHOT);
-    digitalWrite(LED_BUILTIN, HIGH);
-    //delay(500);
+
 	// wait for the conversion complete
 	while (Cy_SAR_IsEndConversion(SAR0, CY_SAR_RETURN_STATUS) != CY_SAR_SUCCESS) {}
-    digitalWrite(LED_BUILTIN, LOW);
-	// return the conversation read back value
-	return Cy_SAR_GetResult16(SAR0, adcPin);
+
+	// read converted value
+	val = Cy_SAR_GetResult16(SAR0, adcPin);
+
+    SAR0->CHAN_EN &= ~(1UL << adcPin); 
+
+    return val;
+}
+void analogReference(uint8_t type)
+{
+    if ((type != AR_DEFAULT) && (type != AR_INTERNAL) && (type != AR_VDD))
+        return;
+    
+    SAR0->CTRL = ((SAR0->CTRL & 0xFFFFFF8F) | (type << 4)); 
 }
 
 void analogWrite(uint8_t pin, uint8_t value)
@@ -304,7 +289,7 @@ void analogWrite(uint8_t pin, uint8_t value)
 	cy_en_tcpwm_status_t pwm_result;
 	uint32_t new_period,new_duty;
 	new_period = (48000000 / 128 / 490);
-    new_duty=(255-value)*8;
+    new_duty=(value * 3); //(256-value)*8;
 
     uint8_t pwmNum = pinToPwmNum(pin);
 
@@ -313,11 +298,7 @@ void analogWrite(uint8_t pin, uint8_t value)
         return;
 
     // configure pin
-    Cy_GPIO_SetDrivemode(gpio_pin_mapping[pin].port, gpio_pin_mapping[pin].pin, CY_GPIO_DM_STRONG_IN_OFF);
-    Cy_GPIO_Write(gpio_pin_mapping[pin].port, gpio_pin_mapping[pin].pin, 1);
-    Cy_GPIO_SetHSIOM(gpio_pin_mapping[pin].port, gpio_pin_mapping[pin].pin, HSIOM_SEL_PWM);
-    Cy_GPIO_SetVtrip(gpio_pin_mapping[pin].port, CY_GPIO_VTRIP_CMOS);
-    Cy_GPIO_SetSlewRate(gpio_pin_mapping[pin].port, CY_GPIO_SLEW_FAST);
+    Cy_GPIO_Pin_Init(gpio_pin_mapping[pin].port, gpio_pin_mapping[pin].pin, &ioss_pwm_pin_config);
 
     // configure clocks
     Cy_SysClk_PeriphAssignDivider((PCLK_TCPWM_CLOCKS0 + pwmNum), CY_SYSCLK_DIV_8_BIT, 4U);
@@ -342,12 +323,14 @@ void analogWrite(uint8_t pin, uint8_t value)
 	Cy_TCPWM_TriggerReloadOrIndex(TCPWM, (1UL << pwmNum));
 }
 
+uint32_t millSecondCnt = 0;
+
 uint32_t mills()
 {
-    return Cy_TCPWM_Counter_GetCounter(TCPWM, 6);
+    return millSecondCnt;
 }
 
 uint32_t micros()
 {
-    return 0;
+    return (millSecondCnt * 1000) + Cy_TCPWM_Counter_GetCounter(TCPWM, 6);
 }

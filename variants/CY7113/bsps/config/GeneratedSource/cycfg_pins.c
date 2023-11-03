@@ -80,98 +80,6 @@ const cy_stc_gpio_pin_config_t CYBSP_SWDIO_config =
     };
 #endif //defined (CY_USING_HAL)
 
-#if (0)
-const cy_stc_gpio_pin_config_t CYBSP_DEBUG_UART_RX_config = 
-{
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_HIGHZ,
-    .hsiom = CYBSP_DEBUG_UART_RX_HSIOM,
-    .intEdge = CY_GPIO_INTR_DISABLE,
-    .vtrip = CY_GPIO_VTRIP_CMOS,
-    .slewRate = CY_GPIO_SLEW_FAST,
-};
-#if defined (CY_USING_HAL)
-    const cyhal_resource_inst_t CYBSP_DEBUG_UART_RX_obj = 
-    {
-        .type = CYHAL_RSC_GPIO,
-        .block_num = CYBSP_DEBUG_UART_RX_PORT_NUM,
-        .channel_num = CYBSP_DEBUG_UART_RX_PIN,
-    };
-#endif //defined (CY_USING_HAL)
-const cy_stc_gpio_pin_config_t CYBSP_DEBUG_UART_TX_config = 
-{
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
-    .hsiom = CYBSP_DEBUG_UART_TX_HSIOM,
-    .intEdge = CY_GPIO_INTR_DISABLE,
-    .vtrip = CY_GPIO_VTRIP_CMOS,
-    .slewRate = CY_GPIO_SLEW_FAST,
-};
-#if defined (CY_USING_HAL)
-    const cyhal_resource_inst_t CYBSP_DEBUG_UART_TX_obj = 
-    {
-        .type = CYHAL_RSC_GPIO,
-        .block_num = CYBSP_DEBUG_UART_TX_PORT_NUM,
-        .channel_num = CYBSP_DEBUG_UART_TX_PIN,
-    };
-#endif //defined (CY_USING_HAL)
-
-
-const cy_stc_gpio_pin_config_t PFET_SNK_CTRL_P0_config = 
-{
-    .outVal = 0,
-    .driveMode = CY_GPIO_DM_STRONG,
-    .hsiom = PFET_SNK_CTRL_P0_HSIOM,
-    .intEdge = CY_GPIO_INTR_DISABLE,
-    .vtrip = CY_GPIO_VTRIP_CMOS,
-    .slewRate = CY_GPIO_SLEW_FAST,
-};
-#if defined (CY_USING_HAL)
-    const cyhal_resource_inst_t PFET_SNK_CTRL_P0_obj = 
-    {
-        .type = CYHAL_RSC_GPIO,
-        .block_num = PFET_SNK_CTRL_P0_PORT_NUM,
-        .channel_num = PFET_SNK_CTRL_P0_PIN,
-    };
-#endif //defined (CY_USING_HAL)
-
-const cy_stc_gpio_pin_config_t PFET_SNK_CTRL_P1_config = 
-{
-    .outVal = 0,
-    .driveMode = CY_GPIO_DM_STRONG,
-    .hsiom = PFET_SNK_CTRL_P1_HSIOM,
-    .intEdge = CY_GPIO_INTR_DISABLE,
-    .vtrip = CY_GPIO_VTRIP_CMOS,
-    .slewRate = CY_GPIO_SLEW_FAST,
-};
-#if defined (CY_USING_HAL)
-    const cyhal_resource_inst_t PFET_SNK_CTRL_P1_obj = 
-    {
-        .type = CYHAL_RSC_GPIO,
-        .block_num = PFET_SNK_CTRL_P1_PORT_NUM,
-        .channel_num = PFET_SNK_CTRL_P1_PIN,
-    };
-#endif //defined (CY_USING_HAL)
-
-const cy_stc_gpio_pin_config_t TEST_LED_1_config = 
-{
-    .outVal = 0,
-    .driveMode = CY_GPIO_DM_STRONG,
-    .hsiom = TEST_LED_1_HSIOM,
-    .intEdge = CY_GPIO_INTR_DISABLE,
-    .vtrip = CY_GPIO_VTRIP_CMOS,
-    .slewRate = CY_GPIO_SLEW_FAST,
-};
-#if defined (CY_USING_HAL)
-    const cyhal_resource_inst_t TEST_LED_1_obj = 
-    {
-        .type = CYHAL_RSC_GPIO,
-        .block_num = TEST_LED_1_PORT_NUM,
-        .channel_num = TEST_LED_1_PIN,
-    };
-#endif //defined (CY_USING_HAL)
-#endif
-
 const cy_stc_gpio_pin_config_t CYBSP_USER_LED_config = 
 {
     .outVal = 1,
@@ -190,55 +98,14 @@ const cy_stc_gpio_pin_config_t CYBSP_USER_LED_config =
     };
 #endif //defined (CY_USING_HAL)
 
-#if (0)
-const cy_stc_gpio_pin_config_t TEST_LED_config = 
-{
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG,
-    .hsiom = TEST_LED_HSIOM,
-    .intEdge = CY_GPIO_INTR_DISABLE,
-    .vtrip = CY_GPIO_VTRIP_CMOS,
-    .slewRate = CY_GPIO_SLEW_FAST,
-};
-#if defined (CY_USING_HAL)
-    const cyhal_resource_inst_t TEST_LED_obj = 
-    {
-        .type = CYHAL_RSC_GPIO,
-        .block_num = TEST_LED_PORT_NUM,
-        .channel_num = TEST_LED_PIN,
-    };
-#endif //defined (CY_USING_HAL)
 
-const cy_stc_gpio_pin_config_t ioss_0_port_2_pin_4_config = 
-{
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_ANALOG,
-    .hsiom = ioss_0_port_2_pin_4_HSIOM,
-    .intEdge = CY_GPIO_INTR_DISABLE,
-    .vtrip = CY_GPIO_VTRIP_CMOS,
-    .slewRate = CY_GPIO_SLEW_FAST,
-};
-#endif
 
 void init_cycfg_pins(void)
 {
-#if (0)
-    Cy_GPIO_Pin_Init(ioss_0_port_2_pin_4_PORT, ioss_0_port_2_pin_4_PIN, &ioss_0_port_2_pin_4_config);
-#endif
     Cy_GPIO_Pin_Init(APP_SWITCH_PORT, APP_SWITCH_PIN, &APP_SWITCH_config);
     Cy_GPIO_Pin_Init(CYBSP_SWCLK_PORT, CYBSP_SWCLK_PIN, &CYBSP_SWCLK_config);
     Cy_GPIO_Pin_Init(CYBSP_SWDIO_PORT, CYBSP_SWDIO_PIN, &CYBSP_SWDIO_config);
-#if (0)
-    Cy_GPIO_Pin_Init(CYBSP_DEBUG_UART_RX_PORT, CYBSP_DEBUG_UART_RX_PIN, &CYBSP_DEBUG_UART_RX_config);
-    Cy_GPIO_Pin_Init(CYBSP_DEBUG_UART_TX_PORT, CYBSP_DEBUG_UART_TX_PIN, &CYBSP_DEBUG_UART_TX_config);
-    Cy_GPIO_Pin_Init(PFET_SNK_CTRL_P0_PORT, PFET_SNK_CTRL_P0_PIN, &PFET_SNK_CTRL_P0_config);
-    Cy_GPIO_Pin_Init(PFET_SNK_CTRL_P1_PORT, PFET_SNK_CTRL_P1_PIN, &PFET_SNK_CTRL_P1_config);
-    Cy_GPIO_Pin_Init(TEST_LED_1_PORT, TEST_LED_1_PIN, &TEST_LED_1_config);
-#endif
     Cy_GPIO_Pin_Init(CYBSP_USER_LED_PORT, CYBSP_USER_LED_PIN, &CYBSP_USER_LED_config);
-#if (0)
-    Cy_GPIO_Pin_Init(TEST_LED_PORT, TEST_LED_PIN, &TEST_LED_config);
-#endif
 }
 
 void reserve_cycfg_pins(void)
@@ -247,16 +114,10 @@ void reserve_cycfg_pins(void)
     cyhal_hwmgr_reserve(&APP_SWITCH_obj);
     cyhal_hwmgr_reserve(&CYBSP_SWCLK_obj);
     cyhal_hwmgr_reserve(&CYBSP_SWDIO_obj);
-#if (0)
-    cyhal_hwmgr_reserve(&CYBSP_DEBUG_UART_RX_obj);
-    cyhal_hwmgr_reserve(&CYBSP_DEBUG_UART_TX_obj);
+    cyhal_hwmgr_reserve(&ioss_0_port_2_pin_1_obj);
+    cyhal_hwmgr_reserve(&ioss_0_port_2_pin_2_obj);
     cyhal_hwmgr_reserve(&PFET_SNK_CTRL_P0_obj);
     cyhal_hwmgr_reserve(&PFET_SNK_CTRL_P1_obj);
-    cyhal_hwmgr_reserve(&TEST_LED_1_obj);
-#endif
     cyhal_hwmgr_reserve(&CYBSP_USER_LED_obj);
-#if (0)
-    cyhal_hwmgr_reserve(&TEST_LED_obj);
-#endif
 #endif //defined (CY_USING_HAL)
 }

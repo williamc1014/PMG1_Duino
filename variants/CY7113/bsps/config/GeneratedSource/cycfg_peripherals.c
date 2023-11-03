@@ -30,7 +30,6 @@
 
 #define CYBSP_SYS_TCNT_INPUT_DISABLED 0x7U
 
-#if (0)
 const cy_stc_sar_channel_config_t pass_0_sar_0_channel_0_config = 
 {
     .addr = (cy_en_sar_chan_config_port_pin_addr_t)(SAR0_VPLUS0_PIN | (SAR0_VPLUS0_PORT << SAR_CHAN_CONFIG_PORT_ADDR_Pos)),
@@ -41,7 +40,16 @@ const cy_stc_sar_channel_config_t pass_0_sar_0_channel_0_config =
     .rangeIntrEn = false,
     .satIntrEn = false,
 };
-
+const cy_stc_sar_channel_config_t pass_0_sar_0_channel_1_config = 
+{
+    .addr = (cy_en_sar_chan_config_port_pin_addr_t)(SAR0_VPLUS1_PIN | (SAR0_VPLUS1_PORT << SAR_CHAN_CONFIG_PORT_ADDR_Pos)),
+    .differential = false,
+    .resolution = CY_SAR_MAX_RES,
+    .avgEn = true,
+    .sampleTimeSel = CY_SAR_SAMPLE_TIME_1,
+    .rangeIntrEn = false,
+    .satIntrEn = false,
+};
 const cy_stc_sar_channel_config_t pass_0_sar_0_inj_channel_config = 
 {
     .addr = (cy_en_sar_chan_config_port_pin_addr_t)(SAR0_VPLUS16_PIN | (SAR0_VPLUS16_PORT << SAR_CHAN_CONFIG_PORT_ADDR_Pos)),
@@ -52,13 +60,14 @@ const cy_stc_sar_channel_config_t pass_0_sar_0_inj_channel_config =
     .rangeIntrEn = false,
     .satIntrEn = false,
 };
+
 const cy_stc_sar_config_t pass_0_sar_0_config = 
 {
-    .vrefSel = CY_SAR_VREF_SEL_VDDA_DIV_2,
-    .vrefBypCapEn = false,
+    .vrefSel = CY_SAR_VREF_SEL_BGR,
+    .vrefBypCapEn = true,
     .negSel = CY_SAR_NEG_SEL_VREF,
     .negVref = CY_SAR_NEGVREF_HW,
-    .boostPump = true,
+    .boostPump = false,
     .power = CY_SAR_QUARTER_PWR,
     .sarMuxDsEn = false,
     .switchDisable = false,
@@ -77,8 +86,8 @@ const cy_stc_sar_config_t pass_0_sar_0_config =
     .rangeThresLow = 0UL,
     .rangeThresHigh = 0UL,
     .rangeCond = CY_SAR_RANGE_COND_BELOW,
-    .chanEn = 65537UL,
-    .channelConfig = {&pass_0_sar_0_channel_0_config, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &pass_0_sar_0_inj_channel_config},
+    .chanEn = 65536UL,
+    .channelConfig = {&pass_0_sar_0_channel_0_config, &pass_0_sar_0_channel_1_config, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &pass_0_sar_0_inj_channel_config},
     .routingConfig = NULL,
     .vrefMvValue = pass_0_sar_0_VREF_MV,
 };
@@ -90,57 +99,18 @@ const cy_stc_sar_config_t pass_0_sar_0_config =
         .channel_num = 0,
     };
 #endif //defined (CY_USING_HAL)
-const cy_stc_scb_uart_config_t CYBSP_DBG_UART_config = 
-{
-    .uartMode = CY_SCB_UART_STANDARD,
-    .enableMutliProcessorMode = false,
-    .smartCardRetryOnNack = false,
-    .irdaInvertRx = false,
-    .irdaEnableLowPowerReceiver = false,
-    .enableLinMode = false,
-    .oversample = 8,
-    .enableMsbFirst = false,
-    .dataWidth = 8UL,
-    .parity = CY_SCB_UART_PARITY_NONE,
-    .stopBits = CY_SCB_UART_STOP_BITS_1,
-    .enableInputFilter = false,
-    .breakWidth = 11UL,
-    .dropOnFrameError = false,
-    .dropOnParityError = false,
-    .receiverAddress = 0x0UL,
-    .receiverAddressMask = 0x0UL,
-    .acceptAddrInFifo = false,
-    .enableCts = false,
-    .ctsPolarity = CY_SCB_UART_ACTIVE_LOW,
-    .rtsRxFifoLevel = 0UL,
-    .rtsPolarity = CY_SCB_UART_ACTIVE_LOW,
-    .rxFifoTriggerLevel = 7UL,
-    .rxFifoIntEnableMask = 0UL,
-    .txFifoTriggerLevel = 0UL,
-    .txFifoIntEnableMask = 0UL,
-};
-#if defined (CY_USING_HAL)
-    const cyhal_resource_inst_t CYBSP_DBG_UART_obj = 
-    {
-        .type = CYHAL_RSC_SCB,
-        .block_num = 0U,
-        .channel_num = 0U,
-    };
-#endif //defined (CY_USING_HAL)
-
-#endif // #if (0)
 
 const cy_stc_tcpwm_counter_config_t CYBSP_SYS_TCNT_config = 
 {
-    .period = 32768,
+    .period = 1000,
     .clockPrescaler = CY_TCPWM_COUNTER_PRESCALER_DIVBY_1,
     .runMode = CY_TCPWM_COUNTER_CONTINUOUS,
     .countDirection = CY_TCPWM_COUNTER_COUNT_UP,
     .compareOrCapture = CY_TCPWM_COUNTER_MODE_CAPTURE,
-    .compare0 = 16384,
+    .compare0 = 1000,
     .compare1 = 16384,
     .enableCompareSwap = false,
-    .interruptSources = CY_TCPWM_INT_NONE,
+    .interruptSources = CY_TCPWM_INT_ON_TC,
     .captureInputMode = CYBSP_SYS_TCNT_INPUT_DISABLED & 0x3U,
     .captureInput = CY_TCPWM_INPUT_0,
     .reloadInputMode = CYBSP_SYS_TCNT_INPUT_DISABLED & 0x3U,
@@ -211,53 +181,6 @@ const cy_stc_usbpd_config_t mtb_usbpd_port0_config =
     .legacyChargingConfig = NULL,
     .buckBoostConfig = NULL,
 };
-
-#if (0)
-const cy_stc_fault_vbus_ovp_cfg_t mtb_usbpd_port1_ovp_config = 
-{
-    .enable = true,
-    .mode = 2,
-    .threshold = 20,
-    .debounce = 10,
-    .retryCount = 2,
-};
-const cy_stc_fault_vbus_ocp_cfg_t mtb_usbpd_port1_ocp_config = 
-{
-    .enable = true,
-    .mode = 1,
-    .threshold = 20,
-    .debounce = 10,
-    .retryCount = 2,
-    .senseRes = 5,
-};
-const cy_stc_fault_vbus_scp_cfg_t mtb_usbpd_port1_scp_config = 
-{
-    .enable = true,
-    .mode = 2,
-    .senseRes = 5,
-    .threshold = 6,
-    .debounce = 10,
-    .retryCount = 2,
-};
-const cy_stc_fault_vbus_rcp_cfg_t mtb_usbpd_port1_rcp_config = 
-{
-    .enable = true,
-    .retryCount = 2,
-};
-const cy_stc_usbpd_config_t mtb_usbpd_port1_config = 
-{
-    .vbusOvpConfig = &mtb_usbpd_port1_ovp_config,
-    .vbusUvpConfig = NULL,
-    .vbusOcpConfig = &mtb_usbpd_port1_ocp_config,
-    .vbusScpConfig = &mtb_usbpd_port1_scp_config,
-    .vbusRcpConfig = &mtb_usbpd_port1_rcp_config,
-    .vconnOcpConfig = NULL,
-    .ccOvpConfig = NULL,
-    .sbuOvpConfig = NULL,
-    .legacyChargingConfig = NULL,
-    .buckBoostConfig = NULL,
-};
-#endif // #if (0)
 
 void init_cycfg_peripherals(void)
 {

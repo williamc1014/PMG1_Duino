@@ -29,10 +29,13 @@ typedef unsigned char   byte;
 #define OUTPUT          CY_GPIO_DM_STRONG   // 6
 #define INPUT_PULLUP    CY_GPIO_DM_PULLUP   // 2
 
-
 #define CHANGE          CY_GPIO_INTR_BOTH       // 3
 #define RISING          CY_GPIO_INTR_RISING     // 1
 #define FALLING         CY_GPIO_INTR_FALLING    // 2
+
+#define AR_DEFAULT      CY_SAR_VREF_SEL_BGR
+#define AR_INTERNAL     CY_SAR_VREF_SEL_BGR
+#define AR_VDD          CY_SAR_VREF_SEL_VDDA_DIV_2
 
 void        pinMode(uint8_t pin, uint8_t mode);
 void        digitalWrite(uint8_t pin, uint8_t value);
@@ -54,6 +57,7 @@ void        tone(uint8_t pin, unsigned int grequency);
 void        noTone(uint8_t pin);
 
 uint16_t    analogRead(uint8_t pin);
+void        analogReference(uint8_t type);
 void        analogWrite(uint8_t pin, uint8_t value);
 
 uint32_t    micros();
