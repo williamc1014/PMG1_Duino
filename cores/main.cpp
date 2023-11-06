@@ -76,9 +76,10 @@ extern "C" {
 #include <Arduino.h>
 #endif
 
+
+
 #if DEBUG_LOG
-#include "debug.h"
-static cy_stc_scb_uart_context_t uartContext;
+#include "Serial.h"
 #endif
 
 #if CY_PD_EPR_ENABLE
@@ -743,7 +744,7 @@ void Instrumentation_Task(void *param)
                                             (unsigned int)gl_DPMTaskCount, (unsigned int)gl_FaultTaskCount);
             (void)stringSize;
             
-            debug_print(string);
+            uart_print(0, string);
 #endif
 
             preAppTaskCount = gl_APPTaskCount;
@@ -823,7 +824,6 @@ int main(void)
     cy_rslt_t result;
     cy_stc_pdutils_timer_config_t timerConfig;
     /* Allocate context for UART operation */
-    
 
     result = cybsp_init() ;
     if (result != CY_RSLT_SUCCESS)
@@ -832,7 +832,7 @@ int main(void)
     }
 
 #if DEBUG_LOG
-    debug_init(&uartContext);
+    uart_init(0, SERIAL_8N1, 115200);
 #endif
 
     /*
@@ -1020,8 +1020,8 @@ int main(void)
      * mode for power saving whenever the PD stack and drivers are idle.
      */
 #if DEBUG_LOG
-    debug_print_byte(0xAA);
-    debug_print("FW");
+    uart_print_byte(0, 0xAA);
+    uart_print(0, "FW");
 #endif
 
     vTaskStartScheduler();

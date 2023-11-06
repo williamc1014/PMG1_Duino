@@ -57,14 +57,14 @@
 #define NULL_PTR NULL
 
 typedef uint32_t  u32;
-typedef uint16_t u16;
-typedef uint8_t u8;
+typedef uint16_t  u16;
+typedef uint8_t   u8;
 
 
-typedef signed long  s32;
-typedef signed short s16;
-typedef int8_t  s8;
-typedef uint32_t dma_addr_t;
+typedef signed long   s32;
+typedef signed short  s16;
+typedef int8_t        s8;
+typedef uint32_t      dma_addr_t;
 
 typedef uint32_t status_t;
 typedef uint32_t handle_t;

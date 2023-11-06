@@ -187,6 +187,7 @@ void init_cycfg_peripherals(void)
     Cy_CTB_SetPumpClkSource(CTBM0, CY_CTB_CLK_PUMP_HF_DIV_2);
     Cy_SysClk_PeriphAssignDivider(PCLK_PASS0_CLOCK_SAR, CY_SYSCLK_DIV_8_BIT, 8U);
     Cy_SysClk_PeriphAssignDivider(PCLK_SCB0_CLOCK, CY_SYSCLK_DIV_8_BIT, 11U);
+    Cy_SysClk_PeriphAssignDivider(PCLK_SCB4_CLOCK, CY_SYSCLK_DIV_16_BIT, 0U);
     Cy_SysClk_PeriphAssignDivider(PCLK_TCPWM_CLOCKS0, CY_SYSCLK_DIV_8_BIT, 4U);
     Cy_SysClk_PeriphAssignDivider(PCLK_TCPWM_CLOCKS1, CY_SYSCLK_DIV_8_BIT, 4U);
     Cy_SysClk_PeriphAssignDivider(PCLK_TCPWM_CLOCKS2, CY_SYSCLK_DIV_8_BIT, 4U);

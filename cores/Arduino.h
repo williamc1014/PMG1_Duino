@@ -36,7 +36,7 @@ extern "C" {
 #include <math.h>
 #include <pgmspace.h>
 #include "cy_pdl.h"
-#include "debug.h"
+
 
 typedef struct
 {
@@ -159,6 +159,102 @@ const cy_stc_gpio_pin_config_t ioss_pwm_pin_config =
 #define PWM_MAX_FREQ  (8000000u)
 #endif
 
+#ifndef UART_HW
+#define UART_HW SCB4
+#endif
+
+#ifdef UART_IRQ
+#define UART_IRQ scb_4_interrupt_IRQn
+#endif
+
+#ifndef UART_RX_PORT
+#define UART_RX_PORT GPIO_PRT3
+#endif
+
+#ifndef UART_RX_PORT_NUM
+#define UART_RX_PORT_NUM 3U
+#endif
+
+#ifndef UART_RX_PIN
+#define UART_RX_PIN 5U
+#endif
+
+#ifndef UART_RX_PIN_NUM
+#define UART_RX_PIN_NUM 5U
+#endif
+
+#ifndef UART_RX_DRIVEMODE
+#define UART_RX_DRIVEMODE CY_GPIO_DM_HIGHZ
+#endif
+
+#ifndef UART_RX_INIT_DRIVESTATE
+#define UART_RX_INIT_DRIVESTATE 1
+#endif
+
+#ifndef ioss_0_port_3_pin_5_HSIOM
+    #define ioss_0_port_3_pin_5_HSIOM HSIOM_SEL_GPIO
+#endif
+
+#define UART_RX_HSIOM ioss_0_port_3_pin_5_HSIOM
+
+#ifndef UART_RX_IRQ
+#define UART_RX_IRQ ioss_interrupt_gpio_IRQn
+#endif
+
+#if defined (CY_USING_HAL)
+    #define UART_RX_HAL_PORT_PIN P3_5
+    #define UART_RX P3_5
+    #define UART_RX_HAL_IRQ CYHAL_GPIO_IRQ_NONE
+    #define UART_RX_HAL_DIR CYHAL_GPIO_DIR_INPUT 
+    #define UART_RX_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_NONE
+#endif //defined (CY_USING_HAL)
+
+#ifndef UART_TX_PORT
+#define UART_TX_PORT GPIO_PRT3
+#endif
+
+#ifndef UART_TX_PORT_NUM
+#define UART_TX_PORT_NUM 3U
+#endif
+
+#ifndef UART_TX_PIN
+#define UART_TX_PIN 6U
+#endif
+
+#ifndef UART_TX_PIN_NUM
+#define UART_TX_PIN_NUM 6U
+#endif
+
+#ifndef UART_TX_DRIVEMODE
+#define UART_TX_DRIVEMODE CY_GPIO_DM_HIGHZ
+#endif
+
+#ifndef UART_TX_INIT_DRIVESTATE
+#define UART_TX_INIT_DRIVESTATE 1
+#endif
+
+#ifndef ioss_0_port_3_pin_6_HSIOM
+    #define ioss_0_port_3_pin_6_HSIOM HSIOM_SEL_GPIO
+#endif
+
+#define UART_TX_HSIOM ioss_0_port_3_pin_6_HSIOM
+
+#ifndef UART_TX_IRQ
+#define UART_TX_IRQ ioss_interrupt_gpio_IRQn
+#endif
+
+#if defined (CY_USING_HAL)
+    #define UART_TX_HAL_PORT_PIN P3_6
+    #define UART_TX P3_6
+    #define UART_TX_HAL_IRQ CYHAL_GPIO_IRQ_NONE
+    #define UART_TX_HAL_DIR CYHAL_GPIO_DIR_INPUT 
+    #define UART_TX_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_NONE
+#endif //defined (CY_USING_HAL)
+
+#ifndef PCLK_UART_CLOCK
+#define PCLK_UART_CLOCK PCLK_SCB4_CLOCK
+#endif
+
 extern void (*pin_intr_handler[IFX_DUINO_MAX_NUM_GPIO])(void);
 
 const ifx_gpio_port_pin_t gpio_pin_mapping[IFX_DUINO_MAX_NUM_GPIO] =
@@ -245,10 +341,42 @@ const ifx_adc_vplus_t adc_VPLUS_mapping[IFX_DUINO_MAX_NUM_ADC] =
   {0, 6}
 };
 
+const cy_stc_scb_uart_config_t serial_config_default = 
+{
+  .uartMode = CY_SCB_UART_STANDARD,
+  .oversample = 16,  
+  .dataWidth = 8UL,
+  .enableMsbFirst = false,
+  .stopBits = CY_SCB_UART_STOP_BITS_1,
+  .parity = CY_SCB_UART_PARITY_NONE,
+  .enableInputFilter = false,
+  .dropOnParityError = false,
+  .dropOnFrameError = false,
+  .enableMutliProcessorMode = false,
+  .receiverAddress = 0x0UL,
+  .receiverAddressMask = 0x0UL,
+  .acceptAddrInFifo = false,
+  .irdaInvertRx = false,
+  .irdaEnableLowPowerReceiver = false,
+  .smartCardRetryOnNack = false,
+  .enableLinMode = false,
+  .enableCts = false,
+  .ctsPolarity = CY_SCB_UART_ACTIVE_LOW,
+  .rtsRxFifoLevel = 0UL,
+  .rtsPolarity = CY_SCB_UART_ACTIVE_LOW,
+  .breakWidth = 11UL,
+  .breakLevel = false,
+  .rxFifoTriggerLevel = 0UL,
+  .rxFifoIntEnableMask = 0UL,
+  .txFifoTriggerLevel = 0UL,
+  .txFifoIntEnableMask = 0UL
+};
+
 #endif
 
 #if CY7113_BOARD
 
+/*
 #ifndef APP_SWITCH_PORT
 #define APP_SWITCH_PORT GPIO_PRT3
 #endif
@@ -260,6 +388,7 @@ const ifx_adc_vplus_t adc_VPLUS_mapping[IFX_DUINO_MAX_NUM_ADC] =
 #ifndef APP_SWITCH_NUM
 #define APP_SWITCH_NUM  3
 #endif
+*/
 
 #define D0    0
 #define D1    1
@@ -318,6 +447,102 @@ const ifx_adc_vplus_t adc_VPLUS_mapping[IFX_DUINO_MAX_NUM_ADC] =
 
 #ifndef PWM_MAX_FREQ
 #define PWM_MAX_FREQ  (8000000u)
+#endif
+
+#ifndef UART_HW
+#define UART_HW SCB4
+#endif
+
+#ifdef UART_IRQ
+#define UART_IRQ scb_4_interrupt_IRQn
+#endif
+
+#ifndef UART_RX_PORT
+#define UART_RX_PORT GPIO_PRT3
+#endif
+
+#ifndef UART_RX_PORT_NUM
+#define UART_RX_PORT_NUM 3U
+#endif
+
+#ifndef UART_RX_PIN
+#define UART_RX_PIN 5U
+#endif
+
+#ifndef UART_RX_PIN_NUM
+#define UART_RX_PIN_NUM 5U
+#endif
+
+#ifndef UART_RX_DRIVEMODE
+#define UART_RX_DRIVEMODE CY_GPIO_DM_HIGHZ
+#endif
+
+#ifndef UART_RX_INIT_DRIVESTATE
+#define UART_RX_INIT_DRIVESTATE 1
+#endif
+
+#ifndef ioss_0_port_3_pin_5_HSIOM
+    #define ioss_0_port_3_pin_5_HSIOM HSIOM_SEL_GPIO
+#endif
+
+#define UART_RX_HSIOM ioss_0_port_3_pin_5_HSIOM
+
+#ifndef UART_RX_IRQ
+#define UART_RX_IRQ ioss_interrupt_gpio_IRQn
+#endif
+
+#if defined (CY_USING_HAL)
+    #define UART_RX_HAL_PORT_PIN P3_5
+    #define UART_RX P3_5
+    #define UART_RX_HAL_IRQ CYHAL_GPIO_IRQ_NONE
+    #define UART_RX_HAL_DIR CYHAL_GPIO_DIR_INPUT 
+    #define UART_RX_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_NONE
+#endif //defined (CY_USING_HAL)
+
+#ifndef UART_TX_PORT
+#define UART_TX_PORT GPIO_PRT3
+#endif
+
+#ifndef UART_TX_PORT_NUM
+#define UART_TX_PORT_NUM 3U
+#endif
+
+#ifndef UART_TX_PIN
+#define UART_TX_PIN 6U
+#endif
+
+#ifndef UART_TX_PIN_NUM
+#define UART_TX_PIN_NUM 6U
+#endif
+
+#ifndef UART_TX_DRIVEMODE
+#define UART_TX_DRIVEMODE CY_GPIO_DM_HIGHZ
+#endif
+
+#ifndef UART_TX_INIT_DRIVESTATE
+#define UART_TX_INIT_DRIVESTATE 1
+#endif
+
+#ifndef ioss_0_port_3_pin_6_HSIOM
+    #define ioss_0_port_3_pin_6_HSIOM HSIOM_SEL_GPIO
+#endif
+
+#define UART_TX_HSIOM ioss_0_port_3_pin_6_HSIOM
+
+#ifndef UART_TX_IRQ
+#define UART_TX_IRQ ioss_interrupt_gpio_IRQn
+#endif
+
+#if defined (CY_USING_HAL)
+    #define UART_TX_HAL_PORT_PIN P3_6
+    #define UART_TX P3_6
+    #define UART_TX_HAL_IRQ CYHAL_GPIO_IRQ_NONE
+    #define UART_TX_HAL_DIR CYHAL_GPIO_DIR_INPUT 
+    #define UART_TX_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_NONE
+#endif //defined (CY_USING_HAL)
+
+#ifndef PCLK_UART_CLOCK
+#define PCLK_UART_CLOCK PCLK_SCB4_CLOCK
 #endif
 
 extern void (*pin_intr_handler[IFX_DUINO_MAX_NUM_GPIO])(void);
@@ -401,6 +626,37 @@ const ifx_adc_vplus_t adc_VPLUS_mapping[IFX_DUINO_MAX_NUM_ADC] =
   {0, 1}
 };
 
+const cy_stc_scb_uart_config_t serial_config_default = 
+{
+  .uartMode = CY_SCB_UART_STANDARD,
+  .oversample = 16,  
+  .dataWidth = 8UL,
+  .enableMsbFirst = false,
+  .stopBits = CY_SCB_UART_STOP_BITS_1,
+  .parity = CY_SCB_UART_PARITY_NONE,
+  .enableInputFilter = false,
+  .dropOnParityError = false,
+  .dropOnFrameError = false,
+  .enableMutliProcessorMode = false,
+  .receiverAddress = 0x0UL,
+  .receiverAddressMask = 0x0UL,
+  .acceptAddrInFifo = false,
+  .irdaInvertRx = false,
+  .irdaEnableLowPowerReceiver = false,
+  .smartCardRetryOnNack = false,
+  .enableLinMode = false,
+  .enableCts = false,
+  .ctsPolarity = CY_SCB_UART_ACTIVE_LOW,
+  .rtsRxFifoLevel = 0UL,
+  .rtsPolarity = CY_SCB_UART_ACTIVE_LOW,
+  .breakWidth = 11UL,
+  .breakLevel = false,
+  .rxFifoTriggerLevel = 0UL,
+  .rxFifoIntEnableMask = 0UL,
+  .txFifoTriggerLevel = 0UL,
+  .txFifoIntEnableMask = 0UL
+};
+
 #endif
 
 //****************************************************************************
@@ -427,6 +683,7 @@ const ifx_adc_vplus_t adc_VPLUS_mapping[IFX_DUINO_MAX_NUM_ADC] =
 // @Arduino Core Includes
 //****************************************************************************
 #include "duino_basic.h"
+#include "Serial.h"
 //#include "wiring_constants.h"
 //#include "binary.h"
 //#include "wiring_digital.h"
@@ -438,6 +695,9 @@ const ifx_adc_vplus_t adc_VPLUS_mapping[IFX_DUINO_MAX_NUM_ADC] =
 //#include "dtostrf.h"
 //#include "WCharacter.h"
 //#include "WInterrupts.h"
+
+
+
 
 //****************************************************************************
 // @Infineon Core Includes
