@@ -117,7 +117,7 @@ const bitRateMapping_t brMapping[UART_BIT_RATE_MAX_NUM] =
 };
 
 void uart_init(uint8_t inst, uint8_t cfg, uint32_t bitrate);
-#if PMGDUINO_BOARD
+#if PMGDUINO_BOARD || (1)
 void uart_print(uint8_t inst, const char* string);
 void uart_print_byte(uint8_t inst, uint8_t byte);
 void uart_print_hword(uint8_t inst, uint16_t hword);
@@ -139,6 +139,9 @@ uint8_t peekRingBuffer(ringbuffer_t *buff);
 void queueRingBuffer(ringbuffer_t *buff, uint8_t data);
 uint8_t dequeueRingBuffer(ringbuffer_t *buff);
 
+void checkUartTxFifoWrite(void);
+void checkUartRxFifoRead(void);
+
 //****************************************************************************
 // @Class Definitions
 //****************************************************************************
@@ -157,7 +160,7 @@ public:
     int read(void);
     size_t write(uint8_t val);
     size_t write(char *str);
-    size_t write(uint8_t *buf, uint8_t size) ;
+    size_t write(uint8_t *buf, uint8_t size);
 };
 
 static HardwareSerial Serial;   

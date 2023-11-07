@@ -14,22 +14,76 @@
 #define DEBUG_UART  0
 #define DUINO_UART  1
 
+#define RINGBUFFER_RX_INDEX 0
+#define RINGBUFFER_TX_INDEX 1
 /* Populate configuration structure */
 cy_stc_sysint_t uartIntrConfig =
 {
-    .intrSrc      = scb_4_interrupt_IRQn,
+    .intrSrc      = UART_IRQ,
     .intrPriority = 3,
 };
 
-#if PMGDUINO_BOARD
+#if PMGDUINO_BOARD || (1)
+#define CYBSP_DEBUG_UART_RX_PORT GPIO_PRT4
+#define CYBSP_DEBUG_UART_RX_PORT_NUM 4U
+#define CYBSP_DEBUG_UART_RX_PIN 0U
+#define CYBSP_DEBUG_UART_RX_NUM 0U
+#define CYBSP_DEBUG_UART_RX_DRIVEMODE CY_GPIO_DM_HIGHZ
+#define CYBSP_DEBUG_UART_RX_INIT_DRIVESTATE 1
+#ifndef ioss_0_port_4_pin_0_HSIOM
+    #define ioss_0_port_4_pin_0_HSIOM P4_0_SCB0_UART_RX
+#endif
+#define CYBSP_DEBUG_UART_RX_HSIOM ioss_0_port_4_pin_0_HSIOM
+#define CYBSP_DEBUG_UART_TX_ENABLED 1U
+#define CYBSP_DEBUG_UART_TX_PORT GPIO_PRT4
+#define CYBSP_DEBUG_UART_TX_PORT_NUM 4U
+#define CYBSP_DEBUG_UART_TX_PIN 1U
+#define CYBSP_DEBUG_UART_TX_NUM 1U
+#define CYBSP_DEBUG_UART_TX_DRIVEMODE CY_GPIO_DM_STRONG_IN_OFF
+#define CYBSP_DEBUG_UART_TX_INIT_DRIVESTATE 1
+#ifndef ioss_0_port_4_pin_1_HSIOM
+    #define ioss_0_port_4_pin_1_HSIOM P4_1_SCB0_UART_TX
+#endif
+#define CYBSP_DEBUG_UART_TX_HSIOM ioss_0_port_4_pin_1_HSIOM
+const cy_stc_scb_uart_config_t CYBSP_DBG_UART_config = 
+{
+  .uartMode = CY_SCB_UART_STANDARD,
+  .oversample = 8,  
+  .dataWidth = 8UL,
+  .enableMsbFirst = false,
+  .stopBits = CY_SCB_UART_STOP_BITS_1,
+  .parity = CY_SCB_UART_PARITY_NONE,
+  .enableInputFilter = false,
+  .dropOnParityError = false,
+  .dropOnFrameError = false,
+  .enableMutliProcessorMode = false,
+  .receiverAddress = 0x0UL,
+  .receiverAddressMask = 0x0UL,
+  .acceptAddrInFifo = false,
+  .irdaInvertRx = false,
+  .irdaEnableLowPowerReceiver = false,
+  .smartCardRetryOnNack = false,
+  .enableLinMode = false,
+  .enableCts = false,
+  .ctsPolarity = CY_SCB_UART_ACTIVE_LOW,
+  .rtsRxFifoLevel = 0UL,
+  .rtsPolarity = CY_SCB_UART_ACTIVE_LOW,
+  .breakWidth = 11UL,
+  .breakLevel = false,
+  .rxFifoTriggerLevel = 0UL,
+  .rxFifoIntEnableMask = 0UL,
+  .txFifoTriggerLevel = 0UL,
+  .txFifoIntEnableMask = 0UL
+};
+#define CYBSP_DBG_UART_HW SCB0
 static cy_stc_scb_uart_context_t dbgUartContext;
 #endif
 static cy_stc_scb_uart_context_t duinoUartContext;
 
-ringbuffer_t uartRxRingBuff;
-ringbuffer_t uartTxRingBuff;
+static ringbuffer_t uartRxRingBuff;
+static ringbuffer_t uartTxRingBuff;
 
-uint8_t rxData = 0;
+uint8_t rxData[64] = {0};
 uint8_t txData = 0;
 
 void initRingBuffer(ringbuffer_t *buff)
@@ -39,16 +93,36 @@ void initRingBuffer(ringbuffer_t *buff)
     buff->tail = 0;
 }
 
+uint8_t getRingBufferspace(uint8_t ringBufferIdx)
+{
+    if(ringBufferIdx == RINGBUFFER_RX_INDEX)
+    {
+        if (uartRxRingBuff.head >= uartRxRingBuff.tail)
+            return uartRxRingBuff.head - uartRxRingBuff.tail; 
+    
+        return UART_BUFFER_SIZE - uartRxRingBuff.tail + uartRxRingBuff.head;
+    }
+    else
+    {
+        if (uartTxRingBuff.head >= uartTxRingBuff.tail)
+            return UART_BUFFER_SIZE - 1 - uartTxRingBuff.head + uartTxRingBuff.tail;
+    
+        return uartTxRingBuff.tail - uartTxRingBuff.head - 1;
+    }
+
+    return 0;
+}
+
 uint8_t peekRingBuffer(ringbuffer_t *buff)
 {
     if (buff->head == buff->tail)
-        return -1;
+        return 0xFF;
     return buff->buffer[buff->tail];
 }
 
 void queueRingBuffer(ringbuffer_t *buff, uint8_t data)
 {
-    int pos = buff->head;
+    uint8_t pos = buff->head + 1;
     if (pos >= UART_BUFFER_SIZE)
         pos = 0;
     
@@ -64,7 +138,7 @@ uint8_t dequeueRingBuffer(ringbuffer_t *buff)
     uint8_t data;
 
     if (buff->head == buff->tail)
-        return -1;
+        return 0xFF;
     
     data = buff->buffer[buff->tail];
     buff->tail ++;
@@ -74,9 +148,63 @@ uint8_t dequeueRingBuffer(ringbuffer_t *buff)
     return data;
 }
 
+uint8_t queueArrayRingBuffer(ringbuffer_t *buff, uint8_t *data, uint8_t size)
+{
+    uint8_t space = (getRingBufferspace(RINGBUFFER_TX_INDEX) >= size) ? size : getRingBufferspace(RINGBUFFER_TX_INDEX);
+
+    for (uint8_t cnt=0; cnt<space; cnt++)
+    {
+        queueRingBuffer(&uartTxRingBuff, data[cnt]);
+    }    
+
+    return space;
+}
+
 bool emptyRingBuffer(ringbuffer_t *buff)
 {
     return ((buff->head == buff->tail) ? true : false);
+}
+
+void checkUartTxFifoWrite(void)
+{
+    uint8_t fifoSizeAvailable = Cy_SCB_GetFifoSize(UART_HW) - Cy_SCB_GetNumInTxFifo(UART_HW);
+
+    for (uint8_t i=0; i<fifoSizeAvailable; i++)
+    {
+        txData = dequeueRingBuffer(&uartTxRingBuff);
+        if (txData != 0xFF)
+            Cy_SCB_WriteTxFifo(UART_HW, txData);
+        else
+            break;
+    }
+}
+
+void checkUartRxFifoRead(void)
+{
+    /*
+    uint8_t fifoDataNum = Cy_SCB_GetNumInRxFifo(UART_HW);
+    uint8_t sizeAvailableQueue = getRingBufferspace(RINGBUFFER_RX_INDEX);
+    uint8_t numToPop;
+    uint8_t data;
+
+    if (fifoDataNum >= sizeAvailableQueue)
+        numToPop = sizeAvailableQueue;
+    else
+        numToPop = fifoDataNum;
+
+    for(uint8_t i=0; i<numToPop; i++)
+    {
+        data = Cy_SCB_ReadRxFifo(UART_HW);
+        queueRingBuffer(&uartRxRingBuff, data);
+    }
+    */
+   for (uint8_t i=0; i<64; i++)
+   {
+        if (rxData[i] != 0)
+            queueRingBuffer(&uartRxRingBuff, rxData[i]);
+        else
+            break;
+   }
 }
 
 HardwareSerial::HardwareSerial()
@@ -103,18 +231,12 @@ void HardwareSerial::end(void)
 
 int HardwareSerial::available(void)
 {
-    if (uartRxRingBuff.head >= uartRxRingBuff.tail)
-        return uartRxRingBuff.head - uartRxRingBuff.tail; 
-    
-    return UART_BUFFER_SIZE - uartRxRingBuff.tail + uartRxRingBuff.head;
+    return (int)getRingBufferspace(RINGBUFFER_RX_INDEX);
 }
 
 int HardwareSerial::availableForWrite(void)
 {
-    if (uartTxRingBuff.head >= uartTxRingBuff.tail)
-        return UART_BUFFER_SIZE - 1 - uartTxRingBuff.head + uartTxRingBuff.tail;
-    
-    return uartTxRingBuff.tail - uartTxRingBuff.head - 1;
+    return (int)getRingBufferspace(RINGBUFFER_TX_INDEX);
 }
 
 int HardwareSerial::peek(void)
@@ -135,80 +257,54 @@ void HardwareSerial::flush(void)
 
 size_t HardwareSerial::write(uint8_t val)
 {
-    if (availableForWrite() != 0)
-        queueRingBuffer(&uartTxRingBuff, val);
-    else
-        return (size_t) 0;
+    uint8_t inQueueCnt = queueArrayRingBuffer(&uartTxRingBuff, &val, 1);
+    checkUartTxFifoWrite();
 
-    if (0UL == (CY_SCB_UART_TRANSMIT_ACTIVE & duinoUartContext.txStatus))
-    {
-        txData = dequeueRingBuffer(&uartTxRingBuff);
-        Cy_SCB_UART_Transmit(UART_HW, &txData, 1, &duinoUartContext);
-    }
-
-    return (size_t) 1;
+    return (size_t) inQueueCnt;
 }
 
 size_t HardwareSerial::write(char *str)
-{
+{   
     uint8_t len = (uint8_t)strlen(str);
-    uint8_t cnt = 0;
 
-    for (cnt=0; cnt<len; cnt++)
-    {
-        if(availableForWrite() != 0)
-            queueRingBuffer(&uartTxRingBuff, str[cnt]);
-        else
-            break;
-    }
+    uint8_t inQueueCnt = queueArrayRingBuffer(&uartTxRingBuff, (uint8_t *)&str[0], len);
+    checkUartTxFifoWrite();
 
-    if (0UL == (CY_SCB_UART_TRANSMIT_ACTIVE & duinoUartContext.txStatus))
-    {
-        txData = dequeueRingBuffer(&uartTxRingBuff);
-        Cy_SCB_UART_Transmit(UART_HW, &txData, 1, &duinoUartContext);
-    }
-
-    return (size_t)cnt;
+    return (size_t) inQueueCnt;
 }
 
 size_t HardwareSerial::write(uint8_t *buf, uint8_t len)
 {
-    uint8_t cnt = 0;
+    uint8_t inQueueCnt = queueArrayRingBuffer(&uartTxRingBuff, buf, len);
+    checkUartTxFifoWrite();
 
-    for (cnt=0; cnt<len; cnt++)
-    {
-        if(availableForWrite() != 0)
-            queueRingBuffer(&uartTxRingBuff, buf[cnt]);
-        else
-            break;
-    }
-
-    if (0UL == (CY_SCB_UART_TRANSMIT_ACTIVE & duinoUartContext.txStatus))
-    {
-        txData = dequeueRingBuffer(&uartTxRingBuff);
-        Cy_SCB_UART_Transmit(UART_HW, &txData, 1, &duinoUartContext);
-    }
-
-    return (size_t)cnt;
+    return (size_t) inQueueCnt;
 }
 
 void UART_Isr(void)
 {
+    //digitalWrite(LED_BUILTIN, 0);
     Cy_SCB_UART_Interrupt(UART_HW, &duinoUartContext);
+    //digitalWrite(LED_BUILTIN, 1);
 }
 
 void handleUartEvent(uint32_t event)
 {
-    if (event == CY_SCB_RX_INTR_LEVEL)
+    //uart_print_word(0, event);
+    
+    if (event == CY_SCB_RX_INTR_NOT_EMPTY)
     {
-        queueRingBuffer(&uartRxRingBuff, rxData);
+        digitalWrite(LED_BUILTIN, 0);
+        queueRingBuffer(&uartRxRingBuff, rxData[0]);
+        digitalWrite(LED_BUILTIN, 1);
     }
 
-    if ((event == CY_SCB_TX_INTR_LEVEL) && !emptyRingBuffer(&uartTxRingBuff))
+    
+    if (event == CY_SCB_UART_TX_NOT_FULL)
     {
-        txData = dequeueRingBuffer(&uartTxRingBuff);
-        Cy_SCB_UART_Transmit(UART_HW, &txData, 1, &duinoUartContext);
+        checkUartTxFifoWrite(); 
     }
+    
 }
 
 void uart_init(uint8_t inst, uint8_t cfg, uint32_t bitrate)
@@ -241,6 +337,7 @@ void uart_init(uint8_t inst, uint8_t cfg, uint32_t bitrate)
 
         if (divNum == 0)
         {
+            digitalWrite(LED_BUILTIN, 0);
             Cy_GPIO_SetDrivemode(UART_RX_PORT, UART_RX_PIN_NUM, CY_GPIO_DM_HIGHZ);
             Cy_GPIO_SetDrivemode(UART_TX_PORT, UART_TX_PIN_NUM, CY_GPIO_DM_HIGHZ);
             return;
@@ -255,19 +352,20 @@ void uart_init(uint8_t inst, uint8_t cfg, uint32_t bitrate)
 
         Cy_SCB_UART_Init(UART_HW, &uart_cfg, &duinoUartContext);
 
-        // setup the callback function point in the context
-        Cy_SCB_UART_RegisterCallback(UART_HW, handleUartEvent, &duinoUartContext);
-
+        Cy_SCB_SetTxInterruptMask(UART_HW, CY_SCB_UART_TX_DONE);
+        Cy_SCB_SetRxInterruptMask(UART_HW, CY_SCB_RX_INTR_NOT_EMPTY);
         /* Hook interrupt service routine and enable interrupt */
         (void) Cy_SysInt_Init(&uartIntrConfig, &UART_Isr);
-        NVIC_EnableIRQ(uartIntrConfig.intrSrc);
+        NVIC_EnableIRQ(UART_IRQ);
+        // setup the callback function point in the context
+        Cy_SCB_UART_RegisterCallback(UART_HW, handleUartEvent, &duinoUartContext);
 
 	    Cy_SCB_UART_Enable(UART_HW);
 
         // start to receive
-        Cy_SCB_UART_Receive(UART_HW, &rxData, 1, &duinoUartContext);
+        Cy_SCB_UART_Receive(UART_HW, rxData, 1, &duinoUartContext);
     }
-#if PMGDUINO_BOARD
+#if PMGDUINO_BOARD || (1)
     else if (inst == DEBUG_UART)
     {
         Cy_GPIO_SetHSIOM(CYBSP_DEBUG_UART_RX_PORT, CYBSP_DEBUG_UART_RX_NUM, CYBSP_DEBUG_UART_RX_HSIOM);
@@ -276,7 +374,7 @@ void uart_init(uint8_t inst, uint8_t cfg, uint32_t bitrate)
         Cy_GPIO_SetDrivemode(CYBSP_DEBUG_UART_RX_PORT, CYBSP_DEBUG_UART_RX_NUM, CY_GPIO_DM_HIGHZ);
         Cy_GPIO_SetDrivemode(CYBSP_DEBUG_UART_TX_PORT, CYBSP_DEBUG_UART_TX_NUM, CY_GPIO_DM_STRONG);
 
-        Cy_SysClk_PeriphAssignDivider(PCLK_SCB2_CLOCK, CY_SYSCLK_DIV_8_BIT, CLK_DBG_UART_NUM);
+        Cy_SysClk_PeriphAssignDivider(PCLK_SCB0_CLOCK, CY_SYSCLK_DIV_8_BIT, CLK_DBG_UART_NUM);
 
         Cy_SysClk_PeriphSetDivider(CY_SYSCLK_DIV_8_BIT, CLK_DBG_UART_NUM, 51UL);
         Cy_SysClk_PeriphEnableDivider(CY_SYSCLK_DIV_8_BIT, CLK_DBG_UART_NUM);
@@ -289,13 +387,13 @@ void uart_init(uint8_t inst, uint8_t cfg, uint32_t bitrate)
         return;
 }
 
-#if PMGDUINO_BOARD
+#if PMGDUINO_BOARD || (1)
 void uart_print(uint8_t inst, const char* string)
 {
     /* Send a string over serial terminal */
     if (inst == DUINO_UART)
         Cy_SCB_UART_PutString(UART_HW, string);
-#if PMGDUINO_BOARD
+#if PMGDUINO_BOARD || 1
     else
         Cy_SCB_UART_PutString(CYBSP_DBG_UART_HW, string);
 #endif
@@ -312,7 +410,7 @@ void uart_print_byte(uint8_t inst, uint8_t byte_var)
 
     if (inst == DUINO_UART)
         Cy_SCB_UART_PutString(UART_HW, string);
-#if PMGDUINO_BOARD
+#if PMGDUINO_BOARD || 1
     else
         Cy_SCB_UART_PutString(CYBSP_DBG_UART_HW, string);
 #endif
@@ -331,7 +429,7 @@ void uart_print_hword(uint8_t inst, uint16_t hword)
 
     if (inst == DUINO_UART)
         Cy_SCB_UART_PutString(UART_HW, string);
-#if PMGDUINO_BOARD
+#if PMGDUINO_BOARD || 1
     else
         Cy_SCB_UART_PutString(CYBSP_DBG_UART_HW, string);
 #endif
@@ -354,7 +452,7 @@ void uart_print_word(uint8_t inst, uint32_t word)
 
     if (inst == DUINO_UART)
         Cy_SCB_UART_PutString(UART_HW, string);
-#if PMGDUINO_BOARD
+#if PMGDUINO_BOARD || 1
     else
         Cy_SCB_UART_PutString(CYBSP_DBG_UART_HW, string);
 #endif

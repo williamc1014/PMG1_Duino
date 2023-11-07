@@ -163,8 +163,8 @@ const cy_stc_gpio_pin_config_t ioss_pwm_pin_config =
 #define UART_HW SCB4
 #endif
 
-#ifdef UART_IRQ
-#define UART_IRQ scb_4_interrupt_IRQn
+#ifndef UART_IRQ
+#define UART_IRQ ((IRQn_Type)scb_4_interrupt_IRQn)
 #endif
 
 #ifndef UART_RX_PORT
@@ -192,14 +192,10 @@ const cy_stc_gpio_pin_config_t ioss_pwm_pin_config =
 #endif
 
 #ifndef ioss_0_port_3_pin_5_HSIOM
-    #define ioss_0_port_3_pin_5_HSIOM HSIOM_SEL_GPIO
+    #define ioss_0_port_3_pin_5_HSIOM P3_5_SCB4_UART_RX
 #endif
 
 #define UART_RX_HSIOM ioss_0_port_3_pin_5_HSIOM
-
-#ifndef UART_RX_IRQ
-#define UART_RX_IRQ ioss_interrupt_gpio_IRQn
-#endif
 
 #if defined (CY_USING_HAL)
     #define UART_RX_HAL_PORT_PIN P3_5
@@ -226,7 +222,7 @@ const cy_stc_gpio_pin_config_t ioss_pwm_pin_config =
 #endif
 
 #ifndef UART_TX_DRIVEMODE
-#define UART_TX_DRIVEMODE CY_GPIO_DM_HIGHZ
+#define UART_TX_DRIVEMODE CY_GPIO_DM_STRONG
 #endif
 
 #ifndef UART_TX_INIT_DRIVESTATE
@@ -234,14 +230,10 @@ const cy_stc_gpio_pin_config_t ioss_pwm_pin_config =
 #endif
 
 #ifndef ioss_0_port_3_pin_6_HSIOM
-    #define ioss_0_port_3_pin_6_HSIOM HSIOM_SEL_GPIO
+    #define ioss_0_port_3_pin_6_HSIOM P3_6_SCB4_UART_TX
 #endif
 
 #define UART_TX_HSIOM ioss_0_port_3_pin_6_HSIOM
-
-#ifndef UART_TX_IRQ
-#define UART_TX_IRQ ioss_interrupt_gpio_IRQn
-#endif
 
 #if defined (CY_USING_HAL)
     #define UART_TX_HAL_PORT_PIN P3_6
@@ -366,10 +358,10 @@ const cy_stc_scb_uart_config_t serial_config_default =
   .rtsPolarity = CY_SCB_UART_ACTIVE_LOW,
   .breakWidth = 11UL,
   .breakLevel = false,
-  .rxFifoTriggerLevel = 0UL,
-  .rxFifoIntEnableMask = 0UL,
-  .txFifoTriggerLevel = 0UL,
-  .txFifoIntEnableMask = 0UL
+  .rxFifoTriggerLevel = 7UL,
+  .rxFifoIntEnableMask = 12UL,
+  .txFifoTriggerLevel = 7UL,
+  .txFifoIntEnableMask = 2UL
 };
 
 #endif
@@ -453,8 +445,8 @@ const cy_stc_scb_uart_config_t serial_config_default =
 #define UART_HW SCB4
 #endif
 
-#ifdef UART_IRQ
-#define UART_IRQ scb_4_interrupt_IRQn
+#ifndef UART_IRQ
+#define UART_IRQ ((IRQn_Type)scb_4_interrupt_IRQn)
 #endif
 
 #ifndef UART_RX_PORT
@@ -482,14 +474,10 @@ const cy_stc_scb_uart_config_t serial_config_default =
 #endif
 
 #ifndef ioss_0_port_3_pin_5_HSIOM
-    #define ioss_0_port_3_pin_5_HSIOM HSIOM_SEL_GPIO
+    #define ioss_0_port_3_pin_5_HSIOM P3_5_SCB4_UART_RX
 #endif
 
-#define UART_RX_HSIOM ioss_0_port_3_pin_5_HSIOM
-
-#ifndef UART_RX_IRQ
-#define UART_RX_IRQ ioss_interrupt_gpio_IRQn
-#endif
+#define UART_RX_HSIOM ioss_0_port_3_pin_5_HSIOM   
 
 #if defined (CY_USING_HAL)
     #define UART_RX_HAL_PORT_PIN P3_5
@@ -516,7 +504,7 @@ const cy_stc_scb_uart_config_t serial_config_default =
 #endif
 
 #ifndef UART_TX_DRIVEMODE
-#define UART_TX_DRIVEMODE CY_GPIO_DM_HIGHZ
+#define UART_TX_DRIVEMODE CY_GPIO_DM_STRONG
 #endif
 
 #ifndef UART_TX_INIT_DRIVESTATE
@@ -524,14 +512,10 @@ const cy_stc_scb_uart_config_t serial_config_default =
 #endif
 
 #ifndef ioss_0_port_3_pin_6_HSIOM
-    #define ioss_0_port_3_pin_6_HSIOM HSIOM_SEL_GPIO
+    #define ioss_0_port_3_pin_6_HSIOM P3_6_SCB4_UART_TX
 #endif
 
 #define UART_TX_HSIOM ioss_0_port_3_pin_6_HSIOM
-
-#ifndef UART_TX_IRQ
-#define UART_TX_IRQ ioss_interrupt_gpio_IRQn
-#endif
 
 #if defined (CY_USING_HAL)
     #define UART_TX_HAL_PORT_PIN P3_6
@@ -651,10 +635,10 @@ const cy_stc_scb_uart_config_t serial_config_default =
   .rtsPolarity = CY_SCB_UART_ACTIVE_LOW,
   .breakWidth = 11UL,
   .breakLevel = false,
-  .rxFifoTriggerLevel = 0UL,
-  .rxFifoIntEnableMask = 0UL,
-  .txFifoTriggerLevel = 0UL,
-  .txFifoIntEnableMask = 0UL
+  .rxFifoTriggerLevel = 7UL,
+  .rxFifoIntEnableMask = 12UL,
+  .txFifoTriggerLevel = 7UL,
+  .txFifoIntEnableMask = 2UL
 };
 
 #endif
