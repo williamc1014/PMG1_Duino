@@ -831,7 +831,7 @@ int main(void)
         CY_ASSERT(0);
     }
 
-#if DEBUG_LOG || (1)
+#if DEBUG_LOG
     uart_init(0, SERIAL_8N1, 115200);
 #endif
 

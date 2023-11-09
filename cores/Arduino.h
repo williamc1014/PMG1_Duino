@@ -36,6 +36,7 @@ extern "C" {
 #include <math.h>
 #include <pgmspace.h>
 #include "cy_pdl.h"
+#include "config.h"
 
 
 typedef struct

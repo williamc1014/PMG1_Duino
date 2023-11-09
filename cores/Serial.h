@@ -25,7 +25,7 @@
 #endif
 
 #ifndef UART_BUFFER_SIZE
-#define UART_BUFFER_SIZE    64
+#define UART_BUFFER_SIZE    32
 #endif
 
 typedef enum
@@ -138,6 +138,8 @@ void initRingBuffer(ringbuffer_t *buff);
 uint8_t peekRingBuffer(ringbuffer_t *buff);
 void queueRingBuffer(ringbuffer_t *buff, uint8_t data);
 uint8_t dequeueRingBuffer(ringbuffer_t *buff);
+uint8_t getRingBufferSpace(ringbuffer_t *buff);
+uint8_t getRingBufferOccupied(ringbuffer_t *buff);
 
 void checkUartTxFifoWrite(void);
 void checkUartRxFifoRead(void);
