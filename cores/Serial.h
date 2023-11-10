@@ -15,10 +15,12 @@
 // @External Prototypes
 //****************************************************************************
 
-#ifdef __cplusplus
+
 #include "cy_pdl.h"
 #include "config.h"
-//#include "Stream.h"
+
+#ifdef __cplusplus
+#include "Stream.h"
 
 #ifndef UART_BIT_RATE_MAX_NUM
 #define UART_BIT_RATE_MAX_NUM 13
@@ -116,14 +118,6 @@ const bitRateMapping_t brMapping[UART_BIT_RATE_MAX_NUM] =
     {115200,   25}
 };
 
-void uart_init(uint8_t inst, uint8_t cfg, uint32_t bitrate);
-#if PMGDUINO_BOARD || (1)
-void uart_print(uint8_t inst, const char* string);
-void uart_print_byte(uint8_t inst, uint8_t byte);
-void uart_print_hword(uint8_t inst, uint16_t hword);
-void uart_print_word(uint8_t inst, uint32_t word);
-#endif
-
 //****************************************************************************
 // ring buffer definition
 //****************************************************************************
@@ -147,7 +141,7 @@ void checkUartRxFifoRead(void);
 //****************************************************************************
 // @Class Definitions
 //****************************************************************************
-class HardwareSerial//: public Stream
+class HardwareSerial: public Stream
 {
 public:
     HardwareSerial();
@@ -160,12 +154,54 @@ public:
     int peek(void);
     void flush(void);
     int read(void);
+    
+    
+    size_t write(const uint8_t);
+    inline size_t write(unsigned long n)
+    {
+        return write((uint8_t)n);
+    }
+    inline size_t write(long n)
+    {
+        return write((uint8_t)n);
+    }
+    inline size_t write(unsigned int n)
+    {
+        return write((uint8_t)n);
+    }
+    inline size_t write(int n)
+    {
+        return write((uint8_t)n);
+    }
+
+    using Print::write; 
+    operator bool()
+    {
+        return true;
+    } 
+    
+#if (0)
     size_t write(uint8_t val);
     size_t write(char *str);
     size_t write(uint8_t *buf, uint8_t size);
-};
-
-static HardwareSerial Serial;   
-
+#endif
+}; 
+static HardwareSerial Serial;
 #endif  /* cplusplus */
+
+
+#ifdef __cplusplus
+extern HardwareSerial Serial;
+#endif  /* cplusplus */
+
+#if (0)
+void uart_init(uint8_t inst, uint8_t cfg, uint32_t bitrate);
+#if PMGDUINO_BOARD || (DEBUG_LOG)
+void uart_print(uint8_t inst, const char* string);
+void uart_print_byte(uint8_t inst, uint8_t byte);
+void uart_print_hword(uint8_t inst, uint16_t hword);
+void uart_print_word(uint8_t inst, uint32_t word);
+#endif // PMGDUINO_BOARD || (DEBUG_LOG)
+#endif //(0)
+
 #endif /*__Serial_h__ */

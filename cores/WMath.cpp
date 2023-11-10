@@ -26,10 +26,6 @@ extern "C" {
 
 #include "WMath.h"
 
-//****************************************************************************
-// @Local Functions
-//****************************************************************************
-
 void randomSeed(uint32_t dwSeed)
 {
     if (dwSeed != 0)
@@ -37,6 +33,7 @@ void randomSeed(uint32_t dwSeed)
         srand(dwSeed) ;
     }
 }
+
 
 long random(long howbig)
 {
@@ -60,16 +57,15 @@ long random(long howsmall, long howbig)
     return random(diff) + howsmall;
 }
 
-extern uint16_t makeWord( uint16_t w )
-{
-  return w ;
+uint16_t makeWord(uint16_t w) 
+{ 
+    return w; 
 }
 
-uint16_t makeWord(uint8_t h, uint8_t l)
-{
-    return (h << 8) | l ;
+uint16_t makeWord(uint8_t h, uint8_t l) 
+{ 
+    return (h << 8) | l; 
 }
-
 
 //****************************************************************************
 //                                 END OF FILE

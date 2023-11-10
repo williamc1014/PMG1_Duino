@@ -44,6 +44,10 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#if PMGDUINO_BOARD || CY7113_BOARD
+#include <Arduino.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -71,12 +75,6 @@ extern "C" {
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
-
-#if PMGDUINO_BOARD || CY7113_BOARD
-#include <Arduino.h>
-#endif
-
-
 
 #if DEBUG_LOG
 #include "Serial.h"
@@ -776,7 +774,6 @@ void DuinoTask(void *param)
 	for (;;)
 	{
 		loop();
-
 	}
 
 }

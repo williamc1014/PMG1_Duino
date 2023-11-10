@@ -220,85 +220,6 @@ void checkUartRxFifoRead(void)
 {
 }
 
-HardwareSerial::HardwareSerial()
-{
-    initRingBuffer(&uartRxRingBuff);
-    initRingBuffer(&uartTxRingBuff);
-}
-
-void HardwareSerial::begin(uint32_t speed)
-{
-    begin(speed, SERIAL_8N1);
-}
-
-void HardwareSerial::begin(uint32_t speed, uart_cfg_idx_t config)
-{
-    uart_init(DUINO_UART, (uint8_t)config, speed);
-}
-
-void HardwareSerial::end(void)
-{
-    Cy_SCB_UART_Disable(UART_HW, &duinoUartContext);
-    Cy_SCB_UART_DeInit(UART_HW);
-}
-
-int HardwareSerial::available(void)
-{
-    return (int)getRingBufferOccupied(&uartRxRingBuff);
-}
-
-int HardwareSerial::availableForWrite(void)
-{
-    return (int)getRingBufferSpace(&uartTxRingBuff);
-}
-
-int HardwareSerial::peek(void)
-{
-    return (int)peekRingBuffer(&uartRxRingBuff);
-}
-
-int HardwareSerial::read(void)
-{
-    return (int)dequeueRingBuffer(&uartRxRingBuff);
-}
-
-void HardwareSerial::flush(void)
-{
-    noInterrupts();
-    while (uartTxRingBuff.head == uartTxRingBuff.tail);
-    while (!(CY_SCB_UART_TRANSMIT_ACTIVE & duinoUartContext.txStatus));
-    interrupts();
-}
-
-size_t HardwareSerial::write(uint8_t val)
-{
-    if (getRingBufferOccupied(&uartTxRingBuff) < UART_BUFFER_SIZE)
-    {
-        queueRingBuffer(&uartTxRingBuff, val);
-        checkUartTxFifoWrite();
-        return (size_t) 1;
-    }
-    else
-        return (size_t) 0;
-}
-
-size_t HardwareSerial::write(char *str)
-{   
-    uint8_t len = (uint8_t)strlen(str);
-
-    uint8_t inQueueCnt = queueArrayRingBuffer(&uartTxRingBuff, (uint8_t *)&str[0], len);
-    checkUartTxFifoWrite();
-    return (size_t) inQueueCnt;
-}
-
-size_t HardwareSerial::write(uint8_t *buf, uint8_t len)
-{
-    uint8_t inQueueCnt = queueArrayRingBuffer(&uartTxRingBuff, buf, len);
-    checkUartTxFifoWrite();
-
-    return (size_t) inQueueCnt;
-}
-
 void UART_Isr(void)
 {
     Cy_SCB_UART_Interrupt(UART_HW, &duinoUartContext);
@@ -468,5 +389,83 @@ void uart_print_word(uint8_t inst, uint32_t word)
 #endif
 }
 #endif // PMGDUINO_BOARD
+
+HardwareSerial::HardwareSerial()
+{
+    initRingBuffer(&uartRxRingBuff);
+    initRingBuffer(&uartTxRingBuff);
+}
+
+void HardwareSerial::begin(uint32_t speed)
+{
+    begin(speed, SERIAL_8N1);
+}
+
+void HardwareSerial::begin(uint32_t speed, uart_cfg_idx_t config)
+{
+    uart_init(DUINO_UART, (uint8_t)config, speed);
+}
+
+void HardwareSerial::end(void)
+{
+    Cy_SCB_UART_Disable(UART_HW, &duinoUartContext);
+    Cy_SCB_UART_DeInit(UART_HW);
+}
+
+int HardwareSerial::available(void)
+{
+    return (int)getRingBufferOccupied(&uartRxRingBuff);
+}
+
+int HardwareSerial::availableForWrite(void)
+{
+    return (int)getRingBufferSpace(&uartTxRingBuff);
+}
+
+int HardwareSerial::peek(void)
+{
+    return (int)peekRingBuffer(&uartRxRingBuff);
+}
+
+int HardwareSerial::read(void)
+{
+    return (int)dequeueRingBuffer(&uartRxRingBuff);
+}
+
+void HardwareSerial::flush(void)
+{
+    noInterrupts();
+    while (uartTxRingBuff.head == uartTxRingBuff.tail);
+    while (!(CY_SCB_UART_TRANSMIT_ACTIVE & duinoUartContext.txStatus));
+    interrupts();
+}
+
+size_t HardwareSerial::write(uint8_t val)
+{
+    while (getRingBufferSpace(&uartTxRingBuff) < 1) {}
+
+    queueRingBuffer(&uartTxRingBuff, val);
+    checkUartTxFifoWrite();
+    return (size_t) 1;
+}
+
+#if (0)
+size_t HardwareSerial::write(char *str)
+{   
+    uint8_t len = (uint8_t)strlen(str);
+
+    uint8_t inQueueCnt = queueArrayRingBuffer(&uartTxRingBuff, (uint8_t *)&str[0], len);
+    checkUartTxFifoWrite();
+    return (size_t) inQueueCnt;
+}
+
+size_t HardwareSerial::write(uint8_t *buf, uint8_t len)
+{
+    uint8_t inQueueCnt = queueArrayRingBuffer(&uartTxRingBuff, buf, len);
+    checkUartTxFifoWrite();
+
+    return (size_t) inQueueCnt;
+}
+#endif
 
 
