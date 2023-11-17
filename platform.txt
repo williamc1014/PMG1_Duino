@@ -104,7 +104,7 @@ compiler.elf2hex.extra_flags=
 # ----------------
 
 ## Compile C files
- recipe.c.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.c.flags} {compiler.c.extra_flags} {build.extra_flags} {build.menu_flags} {compiler.cores_inc.path} {compiler.bsp_inc.path} {compiler.cmsis_inc.path} {compiler.rtos_inc.path} {compiler.clib_inc.path} {compiler.pdl_inc.path} {compiler.pdstack_inc.path} {compiler.corelib_inc.path} "{source_file}" -o "{object_file}"
+recipe.c.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.c.flags} {compiler.c.extra_flags} {build.extra_flags} {build.menu_flags} {compiler.cores_inc.path} {compiler.bsp_inc.path} {compiler.cmsis_inc.path} {compiler.rtos_inc.path} {compiler.clib_inc.path} {compiler.pdl_inc.path} {compiler.pdstack_inc.path} {compiler.corelib_inc.path} "{source_file}" -o "{object_file}"
 
 ## Compile C++ files
 recipe.cpp.o.pattern="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} {compiler.cpp.extra_flags} {build.extra_flags} {build.menu_flags} {compiler.cores_inc.path} {compiler.bsp_inc.path} {compiler.cmsis_inc.path} {compiler.rtos_inc.path} {compiler.clib_inc.path} {compiler.pdl_inc.path} {compiler.pdstack_inc.path} {compiler.corelib_inc.path} "{source_file}" -o "{object_file}"
