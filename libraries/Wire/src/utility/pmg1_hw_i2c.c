@@ -8,9 +8,44 @@ uint8_t i2cRxBuffer[I2C_MAX_BUFFER_SIZE] = {0};
 uint8_t i2cTxBuffer[I2C_MAX_BUFFER_SIZE] = {0};
 bool timeoutFlag = false;
 
+extern void (*onReceiveHandler)(int);
+extern void (*onRequestHandler)(void);
+
 void I2C_Interrupt(void)
 {
-    Cy_SCB_I2C_Interrupt(I2C_HW, &I2C_context);
+    Cy_SCB_I2C_SlaveInterrupt(I2C_HW, &I2C_context);
+}
+
+void i2cEventHandler(uint32_t events)
+{
+    /* Master request data */
+    if (0UL != (events & CY_SCB_I2C_SLAVE_READ_EVENT))
+    {
+    	// The read operation is complete, a NAK or STOP condition received,
+    	// do nothing here
+        if (0UL == (events & CY_SCB_I2C_SLAVE_ERR_EVENT))
+        {
+            if (onRequestHandler != NULL)
+                onRequestHandler();
+        }
+        /* Setup read buffer for the next write transaction to the I2C master */
+        Cy_SCB_I2C_SlaveConfigReadBuf(I2C_HW, i2cTxBuffer, I2C_MAX_BUFFER_SIZE, &I2C_context);
+    }
+
+    /* Slave received data from master */
+    if (0UL != (events & CY_SCB_I2C_SLAVE_WR_CMPLT_EVENT))
+    {
+        if (0UL == (events & CY_SCB_I2C_SLAVE_ERR_EVENT))
+        {
+            if (onReceiveHandler != NULL)
+            {
+                onReceiveHandler(Cy_SCB_I2C_SlaveGetWriteTransferCount(I2C_HW, &I2C_context));
+            }
+        }
+        /* Setup buffer for the next write transaction from the I2C master */
+        Cy_SCB_I2C_SlaveConfigWriteBuf(I2C_HW, i2cRxBuffer, I2C_MAX_BUFFER_SIZE, &I2C_context);
+    }
+    /* Ignore all other events */
 }
 
 void i2cInit(uint8_t address)
@@ -33,7 +68,9 @@ void i2cInit(uint8_t address)
         I2C_config.slaveAddress = address;
     }
     else
+    {
         I2C_config.i2cMode = CY_SCB_I2C_MASTER;
+    }
 
     /* Initialize and enable the I2C in master mode */
     initStatus = Cy_SCB_I2C_Init(I2C_HW, &I2C_config, &I2C_context);
@@ -59,10 +96,15 @@ void i2cInit(uint8_t address)
     Cy_SCB_I2C_SlaveConfigReadBuf(I2C_HW, i2cTxBuffer, I2C_MAX_BUFFER_SIZE, &I2C_context);        
 
     Cy_SCB_I2C_Enable(I2C_HW, &I2C_context);
+
+    Cy_SCB_I2C_RegisterEventCallback(I2C_HW, i2cEventHandler, &I2C_context);
 }
 
 void setPeripheralClock(uint32_t rate)
 {
+    if (rate != 400000 || rate != 100000)
+        return;
+
     Cy_SysClk_PeriphAssignDivider(PCLK_SCB1_CLOCK, CY_SYSCLK_DIV_8_BIT, 7U);
     Cy_SysClk_PeriphDisableDivider(CY_SYSCLK_DIV_8_BIT, 7U);
 
@@ -72,6 +114,8 @@ void setPeripheralClock(uint32_t rate)
         Cy_SysClk_PeriphSetDivider(CY_SYSCLK_DIV_8_BIT, 7U, 14U);
 
     Cy_SysClk_PeriphEnableDivider(CY_SYSCLK_DIV_8_BIT, 7U);
+
+    Cy_SCB_I2C_SetDataRate(I2C_HW, rate, Cy_SysClk_PeriphGetFrequency(CY_SYSCLK_DIV_8_BIT, 7));
 }
 
 cy_en_scb_i2c_status_t i2cSendStart(uint8_t address, uint32_t timeoutMs)

@@ -255,7 +255,7 @@ void TwoWire::flush(void)
 {
 
 }
-
+#if (0)
 // behind the scenes callback function that is called when a data block is received
 void TwoWire::onReceiveService(uint8_t* inBytes, int numBytes)
 {
@@ -296,6 +296,7 @@ void TwoWire::onReceiveService(uint8_t* inBytes, int numBytes)
 // behind the scenes function that is called when data is requested
 void TwoWire::onRequestService(void)
 {
+
     // don't bother if user hasn't registered a callback
     /*
     if (!user_onRequest)
@@ -327,18 +328,21 @@ void TwoWire::slaveStatus(void)
     }
     */
 }
+#endif
+
+void (*onReceiveHandler)(int) = NULL;
+void (*onRequestHandler)(void) = NULL;
 
 // sets function called on slave write
 void TwoWire::onReceive(void (*function)(int))
 {
-    //user_onReceive = function;
-    //Cy_SCB_I2C_RegisterEventCallback(I2C_HW, (cy_cb_scb_i2c_handle_events_t)slaveStatus, &I2C_context);
+    onReceiveHandler = function;
 }
 
 // sets function called on slave read
 void TwoWire::onRequest(void (*function)(void))
 {
-    //user_onRequest = function;
+    onRequestHandler = function;
 }
 
 // Preinstantiate Objects //////////////////////////////////////////////////////

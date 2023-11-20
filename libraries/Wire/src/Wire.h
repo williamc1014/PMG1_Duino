@@ -25,12 +25,12 @@ class TwoWire : public Stream
     //static uint8_t txBufferIndex;
     //static uint8_t txBufferLength;
 
-    static uint8_t transmitting;
-    static void (*user_onRequest)(void);
-    static void (*user_onReceive)(int);
-    static void onRequestService(void);
-    static void onReceiveService(uint8_t*, int);
-    static void slaveStatus(void);
+    //static uint8_t transmitting;
+    //static void (*user_onRequest)(void);
+    //static void (*user_onReceive)(int);
+    //static void onRequestService(void);
+    //static void onReceiveService(uint8_t*, int);
+    //static void slaveStatus(void);
   public:
     TwoWire();
     void begin();
