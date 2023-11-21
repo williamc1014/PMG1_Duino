@@ -253,7 +253,8 @@ int TwoWire::peek(void)
 
 void TwoWire::flush(void)
 {
-
+    i2cSendRestBytes(i2cTimeout);
+    i2cSendStop(i2cTimeout);
 }
 #if (0)
 // behind the scenes callback function that is called when a data block is received

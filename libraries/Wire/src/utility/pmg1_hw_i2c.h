@@ -5,6 +5,9 @@
 #if CY7113_BOARD
 #define I2C_HW SCB0
 #define I2C_IRQ scb_0_interrupt_IRQn
+
+#define I2C_CLOCK_BLOCK PCLK_SCB0_CLOCK
+
 #define I2C_SDA_PORT GPIO_PRT4
 #define I2C_SDA_PIN 1U
 #define I2C_SDA_HSIOM P4_1_SCB0_I2C_SDA
@@ -16,6 +19,9 @@
 #if PMGDUINO_BOARD
 #define I2C_HW SCB1
 #define I2C_IRQ scb_1_interrupt_IRQn
+
+#define I2C_CLOCK_BLOCK PCLK_SCB1_CLOCK
+
 #define I2C_SDA_PORT GPIO_PRT1
 #define I2C_SDA_PIN 5U
 #define I2C_SDA_HSIOM P1_5_SCB1_I2C_SDA

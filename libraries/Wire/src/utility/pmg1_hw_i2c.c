@@ -57,7 +57,7 @@ void i2cInit(uint8_t address)
     Cy_GPIO_Pin_Init(I2C_SCL_PORT, I2C_SCL_PIN, &I2C_SCL_config);
 
     //clock 400kbps
-    Cy_SysClk_PeriphAssignDivider(PCLK_SCB1_CLOCK, CY_SYSCLK_DIV_8_BIT, 7U);
+    Cy_SysClk_PeriphAssignDivider(I2C_CLOCK_BLOCK, CY_SYSCLK_DIV_8_BIT, 7U);
     Cy_SysClk_PeriphDisableDivider(CY_SYSCLK_DIV_8_BIT, 7U);
     Cy_SysClk_PeriphSetDivider(CY_SYSCLK_DIV_8_BIT, 7U, 4U);
     Cy_SysClk_PeriphEnableDivider(CY_SYSCLK_DIV_8_BIT, 7U);
