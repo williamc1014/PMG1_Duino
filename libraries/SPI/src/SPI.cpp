@@ -1,74 +1,106 @@
-#include "SPI.h"
+//#include "SPI.h"
 
 void SPIClass::begin()
 {
 	spiPinInit();
 }
 
-void SPIClass_PmgDuino::setBitOrder(BIT_ORDER_TYPE order)
+void SPIClass::end()
 {
-	BitOrder = order;
-	return;
+	spiDeInit();
 }
 
-BIT_ORDER_TYPE SPIClass_PmgDuino::getBitOrder()
+void SPIClass::beginTransaction(SPISettings settings)
 {
-	return BitOrder;
+	spiParameter.clockFreq = settings.clockFreq;
+	spiParameter.bitOrder = settings.bitOrder;
+	spiParameter.dataMode = settings.dataMode;
+
+	spiInit(spiParameter.clockFreq, spiParameter.bitOrder, spiParameter.dataMode);
 }
 
-void SPIClass_PmgDuino::begin()
+void SPIClass::endTransaction(void)
 {
-	if (BitOrder==BIT_ORDER_TYPE_MSB)
-		initMaster(true);
-	else
-		initMaster(false);
-	return;
+	spiDisable();
 }
 
-uint8_t SPIClass_PmgDuino::transferPacket(uint8_t cmd)
+void SPIClass::setBitOrder(uint8_t order)
 {
-	uint8_t tx_buffer[SIZE_OF_PACKET] = {PACKET_SOP, 0, PACKET_EOP};
-	uint8_t rx_buffer[SIZE_OF_PACKET] = {0, 0, 0};
-
-	tx_buffer[PACKET_CMD_POS] = cmd;
-	return sendPacketEx(tx_buffer, rx_buffer, SIZE_OF_PACKET);
+	if (spiParameter.bitOrder != order)
+	{
+		spiParameter.bitOrder = order;
+		spiDeInit();
+		delay(1);
+		spiInit(spiParameter.clockFreq, spiParameter.bitOrder, spiParameter.dataMode);
+	}
 }
 
-uint8_t SPIClass_PmgDuino::transfer(uint8_t data)
+void SPIClass::setDataMode(uint8_t mode)
 {
-	uint8_t tx_buffer, rx_buffer;
-
-	tx_buffer = data;
-	return sendPacket(&tx_buffer, &rx_buffer, 1);
+	if (spiParameter.dataMode != mode)
+	{
+		spiParameter.dataMode = mode;
+		spiDeInit();
+		delay(1);
+		spiInit(spiParameter.clockFreq, spiParameter.bitOrder, spiParameter.dataMode);
+	}
 }
 
-void SPIClass_PmgDuino::transfer(uint8_t* buf, uint8_t count)
+void SPIClass::setClockDivider(uint8_t div)
 {
-	uint8_t *rx_buffer = new uint8_t[count];
+	uint32_t newRate;
 
-	sendPacket(buf, rx_buffer, count);
+	newRate = 48000000 / 4 / div;
 
-	delete[] rx_buffer;
-
-	return;
+	if (spiParameter.clockFreq != newRate)
+	{
+		spiParameter.clockFreq = newRate;
+		spiDeInit();
+		delay(1);
+		spiInit(spiParameter.clockFreq, spiParameter.bitOrder, spiParameter.dataMode);
+	}
 }
 
-uint16_t SPIClass_PmgDuino::transfer16(uint16_t data)
+uint8_t SPIClass::transfer(uint8_t val)
 {
-	uint8_t rx_buffer[2] = {0, 0};
+	uint8_t txData, rxData;
+
+	txData = val;
+
+	spiSendData(&txData, &rxData, 1);
+
+	return rxData;
+}
+
+void SPIClass::transfer(uint8_t* buffer, uint8_t size)
+{
+	uint8_t i;
+	uint8_t rxData;
+
+	for (i=0; i<size; i++)
+	{
+		spiSendData(&buffer[i], &rxData, size);
+		buffer[i] = rxData;
+	}
+}
+
+uint16_t SPIClass::transfer16(uint16_t val16)
+{
+	uint16_t rx_buffer;
 	uint8_t tx_buf[2] = {0, 0};
 
-	if (BitOrder==BIT_ORDER_TYPE_LSB)
+	if (spiParameter.bitOrder == LSBFIRST)
 	{
-		tx_buf[0] = data;
-		tx_buf[1] = (data>>8);
+		tx_buf[0] = val16;
+		tx_buf[1] = (val16>>8);
 	}
 	else
 	{
-		tx_buf[0] = (data>>8);
-		tx_buf[1] = data;
+		tx_buf[0] = (val16>>8);
+		tx_buf[1] = val16;
 	}
 
-	sendPacket(tx_buf, rx_buffer, 2);
-	return 0;
+	spiSendData(tx_buf, (uint8_t *)&rx_buffer, 2);
+
+	return rx_buffer;
 }

@@ -1,4 +1,4 @@
-#include "pmg1_hw_spi.h"
+//#include "pmg1_hw_spi.h"
 
 cy_stc_scb_spi_context_t spiContext;
 
@@ -26,10 +26,7 @@ void spiInit(uint32_t rate, bool msbFirst, uint8_t mode)
     if (mode > 3)
         return;
 
-    Cy_GPIO_Pin_Init(SPI_CK_PORT, SPI_CK_PIN, &SPI_CK_config);
-    Cy_GPIO_Pin_Init(SPI_COPI_PORT, SPI_COPI_PIN, &SPI_COPI_config);
-    Cy_GPIO_Pin_Init(SPI_CIPO_PORT, SPI_CIPO_PIN, &SPI_CIPO_config);
-    Cy_GPIO_Pin_Init(SPI_CS_PORT, SPI_CS_PIN, &SPI_CS_config);
+    spiPinInit();
 
     // SPI clock source configuration
     div = (uint8_t)((3000000 / rate) - 1);
@@ -39,7 +36,7 @@ void spiInit(uint32_t rate, bool msbFirst, uint8_t mode)
     Cy_SysClk_PeriphEnableDivider(CY_SYSCLK_DIV_8_BIT, 6U);
 
     // configure mode and bit-order
-    SPI_config.sclkMode = mode;
+    SPI_config.sclkMode = (cy_en_scb_spi_sclk_mode_t)mode;
     SPI_config.enableMsbFirst = (msbFirst) ? true : false;
 
     /* Configure SPI to operate */
@@ -63,6 +60,16 @@ void spiDeInit(void)
     Cy_GPIO_Pin_Init(SPI_CS_PORT, SPI_CS_PIN, &SPI_GPIO_HIZ_config);      
 }
 
+void spiEnable(void)
+{
+   Cy_SCB_SPI_Enable(SPI_HW); 
+}
+
+void spiDisable(void)
+{
+    Cy_SCB_SPI_Disable(SPI_HW, &spiContext);
+}
+
 void spiSetPeripheralClock(uint8_t div)
 {
     if (div != SPI_CLOCK_DIV2  || 
@@ -80,20 +87,7 @@ void spiSetPeripheralClock(uint8_t div)
     Cy_SysClk_PeriphEnableDivider(CY_SYSCLK_DIV_8_BIT, 6U);    
 }
 
-uint8_t spiRxData[SPI_BUFFER_MAX_SIZE] = {0xFF};
-
-uint8_t spiSendByte(uint8_t data)
+void spiSendData(uint8_t *txData, uint8_t *rxData, uint8_t size)
 {
-    (void)Cy_SCB_SPI_Transfer(SPIHW, &data, &spiRxData[0], 1, &spiContext);
-
-    return rxData[0];
-}
-
-uint8_t *spiSendArray(uint8_t *data, uint8_t size)
-{
-    if (size > SPI_BUFFER_MAX_SIZE)
-        return;
-    (void)Cy_SCB_SPI_Transfer(SPIHW, data, spiRxData, size, &spiContext);
-    
-    return rxData;
+    (void)Cy_SCB_SPI_Transfer(SPI_HW, txData, rxData, size, &spiContext);
 }

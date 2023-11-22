@@ -1,5 +1,5 @@
 #include <cy_gpio.h>
-#include <sy_scb_spi.h>
+#include <cy_scb_spi.h>
 
 #if CY7113_BOARD
 #define SPI_HW SCB3
@@ -167,19 +167,26 @@ cy_stc_scb_spi_config_t SPI_config =
     .spiMode = CY_SCB_SPI_MASTER,
     .subMode = CY_SCB_SPI_MOTOROLA,
     .sclkMode = CY_SCB_SPI_CPHA0_CPOL0,
+    .parity = CY_SCB_SPI_PARITY_NONE,
+    .dropOnParityError = false,
     .oversample = 4,
     .rxDataWidth = 8UL,
     .txDataWidth = 8UL,
     .enableMsbFirst = true,
-    .enableInputFilter = true,
     .enableFreeRunSclk = false,
+    .enableInputFilter = true,
+    
     .enableMisoLateSample = true,
     .enableTransferSeperation = false,
     .ssPolarity = ((CY_SCB_SPI_ACTIVE_LOW << CY_SCB_SPI_SLAVE_SELECT0) | \
                    (CY_SCB_SPI_ACTIVE_LOW << CY_SCB_SPI_SLAVE_SELECT1) | \
                    (CY_SCB_SPI_ACTIVE_LOW << CY_SCB_SPI_SLAVE_SELECT2) | \
                    (CY_SCB_SPI_ACTIVE_LOW << CY_SCB_SPI_SLAVE_SELECT3)),
+    .ssSetupDelay = CY_SCB_SPI_SS_SETUP_DELAY_0_75_CYCLES,
+    .ssHoldDelay = CY_SCB_SPI_SS_HOLD_DELAY_0_75_CYCLES,
+    .ssInterDataframeDelay = CY_SCB_SPI_SS_INTERFRAME_DELAY_1_5_CYCLES,
     .enableWakeFromSleep = false,
+    .mosiIdleHigh = true,
     .rxFifoTriggerLevel = 7UL,
     .rxFifoIntEnableMask = 0UL,
     .txFifoTriggerLevel = 0UL,
@@ -206,5 +213,7 @@ const cy_stc_sysint_t SPI_SCB_IRQ_cfg =
 void spiPinInit(void);
 void spiInit(uint32_t rate, bool msbFirst, uint8_t mode);
 void spiDeInit(void);
+void spiDisable(void);
 void spiSetPeripheralClock(uint8_t div);
-uint8_t spiSendByte(uint8_t data);
+void spiSendData(uint8_t *txData, uint8_t *rxData, uint8_t size);
+

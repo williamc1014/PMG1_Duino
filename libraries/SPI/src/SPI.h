@@ -23,10 +23,12 @@ typedef enum {
   SPI_MODE3 = 3,
 } SPIMode;
 
+#if (0)
 typedef enum {
   LSBFIRST = 0,
   MSBFIRST = 1,
 } BitOrder;
+#endif
 
 class SPISettings {
   public:
@@ -63,7 +65,7 @@ public:
   void begin();
   void end();
 
-  void setBitOrder(BitOrder order);
+  void setBitOrder(uint8_t order);
   void setDataMode(uint8_t mode);
 	void setClockDivider(uint8_t div);
 
@@ -71,9 +73,9 @@ public:
 	void endTransaction(void);
 	  
 
-  uint8_t transfer(uint8_t data);
-  void transfer(uint8_t* buf, uint8_t count);
-  uint16_t transfer16(uint16_t data);
+  uint8_t transfer(uint8_t val);
+  void transfer(uint8_t* buffer, uint8_t size);
+  uint16_t transfer16(uint16_t val16);
 };
 
 #endif /* SPI_CLASS_TEST_H_ */
