@@ -67,11 +67,11 @@ const cy_stc_pdstack_port_cfg_t mtb_usbpd_port0_pdstack_config =
     .frsConfig = 0, /* FRS configuration */
     .srcPdoCount = 0x00, /* Source PDO count */
     .defSrcPdoMask = 0x00, /* Default Source PDO mask */
-    .snkPdoCount = 0x06, /* Sink PDO count */
-    .defSnkPdoMask = 0x1F, /* Default Sink PDO mask */
+    .snkPdoCount = 0x01,//0x06, /* Sink PDO count */
+    .defSnkPdoMask = 0x01,//0x1F, /* Default Sink PDO mask */
     .srcPdo = {0}, /* Source PDO */
-    .snkPdo = {0x0001905A,0x0002D05A,0x0003C05A,0x0004B05A,0x0006405A,0x9A42305A}, /* Sink PDO */
-    .snkPdoMinMaxCur = {0x005A,0x005A,0x005A,0x005A,0x005A,0x005A}, /* Sink PDO min/max current */
+    .snkPdo = {0x0001905A},//,0x0002D05A,0x0003C05A,0x0004B05A,0x0006405A,0x9A42305A}, /* Sink PDO */
+    .snkPdoMinMaxCur = {0x005A},//,0x005A,0x005A,0x005A,0x005A,0x005A}, /* Sink PDO min/max current */
     .eprSrcPdoCount = 0x00, /* EPR Source PDO count */
     .eprSrcPdoMask = 0x00, /* Default EPR Source PDO mask */
     .eprSnkPdoCount = 0x01, /* EPR Sink PDO count */
@@ -82,57 +82,5 @@ const cy_stc_pdstack_port_cfg_t mtb_usbpd_port0_pdstack_config =
     .eprSnkPdo = {0x0008C1F4}, /* EPR Sink PDO */
 };
 #endif
-#if (0) //defined(PD_PORT1_ENABLED)
-static const uint8_t mtb_usbpd_port1_mfg_name[] = {"Infineon"}; /* Manufacturer Name */
-const cy_stc_pdstack_port_cfg_t mtb_usbpd_port1_pdstack_config = 
-{
-    .signature = 0x50445343, /* PDSC */
-    .version = 0x0100, /* Configuration table version */
-    .mfgLenInfo = 0x0D, /* Length of Manufacturer Information */
-    .mfgVid = 0x04B4, /* Manufacturer Vendor ID */
-    .mfgPid = 0xF500, /* Manufacturer Product ID */
-    .mfgName = &mtb_usbpd_port1_mfg_name[0], /* Manufacturer Name */
-    .scedbEn = 0, /* SCEDB enable */
-    .skedbEn = 1, /* SKEDB enable */
-    .extSrcCap = NULL, /* SCEDB Configuration */
-    .extSrcCapSize = 0, /* Size of extSrcCap in bytes */
-    .extSnkCap = NULL, /* SKEDB Configuration */
-    .extSnkCapSize = 0, /* Size of extSnkCap in bytes */
-    .portRole = 1, /* Port role */
-    .defPortRole = 1, /* Default port role */
-    .curLevel = 2, /* Current level */
-    .cableDiscCount = 0x14, /* Cable Discover count */
-    .srcPdoFlags = {0x70,0x00}, /* Source PDO flags */
-    .snkPdoFlags = {0}, /* Sink PDO flags */
-    .drpToggleEn = 1, /* DRP toggle enable */
-    .rpSupported = 0, /* Rp supported */
-    .pdOpEn = 1, /* PD operation enable */
-    .prefPwrRole = 0, /* Preferred Power role */
-    .portDis = 0, /* Port disable */
-    .cableDiscEn = 1, /* Cable Discovery Enable */
-    .deadBatSupp = 1, /* Dead battery support */
-    .errorRecoveryEn = 1, /* Error recovery enable */
-    .accessoryEn = 1, /* Accessory mode enable */
-    .rpDetachEn = 1, /* Rp detach enable */
-    .vconnRetain = 0, /* VCONN retain */
-    .frsConfig = 0, /* FRS configuration */
-    .srcPdoCount = 0x04, /* Source PDO count */
-    .defSrcPdoMask = 0x01, /* Default Source PDO mask */
-    .snkPdoCount = 0x00, /* Sink PDO count */
-    .defSnkPdoMask = 0x00, /* Default Sink PDO mask */
-    .srcPdo = {0x0701912C,0x0002D12C,0x0004B12C,0x0006412C}, /* Source PDO */
-    .snkPdo = {0}, /* Sink PDO */
-    .snkPdoMinMaxCur = {0}, /* Sink PDO min/max current */
-    .eprSrcPdoCount = 0x00, /* EPR Source PDO count */
-    .eprSrcPdoMask = 0x00, /* Default EPR Source PDO mask */
-    .eprSnkPdoCount = 0x00, /* EPR Sink PDO count */
-    .eprSnkPdoMask = 0x00, /* Default EPR Sink PDO mask */
-    .pdRevision = 0x31100000, /* Get_Revision message response */
-    .srcInfo = 0x003C3C3C, /* Get_Source_Info message response */
-    .eprSrcPdo = {0}, /* EPR Source PDO */
-    .eprSnkPdo = {0}, /* EPR Sink PDO */
-};
-#endif
-
 
 /* [] END OF FILE */

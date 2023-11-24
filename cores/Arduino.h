@@ -110,6 +110,7 @@ extern void loop(void);
 
 #include "Print.h"
 #include "Serial.h"
+#include "usbpd.h"
 
 //****************************************************************************
 // @Board Variant Includes
