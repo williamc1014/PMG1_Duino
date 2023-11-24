@@ -47,14 +47,11 @@ void USBPD::end(void)
 
 void USBPD::updateStatus(void)
 {
-    typecAttached = ctx->dpmConfig.attach;
-    typecPolarity = ctx->dpmConfig.polarity;
-    usbpdConnected = ctx->dpmConfig.connect;
-
-    if (usbpdConnected)
-    {
-        usbpdPowerRole = ctx->dpmConfig.curPortRole;
-    }
+    attached = ctx->dpmConfig.attach;
+    polarity = ctx->dpmConfig.polarity;
+    contractExisted = ctx->dpmConfig.contractExist;
+    powerRole = ctx->dpmConfig.curPortRole;
+    attachedDeviceType = (uint8_t)ctx->dpmConfig.attachedDev;
 }
 
 uint8_t USBPD::getCurrentSinkRdo(void)

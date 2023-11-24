@@ -39,10 +39,12 @@ class USBPD
 
     public:
     
-    bool        usbpdConnected;
-    uint8_t     usbpdPowerRole;
-    bool        typecAttached;
-    uint8_t     typecPolarity;
+    bool        attached;
+    uint8_t     polarity;
+    uint8_t     attachedDeviceType;
+    bool        contractExisted;
+    uint8_t     powerRole;
+    
     
     USBPD() {}
     USBPD(uint8_t port) {
