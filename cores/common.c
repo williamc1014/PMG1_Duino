@@ -4,7 +4,7 @@ void (*pin_intr_handler[IFX_DUINO_MAX_NUM_GPIO])(void) = {NULL};
 
 void pinMode(uint8_t pin, uint8_t mode)
 {
-    if (pin > IFX_DUINO_MAX_NUM_GPIO)
+    if (pin > IFX_DUINO_MAX_NUM_GPIO || pin == LED_BUILTIN)
         return;
 
     Cy_GPIO_SetHSIOM(gpio_pin_mapping[pin].port, gpio_pin_mapping[pin].pin, HSIOM_SEL_GPIO);
