@@ -1,5 +1,7 @@
 #include <usbpd.h>
 
+void (*usbpd_ebent_handler[APP_TOTAL_EVENTS])(void) = {NULL};
+
 void srcCapChangeRetryCbk(cy_timer_id_t id, void *ptrContext)
 {
     cy_stc_pdstack_context_t *ptrPdStackContext = (cy_stc_pdstack_context_t*) ptrContext;
@@ -73,22 +75,33 @@ uint8_t USBPD::getCurrentSinkRdo(void)
     return rdoNum;
 }
 
-bool USBPD::setSrcPdo(uint8_t pdoNum, uint32_t voltage, uint32_t maxCurrent)
+bool USBPD::setSrcPdo(uint8_t pdoNum, src_cap_t srcCap)
 {
+#if PMGDUINO_BOARD    
     if (pdoNum == 0)
-        return false;
+    {
+        // only the flag and current will be updated
+        iSprSrcPdo[0].fixed_src_do_t.drSwap = srcCap.fixed_src_do_t.drSwap;
+        iSprSrcPdo[0].fixed_src_do_t.dualRolePower = srcCap.fixed_src_do_t.dualRolePower;
+        iSprSrcPdo[0].fixed_src_do_t.extPowered = srcCap.fixed_src_do_t.extPowered;
+        iSprSrcPdo[0].fixed_src_do_t.unchunkSup = srcCap.fixed_src_do_t.unchunkSup;
+        iSprSrcPdo[0].fixed_src_do_t.usbCommCap = srcCap.fixed_src_do_t.usbCommCap;
+        iSprSrcPdo[0].fixed_src_do_t.usbSuspendSup = srcCap.fixed_src_do_t.usbSuspendSup;
+        iSprSrcPdo[0].fixed_src_do_t.maxCurrent = srcCap.fixed_src_do_t.maxCurrent;
+        iSprSrcPdo[0].fixed_src_do_t.pkCurrent = srcCap.fixed_src_do_t.pkCurrent;
 
-#if PMGDUINO_BOARD
+        return true;
+    }    
+
+
     uint8_t i;
     uint8_t pdoCnt = 0;
 
-    if (pdoNum == 0 || pdoNum > 7)
+    if (pdoNum > 7)
         return false;
     
-    iSprSrcPdo[pdoNum].fixed_src.maxCurrent = maxCurrent / 10;
-    iSprSrcPdo[pdoNum].fixed_src.voltage = voltage / 50;
-    iSprSrcPdo[pdoNum].fixed_src.supplyType = 0;
-
+    memcpy((void *)&iSprSrcPdo[pdoNum], (const void *)&srcCap, sizeof(uint32_t));
+    
     iSprSrcMask |= (1 << pdoNum);
 
     for (i=0; i<7; i++)
@@ -103,18 +116,29 @@ bool USBPD::setSrcPdo(uint8_t pdoNum, uint32_t voltage, uint32_t maxCurrent)
     return true;
 }
 
-bool USBPD::setSinkPdo(uint8_t pdoNum, uint32_t voltage, uint32_t opCurrent, uint32_t maxCurrent)
+bool USBPD::setSinkPdo(uint8_t pdoNum, snk_cap_t snkCap)
 {
     uint8_t i;
     uint8_t pdoCnt = 0;
 
-    if (pdoNum == 0 || pdoNum > 7)
+    if (pdoNum == 0)
+    {
+        // only update flags and current
+        iSprSnkPdo[0].fixed_snk_do_t.drSwap = snkCap.fixed_snk_do_t.drSwap;
+        iSprSnkPdo[0].fixed_snk_do_t.dualRolePower = snkCap.fixed_snk_do_t.dualRolePower;
+        iSprSnkPdo[0].fixed_snk_do_t.extPowered = snkCap.fixed_snk_do_t.extPowered;
+        iSprSnkPdo[0].fixed_snk_do_t.frSwap = 0;
+        iSprSnkPdo[0].fixed_snk_do_t.opCurrent = snkCap.fixed_snk_do_t.opCurrent; 
+        iSprSnkPdo[0].fixed_snk_do_t.usbCommCap = snkCap.fixed_snk_do_t.usbCommCap;
+
+        return true;
+    }
+
+    if (pdoNum > 7)
         return false;
     
-    iSprSnkPdo[pdoNum].fixed_snk.opCurrent = opCurrent / 10;
-    iSprSnkPdo[pdoNum].fixed_snk.voltage = voltage / 50;
-    iSprSnkPdo[pdoNum].fixed_snk.supplyType = 0;
-
+    memcpy((void *)&iSprSnkPdo[pdoNum], (const void*)&snkCap, sizeof(uint32_t));
+    
     iSprSnkMask |= (1 << pdoNum);
 
     for (i=0; i<7; i++)
@@ -125,15 +149,135 @@ bool USBPD::setSinkPdo(uint8_t pdoNum, uint32_t voltage, uint32_t opCurrent, uin
 
     iSprSnkPdoCnt = pdoCnt;
 
+    if (iSprSnkPdoCnt > 1)
+        iSprSnkPdo[0].fixed_snk_do_t.highCap = 1;
+
     return true;
 }
+
+
+bool USBPD::setFixedSrcPdo(uint8_t pdoNum, uint32_t voltage, uint32_t maxCurrent, uint8_t peakCurrent)
+{
+    src_cap_t srcCap;
+
+    srcCap.val = 0;
+    srcCap.fixed_src_do_t.voltage = voltage / 50;
+    srcCap.fixed_src_do_t.maxCurrent = maxCurrent / 10;
+    srcCap.fixed_src_do_t.pkCurrent = peakCurrent;
+    srcCap.fixed_src_do_t.supplyType = 0;
+
+    return (setSrcPdo(pdoNum, srcCap));
+}
+
+bool USBPD::setFixedSrcPdo0(uint32_t maxCurrent, uint32_t flags)
+{
+    src_cap_t srcCap;
+
+    srcCap.val = flags & 0x3F000000 | (maxCurrent / 10);
+
+    return (setSrcPdo(0, srcCap));
+}
+
+bool USBPD::setVarSrcPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t maxCurrent)
+{
+    src_cap_t srcCap;
+
+    srcCap.val = 0;
+    srcCap.var_src_do_t.maxCurrent = maxCurrent / 10;
+    srcCap.var_src_do_t.maxVoltage = maxVoltage / 50;
+    srcCap.var_src_do_t.minVoltage = minVoltage / 50;
+    srcCap.var_src_do_t.supplyType = 2;
+
+    return (setSrcPdo(pdoNum, srcCap));
+}
+
+bool USBPD::setBatSrcPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t maxPower)
+{
+    src_cap_t srcCap;
+
+    srcCap.val = 0;
+    srcCap.bat_src_do_t.maxPower = maxPower / 250;
+    srcCap.bat_src_do_t.maxVoltage = maxVoltage / 50;
+    srcCap.bat_src_do_t.minVoltage = minVoltage / 50;
+    srcCap.bat_src_do_t.supplyType = 1;
+
+    return (setSrcPdo(pdoNum, srcCap));
+}
+
+bool USBPD::setAugmentedSrcPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t maxCurrent)
+{
+    src_cap_t srcCap;
+
+    srcCap.val = 0;
+    srcCap.src_gen_do_t.maxCurPower = maxCurrent / 50;
+    srcCap.src_gen_do_t.maxVoltage = maxVoltage / 100;
+    srcCap.src_gen_do_t.minVoltage = minVoltage / 100;
+    srcCap.src_gen_do_t.supplyType = 3;
+
+    return (setSrcPdo(pdoNum, srcCap));
+}
+
+bool USBPD::setFixedSnkPdo(uint8_t pdoNum, uint32_t voltage, uint32_t opCurrent)
+{
+    snk_cap_t snkCap;
+
+    snkCap.val = 0;
+    snkCap.fixed_snk_do_t.voltage = voltage / 50;
+    snkCap.fixed_snk_do_t.opCurrent = opCurrent / 10;
+    snkCap.fixed_snk_do_t.supplyType = 0;
+
+    return (setSinkPdo(pdoNum, snkCap));
+}
+
+bool USBPD::setFixedSnkPdo0(uint32_t opCurrent, uint32_t flags)
+{
+    snk_cap_t snkCap;
+
+    snkCap.val = flags & 0x3E000000 | (opCurrent / 10);
+
+    return (setSinkPdo(0, snkCap));
+}
+
+bool USBPD::setVarSnkPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t opCurrent)
+{
+    snk_cap_t snkCap;
+
+    snkCap.val = 0;
+    snkCap.var_snk_do_t.opCurrent = opCurrent / 10;
+    snkCap.var_snk_do_t.maxVoltage = maxVoltage / 50;
+    snkCap.var_snk_do_t.minVoltage = minVoltage / 50;
+    snkCap.var_snk_do_t.supplyType = 2;
+
+    return (setSinkPdo(pdoNum, snkCap));
+}
+
+bool USBPD::setBatSnkPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t opPower)
+{
+    snk_cap_t snkCap;
+
+    snkCap.val = 0;
+    snkCap.bat_snk_do_t.opPower = opPower / 250;
+    snkCap.bat_snk_do_t.maxVoltage = maxVoltage / 50;
+    snkCap.bat_snk_do_t.minVoltage = minVoltage / 50;
+    snkCap.bat_snk_do_t.supplyType = 1;
+
+    return (setSinkPdo(pdoNum, snkCap));
+}
+
 
 bool USBPD::updateSrcPdo(void)
 {
 
 #if PMGDUINO_BOARD
     cy_en_pdstack_status_t status;
-    status = Cy_PdStack_Dpm_UpdateSrcCap(ctx, iSprSrcPdoCnt, iSprSrcPdo);
+
+    cy_pd_pd_do_t srcPdo[7];
+
+    for (uint8_t i=0; i<iSprSrcPdoCnt; i++)
+        srcPdo[i].val = iSprSrcPdo[i].val;
+
+
+    status = Cy_PdStack_Dpm_UpdateSrcCap(ctx, iSprSrcPdoCnt, srcPdo);
     if (status == CY_PDSTACK_STAT_SUCCESS)
     {
         status = Cy_PdStack_Dpm_UpdateSrcCapMask(ctx, (iSprSrcMask | 0x80));
@@ -160,8 +304,12 @@ bool USBPD::updateSrcPdo(void)
 bool USBPD::updateSinkPdo(void)
 {
     cy_en_pdstack_status_t status;
+    cy_pd_pd_do_t snkPdo[7];
 
-    status = Cy_PdStack_Dpm_UpdateSnkCap(ctx, iSprSnkPdoCnt, iSprSnkPdo);
+    for (uint8_t i=0; i<iSprSnkPdoCnt; i++)
+        snkPdo[i].val = iSprSnkPdo[i].val;
+
+    status = Cy_PdStack_Dpm_UpdateSnkCap(ctx, iSprSnkPdoCnt, snkPdo);
 
     if (status == CY_PDSTACK_STAT_SUCCESS)
     {
@@ -182,6 +330,21 @@ bool USBPD::updateSinkPdo(void)
     }
 
     return (status == CY_PDSTACK_STAT_SUCCESS) ? true : false;
+}
+
+bool USBPD::getPartnerPortSrcCap(src_cap_t *srcCapPdo)
+{
+    return true;
+}
+
+void USBPD::registerEvent(uint8_t event, void (*userFunc)(void))
+{
+    usbpd_ebent_handler[event] = userFunc;
+}
+
+void USBPD::unRegisterEvent(uint8_t event)
+{
+    usbpd_ebent_handler[event] = NULL;
 }
 
 USBPD usbpd0 = USBPD(0);

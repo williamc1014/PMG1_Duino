@@ -254,9 +254,11 @@ void sln_pd_event_handler(cy_stc_pdstack_context_t* ctx, cy_en_pdstack_app_evt_t
         {
             /* Send Not supported message */
             Cy_PdStack_Dpm_SendPdCommand(ctx, CY_PDSTACK_DPM_CMD_SEND_NOT_SUPPORTED, NULL, true, NULL);
-            //if (user_hook_APP_EVT_HANDLE_EXTENDED_MSG !=NULL) user_hook_APP_EVT_HANDLE_EXTENDED_MSG();
         }
     }
+
+    if (usbpd_ebent_handler[evt] !=NULL) 
+        (*usbpd_ebent_handler[evt])();
 }
 
 void instrumentation_cb(uint8_t port, uint8_t evt)
@@ -364,7 +366,7 @@ static void cy_gpio_intr_handler(void)
     Cy_SysLib_ExitCriticalSection(intr_state);
 	
 	// Trigger an OS event
-	xSemaphoreGiveFromISR( gl_GpioSemaHandle, &xHigherPriorityTaskWoken);
+	xSemaphoreGiveFromISR(gl_GpioSemaHandle, &xHigherPriorityTaskWoken);
 	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
