@@ -77,6 +77,12 @@ void sink_fet_off(cy_stc_pdstack_context_t * context)
 #if defined(CY_DEVICE_CCG3PA)
     Cy_USBPD_Vbus_GdrvCfetOff(context->ptrUsbPdContext, VBUS_FET_CTRL);
 #elif defined(CY_DEVICE_PMG1S3)
+#if PMGDUINO_BOARD
+if (context->port == 0)
+    Cy_GPIO_Write(PFET_SNK_CTRL_P0_PORT, PFET_SNK_CTRL_P0_PIN, 0);
+else
+    Cy_GPIO_Write(PFET_SNK_CTRL_P1_PORT, PFET_SNK_CTRL_P1_PIN, 0);
+#else
     Cy_PdUtils_SwTimer_Stop(context->ptrTimerContext, GET_APP_TIMER_ID(context, APP_VBUS_FET_ON_TIMER));
 
     Cy_USBPD_Vbus_NgdoG1Ctrl (context->ptrUsbPdContext, false);
@@ -85,6 +91,7 @@ void sink_fet_off(cy_stc_pdstack_context_t * context)
     Cy_PdUtils_SwTimer_Start(context->ptrTimerContext, context, 
                     GET_APP_TIMER_ID(context, APP_VBUS_FET_OFF_TIMER),
                     APP_VBUS_FET_OFF_TIMER_PERIOD, vbus_fet_off_cbk);
+#endif
 #else
     Cy_USBPD_Vbus_GdrvCfetOff(context->ptrUsbPdContext, false);
 #endif /* defined(CY_DEVICE_CCG3PA) */
@@ -107,11 +114,18 @@ void sink_fet_on(cy_stc_pdstack_context_t * context)
 #if defined(CY_DEVICE_CCG3PA)
     Cy_USBPD_Vbus_GdrvCfetOn(context->ptrUsbPdContext, VBUS_FET_CTRL);
 #elif defined(CY_DEVICE_PMG1S3)
+#if PMGDUINO_BOARD
+if (context->port == 0)
+    Cy_GPIO_Write(PFET_SNK_CTRL_P0_PORT, PFET_SNK_CTRL_P0_PIN, 1);
+else
+    Cy_GPIO_Write(PFET_SNK_CTRL_P1_PORT, PFET_SNK_CTRL_P1_PIN, 1);
+#else
     Cy_USBPD_Vbus_NgdoOn(context->ptrUsbPdContext, false);
     
     Cy_PdUtils_SwTimer_Start(context->ptrTimerContext, context, 
                     GET_APP_TIMER_ID(context, APP_VBUS_FET_ON_TIMER),
                     APP_VBUS_FET_ON_TIMER_PERIOD, vbus_fet_on_cbk);
+#endif
 #else
     Cy_USBPD_Vbus_GdrvCfetOn(context->ptrUsbPdContext, false);
 #endif /* defined(CY_DEVICE_CCG3PA) */
