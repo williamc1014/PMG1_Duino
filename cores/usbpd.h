@@ -147,17 +147,32 @@ public:
     void updateStatus(void);
     uint8_t getCurrentSinkRdo(void);
 
+#if PMGDUINO_BOARD
+    void setSrcUSBCommFlag(bool enable);
+    void setSrcDualDataRoleFlag(bool enable);
+    void setSrcDualPowerModeFlag(bool enable);
+    void setSrcUnconstrainedPowerFlag(bool enable);
+#if CY_PD_EPR_ENABLE
+    void setSrcEPRFlag(bool enable);
+#endif
+    void setUnchunkedExtMsgFlag(bool enable);
+    void setSrcUSBSuspendCapFlag(bool enable);
+    void setSrcPeakCurrent(uint8_t peakCurrent);
+#endif
+
     bool setFixedSrcPdo(uint8_t pdoNum, uint32_t voltage, uint32_t maxCurrent, uint8_t peakCurrent);
-    bool setFixedSrcPdo0(uint32_t maxCurrent, uint32_t flags);
     bool setVarSrcPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t maxCurrent);
     bool setBatSrcPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t maxPower);
     bool setAugmentedSrcPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t maxCurrent);
 
+    void setSnkDualDataRoleFlag(bool enable);
+    void setSnkUnconstrainedPowerFlag(bool enable);
+    void setSnkUSBCommFlag(bool enable);
+    void setSnkDualPowerModeFlag(bool enable);
+
     bool setFixedSnkPdo(uint8_t pdoNum, uint32_t voltage, uint32_t opCurrent);
-    bool setFixedSnkPdo0(uint32_t opCurrent, uint32_t flags);
     bool setVarSnkPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t opCurrent);
     bool setBatSnkPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t opPower);
-
 
     bool updateSrcPdo(void);
     bool updateSinkPdo(void);

@@ -78,21 +78,8 @@ uint8_t USBPD::getCurrentSinkRdo(void)
 bool USBPD::setSrcPdo(uint8_t pdoNum, src_cap_t srcCap)
 {
 #if PMGDUINO_BOARD    
-    if (pdoNum == 0)
-    {
-        // only the flag and current will be updated
-        iSprSrcPdo[0].fixed_src_do_t.drSwap = srcCap.fixed_src_do_t.drSwap;
-        iSprSrcPdo[0].fixed_src_do_t.dualRolePower = srcCap.fixed_src_do_t.dualRolePower;
-        iSprSrcPdo[0].fixed_src_do_t.extPowered = srcCap.fixed_src_do_t.extPowered;
-        iSprSrcPdo[0].fixed_src_do_t.unchunkSup = srcCap.fixed_src_do_t.unchunkSup;
-        iSprSrcPdo[0].fixed_src_do_t.usbCommCap = srcCap.fixed_src_do_t.usbCommCap;
-        iSprSrcPdo[0].fixed_src_do_t.usbSuspendSup = srcCap.fixed_src_do_t.usbSuspendSup;
-        iSprSrcPdo[0].fixed_src_do_t.maxCurrent = srcCap.fixed_src_do_t.maxCurrent;
-        iSprSrcPdo[0].fixed_src_do_t.pkCurrent = srcCap.fixed_src_do_t.pkCurrent;
-
-        return true;
-    }    
-
+    if (pdoNum == 0 || pdoNum > 7)
+        return false;
 
     uint8_t i;
     uint8_t pdoCnt = 0;
@@ -121,20 +108,7 @@ bool USBPD::setSinkPdo(uint8_t pdoNum, snk_cap_t snkCap)
     uint8_t i;
     uint8_t pdoCnt = 0;
 
-    if (pdoNum == 0)
-    {
-        // only update flags and current
-        iSprSnkPdo[0].fixed_snk_do_t.drSwap = snkCap.fixed_snk_do_t.drSwap;
-        iSprSnkPdo[0].fixed_snk_do_t.dualRolePower = snkCap.fixed_snk_do_t.dualRolePower;
-        iSprSnkPdo[0].fixed_snk_do_t.extPowered = snkCap.fixed_snk_do_t.extPowered;
-        iSprSnkPdo[0].fixed_snk_do_t.frSwap = 0;
-        iSprSnkPdo[0].fixed_snk_do_t.opCurrent = snkCap.fixed_snk_do_t.opCurrent; 
-        iSprSnkPdo[0].fixed_snk_do_t.usbCommCap = snkCap.fixed_snk_do_t.usbCommCap;
-
-        return true;
-    }
-
-    if (pdoNum > 7)
+    if (pdoNum == 0 || pdoNum > 7)
         return false;
     
     memcpy((void *)&iSprSnkPdo[pdoNum], (const void*)&snkCap, sizeof(uint32_t));
@@ -169,14 +143,53 @@ bool USBPD::setFixedSrcPdo(uint8_t pdoNum, uint32_t voltage, uint32_t maxCurrent
     return (setSrcPdo(pdoNum, srcCap));
 }
 
-bool USBPD::setFixedSrcPdo0(uint32_t maxCurrent, uint32_t flags)
+#if PMGDUINO_BOARD
+void USBPD::setSrcUSBCommFlag(bool enable)
 {
-    src_cap_t srcCap;
-
-    srcCap.val = flags & 0x3F000000 | (maxCurrent / 10);
-
-    return (setSrcPdo(0, srcCap));
+    iSprSrcPdo[0].fixed_src_do_t.usbCommCap = enable ? 1 : 0;
 }
+
+void USBPD::setSrcDualDataRoleFlag(bool enable)
+{
+    iSprSrcPdo[0].fixed_src_do_t.drSwap = enable ? 1 : 0;
+}
+
+void USBPD::setSrcDualPowerModeFlag(bool enable)
+{
+    iSprSrcPdo[0].fixed_src_do_t.dualRolePower = enable ? 1 : 0;
+}
+
+void USBPD::setSrcUnconstrainedPowerFlag(bool enable)
+{
+    iSprSrcPdo[0].fixed_src_do_t.extPowered = enable ? 1 : 0;
+    iSprSrcMask &= 0x7F;
+    iSprSrcMask |= enable ? 0x80 : 0x00;
+}
+
+#if CY_PD_EPR_ENABLE
+void USBPD::setSrcEPRFlag(bool enable)
+{
+    iSprSrcPdo[0].fixed_src_do_t.eprModeCapable = enable ? 1 : 0;
+}
+#endif
+
+void USBPD::setUnchunkedExtMsgFlag(bool enable)
+{
+    iSprSrcPdo[0].fixed_src_do_t.unchunkSup = enable ? 1 : 0;
+}
+
+void USBPD::setSrcUSBSuspendCapFlag(bool enable)
+{
+    iSprSrcPdo[0].fixed_src_do_t.usbSuspendSup = enable ? 1 : 0;
+}
+
+void USBPD::setSrcPeakCurrent(uint8_t peakCurrent)
+{
+    if (peakCurrent > 3)
+        return;
+    iSprSrcPdo[0].fixed_src_do_t.pkCurrent = peakCurrent;
+}
+#endif
 
 bool USBPD::setVarSrcPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t maxCurrent)
 {
@@ -217,6 +230,26 @@ bool USBPD::setAugmentedSrcPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t max
     return (setSrcPdo(pdoNum, srcCap));
 }
 
+void USBPD::setSnkDualDataRoleFlag(bool enable)
+{
+    iSprSnkPdo[0].fixed_snk_do_t.drSwap = enable ? 1 : 0;
+}
+
+void USBPD::setSnkUnconstrainedPowerFlag(bool enable)
+{
+    iSprSnkPdo[0].fixed_snk_do_t.extPowered = enable ? 1 : 0;
+}
+
+void USBPD::setSnkUSBCommFlag(bool enable)
+{
+    iSprSnkPdo[0].fixed_snk_do_t.usbCommCap = enable ? 1 : 0;
+}
+
+void USBPD::setSnkDualPowerModeFlag(bool enable)
+{
+    iSprSnkPdo[0].fixed_snk_do_t.dualRolePower = enable ? 1 : 0;
+}
+
 bool USBPD::setFixedSnkPdo(uint8_t pdoNum, uint32_t voltage, uint32_t opCurrent)
 {
     snk_cap_t snkCap;
@@ -227,15 +260,6 @@ bool USBPD::setFixedSnkPdo(uint8_t pdoNum, uint32_t voltage, uint32_t opCurrent)
     snkCap.fixed_snk_do_t.supplyType = 0;
 
     return (setSinkPdo(pdoNum, snkCap));
-}
-
-bool USBPD::setFixedSnkPdo0(uint32_t opCurrent, uint32_t flags)
-{
-    snk_cap_t snkCap;
-
-    snkCap.val = flags & 0x3E000000 | (opCurrent / 10);
-
-    return (setSinkPdo(0, snkCap));
 }
 
 bool USBPD::setVarSnkPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t opCurrent)
@@ -270,7 +294,6 @@ bool USBPD::updateSrcPdo(void)
 
 #if PMGDUINO_BOARD
     cy_en_pdstack_status_t status;
-
     cy_pd_pd_do_t srcPdo[7];
 
     for (uint8_t i=0; i<iSprSrcPdoCnt; i++)
@@ -334,7 +357,30 @@ bool USBPD::updateSinkPdo(void)
 
 bool USBPD::getPartnerPortSrcCap(src_cap_t *srcCapPdo)
 {
-    return true;
+    cy_en_pdstack_status_t status;
+    cy_pd_pd_do_t snkPdo[7];
+
+    status = Cy_PdStack_Dpm_UpdateSnkCap(ctx, iSprSnkPdoCnt, snkPdo);
+
+    if (status == CY_PDSTACK_STAT_SUCCESS)
+    {
+        Cy_PdStack_Dpm_UpdateSnkCapMask(ctx, iSprSnkMask);
+        if (status == CY_PDSTACK_STAT_SUCCESS)
+        {
+    		if ((ctx->dpmConfig.connect) && (ctx->dpmConfig.curPortRole == CY_PD_PRT_ROLE_SINK))
+    		{
+    			if(Cy_PdStack_Dpm_SendPdCommand(ctx, CY_PDSTACK_DPM_CMD_SNK_CAP_CHNG, NULL, false, NULL) != CY_PDSTACK_STAT_SUCCESS)
+    			{
+    				Cy_PdUtils_SwTimer_Start(ctx->ptrTimerContext, ctx,
+    										GET_USER_TIMER_ID(ctx, SNK_CAP_CHANGE_RETRY_TIMER), 
+                                            SNK_CAP_CHANGE_RETRY_TIMER_PERIOD, 
+                                            snkCapChangeRetryCbk);
+    			}
+    		}
+        }
+    }
+
+    return (status == CY_PDSTACK_STAT_SUCCESS) ? true : false;
 }
 
 void USBPD::registerEvent(uint8_t event, void (*userFunc)(void))
