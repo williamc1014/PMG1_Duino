@@ -45,36 +45,6 @@ cy_stc_sysint_t uartIntrConfig =
     #define ioss_0_port_4_pin_1_HSIOM P4_1_SCB0_UART_TX
 #endif
 #define CYBSP_DEBUG_UART_TX_HSIOM ioss_0_port_4_pin_1_HSIOM
-const cy_stc_scb_uart_config_t CYBSP_DBG_UART_config = 
-{
-  .uartMode = CY_SCB_UART_STANDARD,
-  .oversample = 8,  
-  .dataWidth = 8UL,
-  .enableMsbFirst = false,
-  .stopBits = CY_SCB_UART_STOP_BITS_1,
-  .parity = CY_SCB_UART_PARITY_NONE,
-  .enableInputFilter = false,
-  .dropOnParityError = false,
-  .dropOnFrameError = false,
-  .enableMutliProcessorMode = false,
-  .receiverAddress = 0x0UL,
-  .receiverAddressMask = 0x0UL,
-  .acceptAddrInFifo = false,
-  .irdaInvertRx = false,
-  .irdaEnableLowPowerReceiver = false,
-  .smartCardRetryOnNack = false,
-  .enableLinMode = false,
-  .enableCts = false,
-  .ctsPolarity = CY_SCB_UART_ACTIVE_LOW,
-  .rtsRxFifoLevel = 0UL,
-  .rtsPolarity = CY_SCB_UART_ACTIVE_LOW,
-  .breakWidth = 11UL,
-  .breakLevel = false,
-  .rxFifoTriggerLevel = 0UL,
-  .rxFifoIntEnableMask = 0UL,
-  .txFifoTriggerLevel = 0UL,
-  .txFifoIntEnableMask = 0UL
-};
 #define CYBSP_DBG_UART_HW SCB0
 static cy_stc_scb_uart_context_t dbgUartContext;
 #endif
