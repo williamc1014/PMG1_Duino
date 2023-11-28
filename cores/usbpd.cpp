@@ -288,22 +288,58 @@ bool USBPD::setBatSnkPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltag
     return (setSinkPdo(pdoNum, snkCap));
 }
 
-
 bool USBPD::updateSrcPdo(void)
 {
 
-#if PMGDUINO_BOARD
+#if PMGDUINO_BOARD 
     cy_en_pdstack_status_t status;
     cy_pd_pd_do_t srcPdo[7];
 
     for (uint8_t i=0; i<iSprSrcPdoCnt; i++)
         srcPdo[i].val = iSprSrcPdo[i].val;
 
+#if CY_PD_EPR_ENABLE
+    if (iSprSrcPdo[0].fixed_src_do_t.eprModeCapable)
+        ctx->dpmStat.srcPdoFlags[0] |= CY_PD_SRCCAP_FLAGS_0_EPR_MODE_CAP;
+    else
+        ctx->dpmStat.srcPdoFlags[0] &= ~CY_PD_SRCCAP_FLAGS_0_EPR_MODE_CAP;
+#endif
+    if (iSprSrcPdo[0].fixed_src_do_t.unchunkSup)
+        ctx->dpmStat.srcPdoFlags[0] |= CY_PD_SRCCAP_FLAGS_0_UNCHUNKED_SUPP;
+    else
+        ctx->dpmStat.srcPdoFlags[0] &= ~CY_PD_SRCCAP_FLAGS_0_UNCHUNKED_SUPP;
+
+    if (iSprSrcPdo[0].fixed_src_do_t.drSwap)
+        ctx->dpmStat.srcPdoFlags[0] |= CY_PD_SRCCAP_FLAGS_0_DUAL_ROLE_DATA;
+    else
+        ctx->dpmStat.srcPdoFlags[0] &= ~CY_PD_SRCCAP_FLAGS_0_DUAL_ROLE_DATA;
+
+    if (iSprSrcPdo[0].fixed_src_do_t.usbCommCap)
+        ctx->dpmStat.srcPdoFlags[0] |= CY_PD_SRCCAP_FLAGS_0_USB_COMM;
+    else
+        ctx->dpmStat.srcPdoFlags[0] &= ~CY_PD_SRCCAP_FLAGS_0_USB_COMM;
+
+    if (iSprSrcPdo[0].fixed_src_do_t.extPowered)
+        ctx->dpmStat.srcPdoFlags[0] |= CY_PD_SRCCAP_FLAGS_0_UNCONSTRAINED_POW;
+    else
+        ctx->dpmStat.srcPdoFlags[0] &= ~CY_PD_SRCCAP_FLAGS_0_UNCONSTRAINED_POW;
+
+    if (iSprSrcPdo[0].fixed_src_do_t.usbSuspendSup)
+        ctx->dpmStat.srcPdoFlags[0] |= CY_PD_SRCCAP_FLAGS_1_USB_SUSP_SUPP;
+    else
+        ctx->dpmStat.srcPdoFlags[0] &= ~CY_PD_SRCCAP_FLAGS_1_USB_SUSP_SUPP;
+
+    if (iSprSrcPdo[0].fixed_src_do_t.dualRolePower)
+        ctx->dpmStat.srcPdoFlags[0] |= CY_PD_SRCCAP_FLAGS_1_DUAL_ROLE_POWER;
+    else
+        ctx->dpmStat.srcPdoFlags[0] &= ~CY_PD_SRCCAP_FLAGS_1_DUAL_ROLE_POWER;
+
+    ctx->dpmStat.srcPdoFlags[1] = (iSprSrcPdo[0].fixed_src_do_t.pkCurrent & 0x03);
 
     status = Cy_PdStack_Dpm_UpdateSrcCap(ctx, iSprSrcPdoCnt, srcPdo);
     if (status == CY_PDSTACK_STAT_SUCCESS)
     {
-        status = Cy_PdStack_Dpm_UpdateSrcCapMask(ctx, (iSprSrcMask | 0x80));
+        status = Cy_PdStack_Dpm_UpdateSrcCapMask(ctx, iSprSrcMask);
         if (status == CY_PDSTACK_STAT_SUCCESS)
         {
     		if ((ctx->dpmConfig.connect) && (ctx->dpmConfig.curPortRole == CY_PD_PRT_ROLE_SOURCE))
@@ -333,6 +369,31 @@ bool USBPD::updateSinkPdo(void)
         snkPdo[i].val = iSprSnkPdo[i].val;
 
     status = Cy_PdStack_Dpm_UpdateSnkCap(ctx, iSprSnkPdoCnt, snkPdo);
+
+    if (iSprSnkPdo[0].fixed_snk_do_t.drSwap)
+        ctx->dpmStat.snkPdoFlags[0] |= CY_PD_SNKCAP_FLAGS_0_DUAL_ROLE_DATA;
+    else
+        ctx->dpmStat.snkPdoFlags[0] &= ~CY_PD_SNKCAP_FLAGS_0_DUAL_ROLE_DATA;
+    
+    if (iSprSnkPdo[0].fixed_snk_do_t.usbCommCap)
+        ctx->dpmStat.snkPdoFlags[0] |= CY_PD_SNKCAP_FLAGS_0_USB_COMM;
+    else
+        ctx->dpmStat.snkPdoFlags[0] &= ~CY_PD_SNKCAP_FLAGS_0_USB_COMM;
+
+    if (iSprSnkPdo[0].fixed_snk_do_t.extPowered)
+        ctx->dpmStat.snkPdoFlags[0] |= CY_PD_SNKCAP_FLAGS_0_UNCONSTRAINED_POW;
+    else
+        ctx->dpmStat.snkPdoFlags[0] &= ~CY_PD_SNKCAP_FLAGS_0_UNCONSTRAINED_POW;
+
+    if (iSprSnkPdo[0].fixed_snk_do_t.highCap)
+        ctx->dpmStat.snkPdoFlags[1] |= CY_PD_SNKCAP_FLAGS_1_HIGH_CAP;
+    else
+        ctx->dpmStat.snkPdoFlags[1] &= ~CY_PD_SNKCAP_FLAGS_1_HIGH_CAP;
+
+    if (iSprSnkPdo[0].fixed_snk_do_t.dualRolePower)
+        ctx->dpmStat.snkPdoFlags[1] |= CY_PD_SNKCAP_FLAGS_1_DUAL_ROLE_POWER;
+    else
+        ctx->dpmStat.snkPdoFlags[1] &= ~CY_PD_SNKCAP_FLAGS_1_DUAL_ROLE_POWER;
 
     if (status == CY_PDSTACK_STAT_SUCCESS)
     {

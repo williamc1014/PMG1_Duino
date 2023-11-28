@@ -108,6 +108,53 @@ typedef union
     } bat_snk_do_t;                                      /**< DO interpreted as a Battery Supply PDO - Sink. */
 } snk_cap_t;
 
+#ifndef CY_PD_SRCCAP_FLAGS_1_DUAL_ROLE_POWER
+#define CY_PD_SRCCAP_FLAGS_1_DUAL_ROLE_POWER    (1U << 1U)
+#endif
+
+#ifndef CY_PD_SRCCAP_FLAGS_1_USB_SUSP_SUPP
+#define CY_PD_SRCCAP_FLAGS_1_USB_SUSP_SUPP      (1U << 0U)
+#endif
+
+#ifndef CY_PD_SRCCAP_FLAGS_0_UNCONSTRAINED_POW
+#define CY_PD_SRCCAP_FLAGS_0_UNCONSTRAINED_POW  (1U << 7U)
+#endif
+
+#ifndef CY_PD_SRCCAP_FLAGS_0_USB_COMM
+#define CY_PD_SRCCAP_FLAGS_0_USB_COMM           (1U << 6U)
+#endif
+
+#ifndef CY_PD_SRCCAP_FLAGS_0_DUAL_ROLE_DATA
+#define CY_PD_SRCCAP_FLAGS_0_DUAL_ROLE_DATA     (1U << 5U)
+#endif
+
+#ifndef CY_PD_SRCCAP_FLAGS_0_UNCHUNKED_SUPP
+#define CY_PD_SRCCAP_FLAGS_0_UNCHUNKED_SUPP     (1U << 4U)
+#endif
+
+#ifndef CY_PD_SRCCAP_FLAGS_0_EPR_MODE_CAP
+#define CY_PD_SRCCAP_FLAGS_0_EPR_MODE_CAP       (1U << 3U)
+#endif
+
+#ifndef CY_PD_SNKCAP_FLAGS_1_DUAL_ROLE_POWER
+#define CY_PD_SNKCAP_FLAGS_1_DUAL_ROLE_POWER    (1U << 1U)
+#endif
+
+#ifndef CY_PD_SNKCAP_FLAGS_1_HIGH_CAP
+#define CY_PD_SNKCAP_FLAGS_1_HIGH_CAP           (1U << 0U)
+#endif 
+
+#ifndef CY_PD_SNKCAP_FLAGS_0_UNCONSTRAINED_POW
+#define CY_PD_SNKCAP_FLAGS_0_UNCONSTRAINED_POW  (1U << 7U)
+#endif
+
+#ifndef CY_PD_SNKCAP_FLAGS_0_USB_COMM
+#define CY_PD_SNKCAP_FLAGS_0_USB_COMM           (1U << 6U)
+#endif
+
+#ifndef CY_PD_SNKCAP_FLAGS_0_DUAL_ROLE_DATA
+#define CY_PD_SNKCAP_FLAGS_0_DUAL_ROLE_DATA     (1U << 5U)
+#endif
 
 class USBPD
 {
@@ -118,7 +165,7 @@ private:
     uint8_t                     iSprSnkPdoCnt = 0x01;
     uint8_t                     iSprSnkMask = 0x01;
 
-#if PMGDUINO_BOARD
+#if PMGDUINO_BOARD 
     src_cap_t                   iSprSrcPdo[7] = {0};
     uint8_t                     iSprSrcPdoCnt = 0x01;
     uint8_t                     iSprSrcMask = 0x01;
