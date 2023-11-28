@@ -30,6 +30,18 @@ void snkCapChangeRetryCbk(cy_timer_id_t id, void *ptrContext)
     }
 }
 
+static void usbPdCmdCbk(cy_stc_pdstack_context_t *ptrPdStackContext,
+					  cy_en_pdstack_resp_status_t resp,
+					  const cy_stc_pdstack_pd_packet_t* pkt_ptr)
+{
+	uint8_t port = ((cy_stc_pdstack_context_t *)ptrPdStackContext)->port;
+
+	if (resp == CY_PDSTACK_RES_RCVD)
+	{
+        
+	}
+}
+
 void USBPD::begin(void)
 {
     memcpy((void *)iSprSnkPdo, (const void *)ctx->dpmStat.snkPdo, sizeof(cy_pd_pd_do_t)*7);
@@ -291,7 +303,7 @@ bool USBPD::setBatSnkPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltag
 bool USBPD::updateSrcPdo(void)
 {
 
-#if PMGDUINO_BOARD 
+#if PMGDUINO_BOARD || 1
     cy_en_pdstack_status_t status;
     cy_pd_pd_do_t srcPdo[7];
 
@@ -336,14 +348,17 @@ bool USBPD::updateSrcPdo(void)
 
     ctx->dpmStat.srcPdoFlags[1] = (iSprSrcPdo[0].fixed_src_do_t.pkCurrent & 0x03);
 
+    // optional, called if the PDO content changes
     status = Cy_PdStack_Dpm_UpdateSrcCap(ctx, iSprSrcPdoCnt, srcPdo);
     if (status == CY_PDSTACK_STAT_SUCCESS)
     {
+        // optional, called if the PDO mask changes
         status = Cy_PdStack_Dpm_UpdateSrcCapMask(ctx, iSprSrcMask);
         if (status == CY_PDSTACK_STAT_SUCCESS)
         {
     		if ((ctx->dpmConfig.connect) && (ctx->dpmConfig.curPortRole == CY_PD_PRT_ROLE_SOURCE))
     		{
+                // optional, set a timer for the callback to handle the command sending failure condition
     			if(Cy_PdStack_Dpm_SendPdCommand(ctx, CY_PDSTACK_DPM_CMD_SRC_CAP_CHNG, NULL, false, NULL) != CY_PDSTACK_STAT_SUCCESS)
     			{
     				Cy_PdUtils_SwTimer_Start(ctx->ptrTimerContext, ctx,
@@ -421,25 +436,11 @@ bool USBPD::getPartnerPortSrcCap(src_cap_t *srcCapPdo)
     cy_en_pdstack_status_t status;
     cy_pd_pd_do_t snkPdo[7];
 
-    status = Cy_PdStack_Dpm_UpdateSnkCap(ctx, iSprSnkPdoCnt, snkPdo);
-
-    if (status == CY_PDSTACK_STAT_SUCCESS)
-    {
-        Cy_PdStack_Dpm_UpdateSnkCapMask(ctx, iSprSnkMask);
-        if (status == CY_PDSTACK_STAT_SUCCESS)
-        {
-    		if ((ctx->dpmConfig.connect) && (ctx->dpmConfig.curPortRole == CY_PD_PRT_ROLE_SINK))
-    		{
-    			if(Cy_PdStack_Dpm_SendPdCommand(ctx, CY_PDSTACK_DPM_CMD_SNK_CAP_CHNG, NULL, false, NULL) != CY_PDSTACK_STAT_SUCCESS)
-    			{
-    				Cy_PdUtils_SwTimer_Start(ctx->ptrTimerContext, ctx,
-    										GET_USER_TIMER_ID(ctx, SNK_CAP_CHANGE_RETRY_TIMER), 
-                                            SNK_CAP_CHANGE_RETRY_TIMER_PERIOD, 
-                                            snkCapChangeRetryCbk);
-    			}
-    		}
-        }
-    }
+    Cy_PdStack_Dpm_SendPdCommand(ctx, 
+                                CY_PDSTACK_DPM_CMD_GET_SRC_CAP, 
+                                NULL, 
+                                false, 
+                                usbPdCmdCbk);
 
     return (status == CY_PDSTACK_STAT_SUCCESS) ? true : false;
 }
