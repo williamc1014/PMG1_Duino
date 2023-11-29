@@ -30,16 +30,97 @@ void snkCapChangeRetryCbk(cy_timer_id_t id, void *ptrContext)
     }
 }
 
+void updatePeerSrcPdo(uint8_t port, const cy_stc_pdstack_pd_packet_t* srcCap)
+{
+
+    uint8_t numPdo;
+    uint8_t i;
+    
+    if ((numPdo = srcCap->len) != 0)
+    {
+        for (i=0; i<numPdo; i++)
+        {
+            if (port == 0)
+            {
+                usbpd0.iPartnerSrcPdo[i].val = srcCap->dat[i].val;
+            }
+#if PMGDUINO_BOARD
+            else
+            {
+                usbpd1.iPartnerSrcPdo[i].val = srcCap->dat[i].val;
+            }
+#endif
+        }
+    }
+    
+    if (port == 0)
+    {
+                usbpd0.iPartnerSrcPdoCnt = numPdo;
+    }
+#if PMGDUINO_BOARD
+    else 
+    {
+        usbpd1.iPartnerSrcPdoCnt = numPdo;
+        usbpd1.usbPdCmdComplete = true;
+    }
+#endif
+}
+
+/*
+typedef struct
+{
+    cy_en_pd_sop_t     sop;                         //< Packet type. 
+    uint8_t     len;                                //< Length in data objects. 
+    uint8_t     msg;                                //< Message code. 
+    cy_en_pd_port_role_t     dataRole;              //< Data role. 
+    cy_pd_pd_hdr_t    hdr;                          //< Message header. 
+    cy_pd_pd_do_t     dat[CY_PD_MAX_NO_OF_DO + CY_PD_MAX_NO_OF_EPR_PDO];      //< Data objects associated with the message. 
+} cy_stc_pdstack_pd_packet_t;
+*/
 static void usbPdCmdCbk(cy_stc_pdstack_context_t *ptrPdStackContext,
 					  cy_en_pdstack_resp_status_t resp,
 					  const cy_stc_pdstack_pd_packet_t* pkt_ptr)
 {
 	uint8_t port = ((cy_stc_pdstack_context_t *)ptrPdStackContext)->port;
+    uint8_t numPdo;
+    uint8_t i;
 
+#if (0)
 	if (resp == CY_PDSTACK_RES_RCVD)
 	{
-        
+        if (pkt_ptr->msg == CY_PDSTACK_DATA_MSG_SRC_CAP)
+        {
+            if ((numPdo = pkt_ptr->len) != 0)
+            {
+                for (i=0; i<numPdo; i++)
+                {
+                    if (port == 0)
+                    {
+                        usbpd0.iPartnerSrcPdo[i].val = pkt_ptr->dat[i].val;
+                    }
+#if PMGDUINO_BOARD
+                    else
+                    {
+                        usbpd1.iPartnerSrcPdo[i].val = pkt_ptr->dat[i].val;
+                    }
+#endif
+                }
+            }
+            if (port == 0)
+            {
+                usbpd0.iPartnerSrcPdoCnt = numPdo;
+                usbpd0.usbPdCmdComplete = true;
+            }
+#if PMGDUINO_BOARD
+            else 
+            {
+                usbpd1.iPartnerSrcPdoCnt = numPdo;
+                usbpd1.usbPdCmdComplete = true;
+            }
+#endif
+        }
 	}
+#endif
 }
 
 void USBPD::begin(void)
@@ -383,8 +464,6 @@ bool USBPD::updateSinkPdo(void)
     for (uint8_t i=0; i<iSprSnkPdoCnt; i++)
         snkPdo[i].val = iSprSnkPdo[i].val;
 
-    status = Cy_PdStack_Dpm_UpdateSnkCap(ctx, iSprSnkPdoCnt, snkPdo);
-
     if (iSprSnkPdo[0].fixed_snk_do_t.drSwap)
         ctx->dpmStat.snkPdoFlags[0] |= CY_PD_SNKCAP_FLAGS_0_DUAL_ROLE_DATA;
     else
@@ -410,6 +489,7 @@ bool USBPD::updateSinkPdo(void)
     else
         ctx->dpmStat.snkPdoFlags[1] &= ~CY_PD_SNKCAP_FLAGS_1_DUAL_ROLE_POWER;
 
+    status = Cy_PdStack_Dpm_UpdateSnkCap(ctx, iSprSnkPdoCnt, snkPdo);
     if (status == CY_PDSTACK_STAT_SUCCESS)
     {
         Cy_PdStack_Dpm_UpdateSnkCapMask(ctx, iSprSnkMask);
@@ -427,20 +507,6 @@ bool USBPD::updateSinkPdo(void)
     		}
         }
     }
-
-    return (status == CY_PDSTACK_STAT_SUCCESS) ? true : false;
-}
-
-bool USBPD::getPartnerPortSrcCap(src_cap_t *srcCapPdo)
-{
-    cy_en_pdstack_status_t status;
-    cy_pd_pd_do_t snkPdo[7];
-
-    Cy_PdStack_Dpm_SendPdCommand(ctx, 
-                                CY_PDSTACK_DPM_CMD_GET_SRC_CAP, 
-                                NULL, 
-                                false, 
-                                usbPdCmdCbk);
 
     return (status == CY_PDSTACK_STAT_SUCCESS) ? true : false;
 }

@@ -13,6 +13,7 @@ extern "C" {
 #include "user_timer_id.h"
 
 extern cy_stc_pdstack_context_t *get_pdstack_context(uint8_t portIdx);
+extern void updatePeerSrcPdo(uint8_t port, const cy_stc_pdstack_pd_packet_t* srcCap);
 
 #ifdef __cplusplus
 }
@@ -161,12 +162,12 @@ class USBPD
 private:
     uint8_t                     portIdx;
     cy_stc_pdstack_context_t    *ctx;
-    snk_cap_t                   iSprSnkPdo[7] = {0};
+    snk_cap_t                   iSprSnkPdo[13] = {0};
     uint8_t                     iSprSnkPdoCnt = 0x01;
     uint8_t                     iSprSnkMask = 0x01;
 
 #if PMGDUINO_BOARD 
-    src_cap_t                   iSprSrcPdo[7] = {0};
+    src_cap_t                   iSprSrcPdo[13] = {0};
     uint8_t                     iSprSrcPdoCnt = 0x01;
     uint8_t                     iSprSrcMask = 0x01;
 #endif
@@ -180,8 +181,15 @@ public:
     uint8_t     attachedDeviceType;
     bool        contractExisted;
     uint8_t     powerRole;
-    
-    
+
+    bool        usbPdCmdComplete = false;       
+
+    src_cap_t   iPartnerSrcPdo[13] = {0};
+    uint8_t     iPartnerSrcPdoCnt = 0x00;    
+
+    src_cap_t   iPartnerSnkPdo[13] = {0};
+    uint8_t     iPartnerSnkPdoCnt = 0x00; 
+
     USBPD() {}
     USBPD(uint8_t port) {
         portIdx = port;
@@ -223,8 +231,6 @@ public:
 
     bool updateSrcPdo(void);
     bool updateSinkPdo(void);
-
-    bool getPartnerPortSrcCap(src_cap_t *srcCapPdo);
 
     void registerEvent(uint8_t event, void (*userFunc)(void));
     void unRegisterEvent(uint8_t event);

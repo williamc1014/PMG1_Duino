@@ -421,6 +421,8 @@ static cy_pd_pd_do_t form_rdo(cy_stc_pdstack_context_t* context, uint8_t pdo_no,
 
 static cy_en_pdstack_pdo_sel_alg_t src_pdo_selection_algorithm = (cy_en_pdstack_pdo_sel_alg_t)PD_PDO_SEL_ALGO;
 
+extern void updatePeerSrcPdo(uint8_t port, const cy_stc_pdstack_pd_packet_t* srcCap);
+
 /*
  * Evaluate the source capabilities listed by the source and pick the appropriate one to request for.
  */
@@ -438,6 +440,9 @@ void eval_src_cap(cy_stc_pdstack_context_t* context, const cy_stc_pdstack_pd_pac
     bool match = false;
     uint8_t src_pdo_len = srcCap->len;
     uint8_t snk_pdo_len = dpm->curSnkPdocount;
+
+    updatePeerSrcPdo(port, srcCap);
+
 #if (CY_PD_EPR_ENABLE)
     bool eprActive = false;
     bool eprSpr = false;
