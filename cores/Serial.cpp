@@ -23,7 +23,7 @@ cy_stc_sysint_t uartIntrConfig =
     .intrPriority = 3,
 };
 
-#if PMGDUINO_BOARD || (DEBUG_LOG)
+#if PMGDUINO_BOARD || (DEBUG_LOG) && (0)
 #define CYBSP_DEBUG_UART_RX_PORT GPIO_PRT4
 #define CYBSP_DEBUG_UART_RX_PORT_NUM 4U
 #define CYBSP_DEBUG_UART_RX_PIN 0U
@@ -266,7 +266,7 @@ void uart_init(uint8_t inst, uint8_t cfg, uint32_t bitrate)
         // start to receive
         Cy_SCB_UART_Receive(UART_HW, &rxData, 1, &duinoUartContext);
     }
-#if PMGDUINO_BOARD || (DEBUG_LOG)
+#if PMGDUINO_BOARD || (DEBUG_LOG) && (0)
     else if (inst == DEBUG_UART)
     {
         Cy_GPIO_SetHSIOM(CYBSP_DEBUG_UART_RX_PORT, CYBSP_DEBUG_UART_RX_NUM, CYBSP_DEBUG_UART_RX_HSIOM);

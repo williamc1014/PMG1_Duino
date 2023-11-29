@@ -76,7 +76,7 @@ extern "C" {
 #include "task.h"
 #include "semphr.h"
 
-#if DEBUG_LOG
+#if DEBUG_LOG && (0)
 #include "Serial.h"
 #endif
 
@@ -830,9 +830,12 @@ int main(void)
         CY_ASSERT(0);
     }
 
-#if DEBUG_LOG
+#if DEBUG_LOG && (0)
     uart_init(0, SERIAL_8N1, 115200);
 #endif
+
+    Cy_GPIO_Write(BUCK_ENABLE_PORT, BUCK_ENABLE_PIN, 1);
+    Cy_GPIO_Write(NMOS_ENABLE_PORT, NMOS_ENABLE_PIN, 0);
 
     /*
      * Register the interrupt handler for the watchdog timer. This timer is used to
@@ -1018,7 +1021,7 @@ int main(void)
      * Since this application does not have any other function, the PMG1 device can be placed in "deep sleep"
      * mode for power saving whenever the PD stack and drivers are idle.
      */
-#if DEBUG_LOG
+#if DEBUG_LOG && (0)
     uart_print_byte(0, 0xAA);
     uart_print(0, "FW");
 #endif

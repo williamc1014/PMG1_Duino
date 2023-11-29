@@ -194,7 +194,7 @@ static HardwareSerial Serial;
 extern HardwareSerial Serial;
 #endif  /* cplusplus */
 
-#if (0)
+
 void uart_init(uint8_t inst, uint8_t cfg, uint32_t bitrate);
 #if PMGDUINO_BOARD || (DEBUG_LOG)
 void uart_print(uint8_t inst, const char* string);
@@ -202,6 +202,5 @@ void uart_print_byte(uint8_t inst, uint8_t byte);
 void uart_print_hword(uint8_t inst, uint16_t hword);
 void uart_print_word(uint8_t inst, uint32_t word);
 #endif // PMGDUINO_BOARD || (DEBUG_LOG)
-#endif //(0)
 
 #endif /*__Serial_h__ */
