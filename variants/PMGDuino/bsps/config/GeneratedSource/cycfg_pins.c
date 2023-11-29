@@ -80,28 +80,28 @@ const cy_stc_gpio_pin_config_t CYBSP_SWDIO_config =
     };
 #endif //defined (CY_USING_HAL)
 
-const cy_stc_gpio_pin_config_t CYBSP_DEBUG_UART_RX_config = 
+const cy_stc_gpio_pin_config_t CYBSP_BUCK_ENABLE_config = 
 {
     .outVal = 1,
-    .driveMode = CY_GPIO_DM_HIGHZ,
-    .hsiom = CYBSP_DEBUG_UART_RX_HSIOM,
+    .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+    .hsiom = CYBSP_BUCK_ENABLE_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .vtrip = CY_GPIO_VTRIP_CMOS,
     .slewRate = CY_GPIO_SLEW_FAST,
 };
 #if defined (CY_USING_HAL)
-    const cyhal_resource_inst_t CYBSP_DEBUG_UART_RX_obj = 
+    const cyhal_resource_inst_t CYBSP_BUCK_ENABLE_obj = 
     {
         .type = CYHAL_RSC_GPIO,
-        .block_num = CYBSP_DEBUG_UART_RX_PORT_NUM,
-        .channel_num = CYBSP_DEBUG_UART_RX_PIN,
+        .block_num = CYBSP_BUCK_ENABLE_PORT_NUM,
+        .channel_num = CYBSP_BUCK_ENABLE_PIN,
     };
 #endif //defined (CY_USING_HAL)
-const cy_stc_gpio_pin_config_t CYBSP_DEBUG_UART_TX_config = 
+const cy_stc_gpio_pin_config_t CYBSP_NMOS_ENABLE_config = 
 {
-    .outVal = 1,
+    .outVal = 0,
     .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
-    .hsiom = CYBSP_DEBUG_UART_TX_HSIOM,
+    .hsiom = CYBSP_NMOS_ENABLE_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .vtrip = CY_GPIO_VTRIP_CMOS,
     .slewRate = CY_GPIO_SLEW_FAST,
@@ -220,8 +220,8 @@ void init_cycfg_pins(void)
     Cy_GPIO_Pin_Init(APP_SWITCH_PORT, APP_SWITCH_PIN, &APP_SWITCH_config);
     Cy_GPIO_Pin_Init(CYBSP_SWCLK_PORT, CYBSP_SWCLK_PIN, &CYBSP_SWCLK_config);
     Cy_GPIO_Pin_Init(CYBSP_SWDIO_PORT, CYBSP_SWDIO_PIN, &CYBSP_SWDIO_config);
-    Cy_GPIO_Pin_Init(CYBSP_DEBUG_UART_RX_PORT, CYBSP_DEBUG_UART_RX_PIN, &CYBSP_DEBUG_UART_RX_config);
-    Cy_GPIO_Pin_Init(CYBSP_DEBUG_UART_TX_PORT, CYBSP_DEBUG_UART_TX_PIN, &CYBSP_DEBUG_UART_TX_config);
+    Cy_GPIO_Pin_Init(CYBSP_BUCK_ENABLE_PORT, CYBSP_BUCK_ENABLE_PIN, &CYBSP_BUCK_ENABLE_config);
+    Cy_GPIO_Pin_Init(CYBSP_NMOS_ENABLE_PORT, CYBSP_NMOS_ENABLE_PIN, &CYBSP_NMOS_ENABLE_config);
     Cy_GPIO_Pin_Init(PFET_SNK_CTRL_P0_PORT, PFET_SNK_CTRL_P0_PIN, &PFET_SNK_CTRL_P0_config);
     Cy_GPIO_Pin_Init(PFET_SNK_CTRL_P1_PORT, PFET_SNK_CTRL_P1_PIN, &PFET_SNK_CTRL_P1_config);
     Cy_GPIO_Pin_Init(TEST_LED_1_PORT, TEST_LED_1_PIN, &TEST_LED_1_config);

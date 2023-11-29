@@ -98,43 +98,43 @@ extern "C" {
     #define CYBSP_SWDIO_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_STRONG
 #endif //defined (CY_USING_HAL)
 
-#define CYBSP_DEBUG_UART_RX_ENABLED 1U
-#define CYBSP_DEBUG_UART_RX_PORT GPIO_PRT4
-#define CYBSP_DEBUG_UART_RX_PORT_NUM 4U
-#define CYBSP_DEBUG_UART_RX_PIN 0U
-#define CYBSP_DEBUG_UART_RX_NUM 0U
-#define CYBSP_DEBUG_UART_RX_DRIVEMODE CY_GPIO_DM_HIGHZ
-#define CYBSP_DEBUG_UART_RX_INIT_DRIVESTATE 1
+#define CYBSP_BUCK_ENABLE_ENABLED 1U
+#define CYBSP_BUCK_ENABLE_PORT GPIO_PRT4
+#define CYBSP_BUCK_ENABLE_PORT_NUM 4U
+#define CYBSP_BUCK_ENABLE_PIN 0U
+#define CYBSP_BUCK_ENABLE_NUM 0U
+#define CYBSP_BUCK_ENABLE_DRIVEMODE CY_GPIO_DM_STRONG_IN_OFF
+#define CYBSP_BUCK_ENABLE_INIT_DRIVESTATE 1
 #ifndef ioss_0_port_4_pin_0_HSIOM
     #define ioss_0_port_4_pin_0_HSIOM HSIOM_SEL_GPIO
 #endif
-#define CYBSP_DEBUG_UART_RX_HSIOM ioss_0_port_4_pin_0_HSIOM
-#define CYBSP_DEBUG_UART_RX_IRQ ioss_interrupt_gpio_IRQn
+#define CYBSP_BUCK_ENABLE_HSIOM ioss_0_port_4_pin_0_HSIOM
+#define CYBSP_BUCK_ENABLE_IRQ ioss_interrupt_gpio_IRQn
 #if defined (CY_USING_HAL)
-    #define CYBSP_DEBUG_UART_RX_HAL_PORT_PIN P4_0
-    #define CYBSP_DEBUG_UART_RX P4_0
-    #define CYBSP_DEBUG_UART_RX_HAL_IRQ CYHAL_GPIO_IRQ_NONE
-    #define CYBSP_DEBUG_UART_RX_HAL_DIR CYHAL_GPIO_DIR_INPUT 
-    #define CYBSP_DEBUG_UART_RX_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_NONE
+    #define CYBSP_BUCK_ENABLE_HAL_PORT_PIN P4_0
+    #define CYBSP_BUCK_ENABLE P4_0
+    #define CYBSP_BUCK_ENABLE_HAL_IRQ CYHAL_GPIO_IRQ_NONE
+    #define CYBSP_BUCK_ENABLE_HAL_DIR CYHAL_GPIO_DIR_OUTPUT 
+    #define CYBSP_BUCK_ENABLE_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_STRONG
 #endif //defined (CY_USING_HAL)
-#define CYBSP_DEBUG_UART_TX_ENABLED 1U
-#define CYBSP_DEBUG_UART_TX_PORT GPIO_PRT4
-#define CYBSP_DEBUG_UART_TX_PORT_NUM 4U
-#define CYBSP_DEBUG_UART_TX_PIN 1U
-#define CYBSP_DEBUG_UART_TX_NUM 1U
-#define CYBSP_DEBUG_UART_TX_DRIVEMODE CY_GPIO_DM_STRONG_IN_OFF
-#define CYBSP_DEBUG_UART_TX_INIT_DRIVESTATE 1
+#define CYBSP_NMOS_ENABLE_ENABLED 1U
+#define CYBSP_NMOS_ENABLE_PORT GPIO_PRT4
+#define CYBSP_NMOS_ENABLE_PORT_NUM 4U
+#define CYBSP_NMOS_ENABLE_PIN 1U
+#define CYBSP_NMOS_ENABLE_NUM 1U
+#define CYBSP_NMOS_ENABLE_DRIVEMODE CY_GPIO_DM_STRONG_IN_OFF
+#define CYBSP_NMOS_ENABLE_INIT_DRIVESTATE 1
 #ifndef ioss_0_port_4_pin_1_HSIOM
     #define ioss_0_port_4_pin_1_HSIOM HSIOM_SEL_GPIO
 #endif
-#define CYBSP_DEBUG_UART_TX_HSIOM ioss_0_port_4_pin_1_HSIOM
-#define CYBSP_DEBUG_UART_TX_IRQ ioss_interrupt_gpio_IRQn
+#define CYBSP_NMOS_ENABLE_HSIOM ioss_0_port_4_pin_1_HSIOM
+#define CYBSP_NMOS_ENABLE_IRQ ioss_interrupt_gpio_IRQn
 #if defined (CY_USING_HAL)
-    #define CYBSP_DEBUG_UART_TX_HAL_PORT_PIN P4_1
-    #define CYBSP_DEBUG_UART_TX P4_1
-    #define CYBSP_DEBUG_UART_TX_HAL_IRQ CYHAL_GPIO_IRQ_NONE
-    #define CYBSP_DEBUG_UART_TX_HAL_DIR CYHAL_GPIO_DIR_OUTPUT 
-    #define CYBSP_DEBUG_UART_TX_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_STRONG
+    #define CYBSP_NMOS_ENABLE_HAL_PORT_PIN P4_1
+    #define CYBSP_NMOS_ENABLE P4_1
+    #define CYBSP_NMOS_ENABLE_HAL_IRQ CYHAL_GPIO_IRQ_NONE
+    #define CYBSP_NMOS_ENABLE_HAL_DIR CYHAL_GPIO_DIR_OUTPUT 
+    #define CYBSP_NMOS_ENABLE_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_STRONG
 #endif //defined (CY_USING_HAL)
 #define PFET_SNK_CTRL_P0_ENABLED 1U
 #define PFET_SNK_CTRL_P0_PORT GPIO_PRT5
@@ -265,13 +265,13 @@ extern const cy_stc_gpio_pin_config_t CYBSP_SWDIO_config;
     extern const cyhal_resource_inst_t CYBSP_SWDIO_obj;
 #endif //defined (CY_USING_HAL)
 
-extern const cy_stc_gpio_pin_config_t CYBSP_DEBUG_UART_RX_config;
+extern const cy_stc_gpio_pin_config_t CYBSP_BUCK_ENABLE_config;
 #if defined (CY_USING_HAL)
-    extern const cyhal_resource_inst_t CYBSP_DEBUG_UART_RX_obj;
+    extern const cyhal_resource_inst_t CYBSP_BUCK_ENABLE_obj;
 #endif //defined (CY_USING_HAL)
-extern const cy_stc_gpio_pin_config_t CYBSP_DEBUG_UART_TX_config;
+extern const cy_stc_gpio_pin_config_t CYBSP_NMOS_ENABLE_config;
 #if defined (CY_USING_HAL)
-    extern const cyhal_resource_inst_t CYBSP_DEBUG_UART_TX_obj;
+    extern const cyhal_resource_inst_t CYBSP_NMOS_ENABLE_obj;
 #endif //defined (CY_USING_HAL)
 extern const cy_stc_gpio_pin_config_t PFET_SNK_CTRL_P0_config;
 #if defined (CY_USING_HAL)
