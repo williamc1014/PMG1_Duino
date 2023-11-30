@@ -61,7 +61,6 @@ void updatePeerSrcPdo(uint8_t port, const cy_stc_pdstack_pd_packet_t* srcCap)
     else 
     {
         usbpd1.iPartnerSrcPdoCnt = numPdo;
-        usbpd1.usbPdCmdComplete = true;
     }
 #endif
 }

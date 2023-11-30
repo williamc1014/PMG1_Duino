@@ -370,7 +370,8 @@ static void cy_gpio_intr_handler(void)
                 if (enterVBUSSafe5V(1) == true)
                     waitNegotiationComplete ++;
 #endif
-				//Cy_DFU_ExecuteApp(0);
+                if (waitNegotiationComplete == 0)
+				    Cy_DFU_ExecuteApp(0);
 			}
 		}
 	}
