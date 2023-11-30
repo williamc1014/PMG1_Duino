@@ -14,6 +14,7 @@ extern "C" {
 
 extern cy_stc_pdstack_context_t *get_pdstack_context(uint8_t portIdx);
 extern void updatePeerSrcPdo(uint8_t port, const cy_stc_pdstack_pd_packet_t* srcCap);
+extern bool enterVBUSSafe5V(uint8_t port);
 
 #ifdef __cplusplus
 }
@@ -228,6 +229,9 @@ public:
     bool setFixedSnkPdo(uint8_t pdoNum, uint32_t voltage, uint32_t opCurrent);
     bool setVarSnkPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t opCurrent);
     bool setBatSnkPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t opPower);
+
+    bool disableSnkPdo(uint8_t pdoNum);
+    uint8_t getSnkPdoNum(void);
 
     bool updateSrcPdo(void);
     bool updateSinkPdo(void);

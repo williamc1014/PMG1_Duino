@@ -242,6 +242,9 @@ cy_stc_pdstack_context_t *get_pdstack_context(uint8_t portIdx)
     return (gl_PdStackContexts[portIdx]);
 }
 
+static uint8_t waitNegotiationComplete = 0;
+
+
 /* Solution PD event handler */
 void sln_pd_event_handler(cy_stc_pdstack_context_t* ctx, cy_en_pdstack_app_evt_t evt, const void *data)
 {
@@ -254,6 +257,17 @@ void sln_pd_event_handler(cy_stc_pdstack_context_t* ctx, cy_en_pdstack_app_evt_t
         {
             /* Send Not supported message */
             Cy_PdStack_Dpm_SendPdCommand(ctx, CY_PDSTACK_DPM_CMD_SEND_NOT_SUPPORTED, NULL, true, NULL);
+        }
+    }
+
+    if (waitNegotiationComplete && evt == APP_EVT_PD_CONTRACT_NEGOTIATION_COMPLETE)
+    {
+        if (waitNegotiationComplete)
+        {
+            waitNegotiationComplete --;
+        
+            if (waitNegotiationComplete == 0)
+		        Cy_DFU_ExecuteApp(0);
         }
     }
 
@@ -334,6 +348,9 @@ static void cy_usbpd1_intr1_handler(void)
 
 uint32_t gpioIntrPendingFlag = 0;
 
+extern bool enterVBUSSafe5V(uint8_t port);
+
+
 static void cy_gpio_intr_handler(void)
 {
 	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
@@ -347,7 +364,13 @@ static void cy_gpio_intr_handler(void)
 			if (Cy_GPIO_Read(APP_SWITCH_PORT, APP_SWITCH_PIN) == 0)
 			{
 				Cy_GPIO_ClearInterrupt(APP_SWITCH_PORT, APP_SWITCH_NUM);
-				Cy_DFU_ExecuteApp(0);
+                if (enterVBUSSafe5V(0) == true)
+                    waitNegotiationComplete ++;
+#if PMGDUINO_BOARD
+                if (enterVBUSSafe5V(1) == true)
+                    waitNegotiationComplete ++;
+#endif
+				//Cy_DFU_ExecuteApp(0);
 			}
 		}
 	}
@@ -834,8 +857,8 @@ int main(void)
     uart_init(0, SERIAL_8N1, 115200);
 #endif
 
-    Cy_GPIO_Write(BUCK_ENABLE_PORT, BUCK_ENABLE_PIN, 1);
-    Cy_GPIO_Write(NMOS_ENABLE_PORT, NMOS_ENABLE_PIN, 0);
+    //Cy_GPIO_Write(BUCK_ENABLE_PORT, BUCK_ENABLE_PIN, 1);
+    //Cy_GPIO_Write(NMOS_ENABLE_PORT, NMOS_ENABLE_PIN, 0);
 
     /*
      * Register the interrupt handler for the watchdog timer. This timer is used to

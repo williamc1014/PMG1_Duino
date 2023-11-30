@@ -66,6 +66,51 @@ void updatePeerSrcPdo(uint8_t port, const cy_stc_pdstack_pd_packet_t* srcCap)
 #endif
 }
 
+bool enterVBUSSafe5V(uint8_t port)
+{
+    uint8_t i;
+    uint8_t cnt;
+
+    if (port == 0)
+    {
+        usbpd0.updateStatus();
+        
+        cnt = usbpd0.getSnkPdoNum();
+
+        if (usbpd0.contractExisted && 
+            usbpd0.powerRole == CY_PD_PRT_ROLE_SINK &&
+            usbpd0.getCurrentSinkRdo() != 0)
+        {
+            for (i=1; i<cnt; i++)
+                usbpd0.disableSnkPdo(i);
+            usbpd0.updateSinkPdo();
+            return true;
+        }
+    }
+#if PMGDUINO_BOARD
+    else
+    {
+        usbpd1.updateStatus();
+        
+        cnt = usbpd1.getSnkPdoNum();
+
+        if (usbpd1.contractExisted && 
+            usbpd1.powerRole == CY_PD_PRT_ROLE_SINK &&
+            usbpd1.getCurrentSinkRdo() != 0)
+        {
+            for (i=1; i<cnt; i++)
+                usbpd1.disableSnkPdo(i);
+            usbpd1.updateSinkPdo();
+            return true;
+        }
+
+    }
+
+    
+#endif
+    return false;
+}
+
 /*
 typedef struct
 {
@@ -144,7 +189,7 @@ void USBPD::updateStatus(void)
 {
     attached = ctx->dpmConfig.attach;
     polarity = ctx->dpmConfig.polarity;
-    contractExisted = ctx->dpmConfig.contractExist;
+    contractExisted = ctx->dpmConfig.connect;
     powerRole = ctx->dpmConfig.curPortRole;
     attachedDeviceType = (uint8_t)ctx->dpmConfig.attachedDev;
 }
@@ -381,10 +426,33 @@ bool USBPD::setBatSnkPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltag
     return (setSinkPdo(pdoNum, snkCap));
 }
 
+bool USBPD::disableSnkPdo(uint8_t pdoNum)
+{
+    if (pdoNum == 0 || pdoNum > 7)
+        return false;
+
+    iSprSnkMask &= ~(1 << pdoNum);
+
+    if (iSprSnkPdoCnt > 1)
+        iSprSnkPdoCnt --;
+
+    if (iSprSnkPdoCnt == 1)
+         iSprSnkPdo[0].fixed_snk_do_t.highCap = 0;
+
+    iSprSnkPdo[pdoNum].val = 0;
+
+    return true;
+}
+
+uint8_t USBPD::getSnkPdoNum(void)
+{
+    return iSprSnkPdoCnt;
+}
+
 bool USBPD::updateSrcPdo(void)
 {
 
-#if PMGDUINO_BOARD || 1
+#if PMGDUINO_BOARD
     cy_en_pdstack_status_t status;
     cy_pd_pd_do_t srcPdo[7];
 
