@@ -69,6 +69,8 @@ extern "C" {
 #define CLK_ADC_ENABLED 1U
 #define CLK_ADC_HW CY_SYSCLK_DIV_8_BIT
 #define CLK_ADC_NUM 8U
+#define CLK_PMIC_HW CY_SYSCLK_DIV_8_BIT
+#define CLK_PMIC_NUM 5U
 
 #if defined (CY_USING_HAL)
     extern const cyhal_resource_inst_t CLK_PDRX_obj;

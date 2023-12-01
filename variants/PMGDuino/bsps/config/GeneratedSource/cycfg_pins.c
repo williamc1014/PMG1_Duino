@@ -169,11 +169,39 @@ const cy_stc_gpio_pin_config_t TEST_LED_config =
     };
 #endif //defined (CY_USING_HAL)
 
-const cy_stc_gpio_pin_config_t ioss_0_port_2_pin_4_config = 
+const cy_stc_gpio_pin_config_t PMIC_I2C_SCL_config = 
 {
     .outVal = 1,
-    .driveMode = CY_GPIO_DM_ANALOG,
-    .hsiom = ioss_0_port_2_pin_4_HSIOM,
+    .driveMode = CY_GPIO_DM_OD_DRIVESLOW,
+    .hsiom = PMIC_I2C_SCL_HSIOM,
+    .intEdge = CY_GPIO_INTR_DISABLE,
+    .vtrip = CY_GPIO_VTRIP_CMOS,
+    .slewRate = CY_GPIO_SLEW_FAST,
+};
+const cy_stc_gpio_pin_config_t PMIC_I2C_SDA_config = 
+{
+    .outVal = 1,
+    .driveMode = CY_GPIO_DM_OD_DRIVESLOW,
+    .hsiom = PMIC_I2C_SDA_HSIOM,
+    .intEdge = CY_GPIO_INTR_DISABLE,
+    .vtrip = CY_GPIO_VTRIP_CMOS,
+    .slewRate = CY_GPIO_SLEW_FAST,
+};
+
+const cy_stc_gpio_pin_config_t PMIC0_INTn_config = 
+{
+    .outVal = 1,
+    .driveMode = CY_GPIO_DM_HIGHZ,
+    .hsiom = PMIC0_INTn_HSIOM,
+    .intEdge = CY_GPIO_INTR_DISABLE,
+    .vtrip = CY_GPIO_VTRIP_CMOS,
+    .slewRate = CY_GPIO_SLEW_FAST,
+};
+const cy_stc_gpio_pin_config_t PMIC1_INTn_config = 
+{
+    .outVal = 1,
+    .driveMode = CY_GPIO_DM_HIGHZ,
+    .hsiom = PMIC1_INTn_HSIOM,
     .intEdge = CY_GPIO_INTR_DISABLE,
     .vtrip = CY_GPIO_VTRIP_CMOS,
     .slewRate = CY_GPIO_SLEW_FAST,
@@ -181,7 +209,6 @@ const cy_stc_gpio_pin_config_t ioss_0_port_2_pin_4_config =
 
 void init_cycfg_pins(void)
 {
-    Cy_GPIO_Pin_Init(ioss_0_port_2_pin_4_PORT, ioss_0_port_2_pin_4_PIN, &ioss_0_port_2_pin_4_config);
     Cy_GPIO_Pin_Init(APP_SWITCH_PORT, APP_SWITCH_PIN, &APP_SWITCH_config);
     Cy_GPIO_Pin_Init(CYBSP_SWCLK_PORT, CYBSP_SWCLK_PIN, &CYBSP_SWCLK_config);
     Cy_GPIO_Pin_Init(CYBSP_SWDIO_PORT, CYBSP_SWDIO_PIN, &CYBSP_SWDIO_config);
@@ -190,6 +217,11 @@ void init_cycfg_pins(void)
     Cy_GPIO_Pin_Init(TEST_LED_1_PORT, TEST_LED_1_PIN, &TEST_LED_1_config);
     Cy_GPIO_Pin_Init(CYBSP_USER_LED_PORT, CYBSP_USER_LED_PIN, &CYBSP_USER_LED_config);
     Cy_GPIO_Pin_Init(TEST_LED_PORT, TEST_LED_PIN, &TEST_LED_config);
+
+    Cy_GPIO_Pin_Init(PMIC_I2C_SCL_PORT, PMIC_I2C_SCL_PIN, &PMIC_I2C_SCL_config);
+    Cy_GPIO_Pin_Init(PMIC_I2C_SDA_PORT, PMIC_I2C_SDA_PIN, &PMIC_I2C_SDA_config);
+    Cy_GPIO_Pin_Init(PMIC0_INTn_PORT, PMIC0_INTn_PIN, &PMIC0_INTn_config);
+    Cy_GPIO_Pin_Init(PMIC1_INTn_PORT, PMIC1_INTn_PIN, &PMIC1_INTn_config);
 }
 
 void reserve_cycfg_pins(void)

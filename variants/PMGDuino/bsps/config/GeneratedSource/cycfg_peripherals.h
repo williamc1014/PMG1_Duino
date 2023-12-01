@@ -94,6 +94,8 @@ extern "C" {
 #define mtb_usbpd_port1_HW_TRIM PDSS_TRIMS1
 #define mtb_usbpd_port1_IRQ usbpd_1_interrupt_IRQn
 #define mtb_usbpd_port1_DS_IRQ usbpd_1_interrupt_wakeup_IRQn
+#define PMIC_I2C_HW SCB6
+#define PMIC_I2C_IRQ scb_6_interrupt_IRQn
 
 extern const cy_stc_sar_channel_config_t pass_0_sar_0_channel_0_config;
 extern const cy_stc_sar_channel_config_t pass_0_sar_0_inj_channel_config;

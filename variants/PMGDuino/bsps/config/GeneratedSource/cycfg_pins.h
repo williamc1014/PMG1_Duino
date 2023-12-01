@@ -193,24 +193,79 @@ extern "C" {
     #define TEST_LED_HAL_DIR CYHAL_GPIO_DIR_BIDIRECTIONAL 
     #define TEST_LED_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_STRONG
 #endif //defined (CY_USING_HAL)
-
-#define ioss_0_port_2_pin_4_ENABLED 1U
-#define ioss_0_port_2_pin_4_PORT GPIO_PRT2
-#define ioss_0_port_2_pin_4_PORT_NUM 2U
-#define ioss_0_port_2_pin_4_PIN 4U
-#define ioss_0_port_2_pin_4_NUM 4U
-#define ioss_0_port_2_pin_4_DRIVEMODE CY_GPIO_DM_ANALOG
-#define ioss_0_port_2_pin_4_INIT_DRIVESTATE 1
-#ifndef ioss_0_port_2_pin_4_HSIOM
-    #define ioss_0_port_2_pin_4_HSIOM HSIOM_SEL_GPIO
+#define PMIC_I2C_SCL_PORT GPIO_PRT6
+#define PMIC_I2C_SCL_PORT_NUM 6U
+#define PMIC_I2C_SCL_PIN 1U
+#define PMIC_I2C_SCL_NUM 1U
+#define PMIC_I2C_SCL_DRIVEMODE CY_GPIO_DM_OD_DRIVESLOW
+#define PMIC_I2C_SCL_INIT_DRIVESTATE 1
+#ifndef ioss_0_port_6_pin_1_HSIOM
+    #define ioss_0_port_6_pin_1_HSIOM HSIOM_SEL_GPIO
 #endif
-#define ioss_0_port_2_pin_4_IRQ ioss_interrupt_gpio_IRQn
+#define PMIC_I2C_SCL_HSIOM ioss_0_port_6_pin_1_HSIOM
+#define PMIC_I2C_SCL_IRQ ioss_interrupt_gpio_IRQn
 #if defined (CY_USING_HAL)
-    #define ioss_0_port_2_pin_4_HAL_PORT_PIN P2_4
-    #define ioss_0_port_2_pin_4 P2_4
-    #define ioss_0_port_2_pin_4_HAL_IRQ CYHAL_GPIO_IRQ_NONE
-    #define ioss_0_port_2_pin_4_HAL_DIR CYHAL_GPIO_DIR_INPUT 
-    #define ioss_0_port_2_pin_4_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_ANALOG
+    #define PMIC_I2C_SCL_HAL_PORT_PIN P6_1
+    #define PMIC_I2C_SCL P6_1
+    #define PMIC_I2C_SCL_HAL_IRQ CYHAL_GPIO_IRQ_NONE
+    #define PMIC_I2C_SCL_HAL_DIR CYHAL_GPIO_DIR_BIDIRECTIONAL 
+    #define PMIC_I2C_SCL_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_OPENDRAINDRIVESLOW
+#endif //defined (CY_USING_HAL)
+#define PMIC_I2C_SDA_PORT GPIO_PRT6
+#define PMIC_I2C_SDA_PORT_NUM 6U
+#define PMIC_I2C_SDA_PIN 0U
+#define PMIC_I2C_SDA_NUM 0U
+#define PMIC_I2C_SDA_DRIVEMODE CY_GPIO_DM_OD_DRIVESLOW
+#define PMIC_I2C_SDA_INIT_DRIVESTATE 1
+#ifndef ioss_0_port_6_pin_0_HSIOM
+    #define ioss_0_port_6_pin_0_HSIOM HSIOM_SEL_GPIO
+#endif
+#define PMIC_I2C_SDA_HSIOM ioss_0_port_6_pin_0_HSIOM
+#define PMIC_I2C_SDA_IRQ ioss_interrupt_gpio_IRQn
+#if defined (CY_USING_HAL)
+    #define PMIC_I2C_SDA_HAL_PORT_PIN P6_0
+    #define PMIC_I2C_SDA P6_0
+    #define PMIC_I2C_SDA_HAL_IRQ CYHAL_GPIO_IRQ_NONE
+    #define PMIC_I2C_SDA_HAL_DIR CYHAL_GPIO_DIR_BIDIRECTIONAL 
+    #define PMIC_I2C_SDA_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_OPENDRAINDRIVESLOW
+#endif //defined (CY_USING_HAL)
+
+#define PMIC0_INTn_PORT GPIO_PRT6
+#define PMIC0_INTn_PORT_NUM 6U
+#define PMIC0_INTn_PIN 2U
+#define PMIC0_INTn_NUM 2U
+#define PMIC0_INTn_DRIVEMODE CY_GPIO_DM_HIGHZ
+#define PMIC0_INTn_INIT_DRIVESTATE 1
+#ifndef ioss_0_port_6_pin_2_HSIOM
+    #define ioss_0_port_6_pin_2_HSIOM HSIOM_SEL_GPIO
+#endif
+#define PMIC0_INTn_HSIOM ioss_0_port_6_pin_2_HSIOM
+#define PMIC0_INTn_IRQ ioss_interrupt_gpio_IRQn
+#if defined (CY_USING_HAL)
+    #define PMIC0_INTn_HAL_PORT_PIN P6_2
+    #define PMIC0_INTn P6_2
+    #define PMIC0_INTn_HAL_IRQ CYHAL_GPIO_IRQ_NONE
+    #define PMIC0_INTn_HAL_DIR CYHAL_GPIO_DIR_INPUT 
+    #define PMIC0_INTn_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_NONE
+#endif //defined (CY_USING_HAL)
+
+#define PMIC1_INTn_PORT GPIO_PRT6
+#define PMIC1_INTn_PORT_NUM 6U
+#define PMIC1_INTn_PIN 3U
+#define PMIC1_INTn_NUM 3U
+#define PMIC1_INTn_DRIVEMODE CY_GPIO_DM_HIGHZ
+#define PMIC1_INTn_INIT_DRIVESTATE 1
+#ifndef ioss_0_port_6_pin_3_HSIOM
+    #define ioss_0_port_6_pin_3_HSIOM HSIOM_SEL_GPIO
+#endif
+#define PMIC1_INTn_HSIOM ioss_0_port_6_pin_3_HSIOM
+#define PMIC1_INTn_IRQ ioss_interrupt_gpio_IRQn
+#if defined (CY_USING_HAL)
+    #define PMIC1_INTn_HAL_PORT_PIN P6_3
+    #define PMIC1_INTn P6_3
+    #define PMIC1_INTn_HAL_IRQ CYHAL_GPIO_IRQ_NONE
+    #define PMIC1_INTn_HAL_DIR CYHAL_GPIO_DIR_INPUT 
+    #define PMIC1_INTn_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_NONE
 #endif //defined (CY_USING_HAL)
 
 extern const cy_stc_gpio_pin_config_t APP_SWITCH_config;

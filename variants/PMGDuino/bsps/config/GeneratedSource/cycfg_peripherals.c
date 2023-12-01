@@ -121,6 +121,22 @@ const cy_stc_tcpwm_counter_config_t CYBSP_SYS_TCNT_config =
     };
 #endif //defined (CY_USING_HAL)
 
+const cy_stc_scb_i2c_config_t PMIC_I2C_config = 
+{
+    .i2cMode = CY_SCB_I2C_MASTER,
+    .useRxFifo = true,
+    .useTxFifo = true,
+    .slaveAddress = 0U,
+    .slaveAddressMask = 0U,
+    .acceptAddrInFifo = false,
+    .ackGeneralAddr = false,
+    .enableWakeFromSleep = false,
+    .enableDigitalFilter = false,
+    .lowPhaseDutyCycle = 0,
+    .highPhaseDutyCycle = 0,
+    .delayInFifoAddress = 0,
+};
+
 const cy_stc_fault_vbus_ovp_cfg_t mtb_usbpd_port0_ovp_config = 
 {
     .enable = true,
@@ -241,6 +257,7 @@ void init_cycfg_peripherals(void)
     Cy_SysClk_PeriphAssignDivider(PCLK_USBPD1_CLOCK_SAR, CY_SYSCLK_DIV_8_BIT, 2U);
     Cy_SysClk_PeriphAssignDivider(PCLK_USBPD1_CLOCK_FILTER1, CY_SYSCLK_DIV_8_BIT, 3U);
     Cy_SysClk_PeriphAssignDivider(PCLK_USBPD1_CLOCK_FILTER2, CY_SYSCLK_DIV_8_BIT, 3U);
+    Cy_SysClk_PeriphAssignDivider(PCLK_SCB6_CLOCK, CY_SYSCLK_DIV_8_BIT, 5U);
 }
 
 void reserve_cycfg_peripherals(void)
