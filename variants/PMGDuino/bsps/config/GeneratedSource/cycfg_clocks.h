@@ -45,9 +45,6 @@ extern "C" {
 #define CLK_SYS_TCNT_ENABLED 1U
 #define CLK_SYS_TCNT_HW CY_SYSCLK_DIV_8_BIT
 #define CLK_SYS_TCNT_NUM 10U
-#define CLK_DBG_UART_ENABLED 1U
-#define CLK_DBG_UART_HW CY_SYSCLK_DIV_8_BIT
-#define CLK_DBG_UART_NUM 11U
 #define CLK_PDTX_ENABLED 1U
 #define CLK_PDTX_HW CY_SYSCLK_DIV_8_BIT
 #define CLK_PDTX_NUM 1U
@@ -76,7 +73,6 @@ extern "C" {
 #if defined (CY_USING_HAL)
     extern const cyhal_resource_inst_t CLK_PDRX_obj;
     extern const cyhal_resource_inst_t CLK_SYS_TCNT_obj;
-    extern const cyhal_resource_inst_t CLK_DBG_UART_obj;
     extern const cyhal_resource_inst_t CLK_PDTX_obj;
     extern const cyhal_resource_inst_t CLK_PDSAR_obj;
     extern const cyhal_resource_inst_t CLK_FILTER1_obj;

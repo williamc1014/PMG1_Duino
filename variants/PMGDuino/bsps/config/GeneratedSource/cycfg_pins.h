@@ -97,27 +97,6 @@ extern "C" {
     #define CYBSP_SWDIO_HAL_DIR CYHAL_GPIO_DIR_BIDIRECTIONAL 
     #define CYBSP_SWDIO_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_STRONG
 #endif //defined (CY_USING_HAL)
-
-#define CYBSP_BUCK_ENABLE_ENABLED 1U
-#define BUCK_ENABLE_PORT GPIO_PRT4
-#define BUCK_ENABLE_PORT_NUM 4U
-#define BUCK_ENABLE_PIN 0U
-#define BUCK_ENABLE_NUM 0U
-#define BUCK_ENABLE_DRIVEMODE CY_GPIO_DM_STRONG
-#define BUCK_ENABLE_INIT_DRIVESTATE 1
-#ifndef ioss_0_port_4_pin_0_HSIOM
-    #define ioss_0_port_4_pin_0_HSIOM HSIOM_SEL_GPIO
-#endif
-#define BUCK_ENABLE_HSIOM ioss_0_port_4_pin_0_HSIOM
-#define BUCK_ENABLE_IRQ ioss_interrupt_gpio_IRQn
-#if defined (CY_USING_HAL)
-    #define BUCK_ENABLE_HAL_PORT_PIN P4_0
-    #define BUCK_ENABLE P4_0
-    #define BUCK_ENABLE_HAL_IRQ CYHAL_GPIO_IRQ_NONE
-    #define BUCK_ENABLE_HAL_DIR CYHAL_GPIO_DIR_BIDIRECTIONAL 
-    #define BUCK_ENABLE_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_STRONG
-#endif //defined (CY_USING_HAL)
-
 #define CYBSP_NMOS_ENABLE_ENABLED 1U
 #define NMOS_ENABLE_PORT GPIO_PRT4
 #define NMOS_ENABLE_PORT_NUM 4U
@@ -137,7 +116,6 @@ extern "C" {
     #define NMOS_ENABLE_HAL_DIR CYHAL_GPIO_DIR_BIDIRECTIONAL 
     #define NMOS_ENABLE_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_STRONG
 #endif //defined (CY_USING_HAL)
-
 #define PFET_SNK_CTRL_P0_ENABLED 1U
 #define PFET_SNK_CTRL_P0_PORT GPIO_PRT5
 #define PFET_SNK_CTRL_P0_PORT_NUM 5U
@@ -265,11 +243,6 @@ extern const cy_stc_gpio_pin_config_t CYBSP_SWCLK_config;
 extern const cy_stc_gpio_pin_config_t CYBSP_SWDIO_config;
 #if defined (CY_USING_HAL)
     extern const cyhal_resource_inst_t CYBSP_SWDIO_obj;
-#endif //defined (CY_USING_HAL)
-
-extern const cy_stc_gpio_pin_config_t CYBSP_BUCK_ENABLE_config;
-#if defined (CY_USING_HAL)
-    extern const cyhal_resource_inst_t CYBSP_BUCK_ENABLE_obj;
 #endif //defined (CY_USING_HAL)
 extern const cy_stc_gpio_pin_config_t CYBSP_NMOS_ENABLE_config;
 #if defined (CY_USING_HAL)

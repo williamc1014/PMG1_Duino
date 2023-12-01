@@ -41,12 +41,6 @@
         .block_num = CLK_SYS_TCNT_HW,
         .channel_num = CLK_SYS_TCNT_NUM,
     };
-    const cyhal_resource_inst_t CLK_DBG_UART_obj = 
-    {
-        .type = CYHAL_RSC_CLOCK,
-        .block_num = CLK_DBG_UART_HW,
-        .channel_num = CLK_DBG_UART_NUM,
-    };
     const cyhal_resource_inst_t CLK_PDTX_obj = 
     {
         .type = CYHAL_RSC_CLOCK,
@@ -106,9 +100,6 @@ void init_cycfg_clocks(void)
     Cy_SysClk_PeriphDisableDivider(CY_SYSCLK_DIV_8_BIT, 10U);
     Cy_SysClk_PeriphSetDivider(CY_SYSCLK_DIV_8_BIT, 10U, 47U);
     Cy_SysClk_PeriphEnableDivider(CY_SYSCLK_DIV_8_BIT, 10U);
-    Cy_SysClk_PeriphDisableDivider(CY_SYSCLK_DIV_8_BIT, 11U);
-    Cy_SysClk_PeriphSetDivider(CY_SYSCLK_DIV_8_BIT, 11U, 51U);
-    Cy_SysClk_PeriphEnableDivider(CY_SYSCLK_DIV_8_BIT, 11U);
     Cy_SysClk_PeriphDisableDivider(CY_SYSCLK_DIV_8_BIT, 1U);
     Cy_SysClk_PeriphSetDivider(CY_SYSCLK_DIV_8_BIT, 1U, 79U);
     Cy_SysClk_PeriphEnableDivider(CY_SYSCLK_DIV_8_BIT, 1U);
@@ -125,7 +116,7 @@ void init_cycfg_clocks(void)
     Cy_SysClk_PeriphSetDivider(CY_SYSCLK_DIV_16_BIT, 0U, 25U);
     Cy_SysClk_PeriphEnableDivider(CY_SYSCLK_DIV_16_BIT, 0U);
     Cy_SysClk_PeriphDisableDivider(CY_SYSCLK_DIV_8_BIT, 6U);
-    Cy_SysClk_PeriphSetDivider(CY_SYSCLK_DIV_8_BIT, 6U, 0U);
+    Cy_SysClk_PeriphSetDivider(CY_SYSCLK_DIV_8_BIT, 6U, 3U);
     Cy_SysClk_PeriphEnableDivider(CY_SYSCLK_DIV_8_BIT, 6U);
     Cy_SysClk_PeriphDisableDivider(CY_SYSCLK_DIV_8_BIT, 7U);
     Cy_SysClk_PeriphSetDivider(CY_SYSCLK_DIV_8_BIT, 7U, 0U);
@@ -140,7 +131,6 @@ void reserve_cycfg_clocks(void)
 #if defined (CY_USING_HAL)
     cyhal_hwmgr_reserve(&CLK_PDRX_obj);
     cyhal_hwmgr_reserve(&CLK_SYS_TCNT_obj);
-    cyhal_hwmgr_reserve(&CLK_DBG_UART_obj);
     cyhal_hwmgr_reserve(&CLK_PDTX_obj);
     cyhal_hwmgr_reserve(&CLK_PDSAR_obj);
     cyhal_hwmgr_reserve(&CLK_FILTER1_obj);

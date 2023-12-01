@@ -52,9 +52,6 @@ extern "C" {
 #define pass_0_sar_0_IRQ pass_0_interrupt_sar_IRQn
 #define pass_0_sar_0_VREF_MV 1200UL
 #define pass_0_sarmux_0_tempsensor_0_ENABLED 1U
-#define CYBSP_DBG_UART_ENABLED 1U
-#define CYBSP_DBG_UART_HW SCB0
-#define CYBSP_DBG_UART_IRQ scb_0_interrupt_IRQn
 #define pwm0_ENABLED 1U
 #define pwm0_HW TCPWM
 #define pwm0_NUM 0UL
@@ -103,11 +100,6 @@ extern const cy_stc_sar_channel_config_t pass_0_sar_0_inj_channel_config;
 extern const cy_stc_sar_config_t pass_0_sar_0_config;
 #if defined (CY_USING_HAL)
     extern const cyhal_resource_inst_t pass_0_sar_0_obj;
-#endif //defined (CY_USING_HAL)
-
-extern const cy_stc_scb_uart_config_t CYBSP_DBG_UART_config;
-#if defined (CY_USING_HAL)
-    extern const cyhal_resource_inst_t CYBSP_DBG_UART_obj;
 #endif //defined (CY_USING_HAL)
 
 extern const cy_stc_tcpwm_counter_config_t CYBSP_SYS_TCNT_config;

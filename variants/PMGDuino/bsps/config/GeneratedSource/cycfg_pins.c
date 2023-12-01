@@ -79,25 +79,6 @@ const cy_stc_gpio_pin_config_t CYBSP_SWDIO_config =
         .channel_num = CYBSP_SWDIO_PIN,
     };
 #endif //defined (CY_USING_HAL)
-
-const cy_stc_gpio_pin_config_t BUCK_ENABLE_config = 
-{
-    .outVal = 1,
-    .driveMode = CY_GPIO_DM_STRONG,
-    .hsiom = BUCK_ENABLE_HSIOM,
-    .intEdge = CY_GPIO_INTR_DISABLE,
-    .vtrip = CY_GPIO_VTRIP_CMOS,
-    .slewRate = CY_GPIO_SLEW_FAST,
-};
-#if defined (CY_USING_HAL)
-    const cyhal_resource_inst_t BUCK_ENABLE_obj = 
-    {
-        .type = CYHAL_RSC_GPIO,
-        .block_num = BUCK_ENABLE_PORT_NUM,
-        .channel_num = BUCK_ENABLE_PIN,
-    };
-#endif //defined (CY_USING_HAL)
-
 const cy_stc_gpio_pin_config_t NMOS_ENABLE_config = 
 {
     .outVal = 0,
@@ -115,7 +96,6 @@ const cy_stc_gpio_pin_config_t NMOS_ENABLE_config =
         .channel_num = NMOS_ENABLE_PIN,
     };
 #endif //defined (CY_USING_HAL)
-
 const cy_stc_gpio_pin_config_t PFET_SNK_CTRL_P0_config = 
 {
     .outVal = 0,
@@ -222,7 +202,6 @@ void init_cycfg_pins(void)
     Cy_GPIO_Pin_Init(APP_SWITCH_PORT, APP_SWITCH_PIN, &APP_SWITCH_config);
     Cy_GPIO_Pin_Init(CYBSP_SWCLK_PORT, CYBSP_SWCLK_PIN, &CYBSP_SWCLK_config);
     Cy_GPIO_Pin_Init(CYBSP_SWDIO_PORT, CYBSP_SWDIO_PIN, &CYBSP_SWDIO_config);
-    Cy_GPIO_Pin_Init(BUCK_ENABLE_PORT, BUCK_ENABLE_PIN, &BUCK_ENABLE_config);
     Cy_GPIO_Pin_Init(NMOS_ENABLE_PORT, NMOS_ENABLE_PIN, &NMOS_ENABLE_config);
     Cy_GPIO_Pin_Init(PFET_SNK_CTRL_P0_PORT, PFET_SNK_CTRL_P0_PIN, &PFET_SNK_CTRL_P0_config);
     Cy_GPIO_Pin_Init(PFET_SNK_CTRL_P1_PORT, PFET_SNK_CTRL_P1_PIN, &PFET_SNK_CTRL_P1_config);
@@ -237,8 +216,6 @@ void reserve_cycfg_pins(void)
     cyhal_hwmgr_reserve(&APP_SWITCH_obj);
     cyhal_hwmgr_reserve(&CYBSP_SWCLK_obj);
     cyhal_hwmgr_reserve(&CYBSP_SWDIO_obj);
-    cyhal_hwmgr_reserve(&BUCK_ENABLE_obj);
-    cyhal_hwmgr_reserve(&NMOS_ENABLE_obj);
     cyhal_hwmgr_reserve(&PFET_SNK_CTRL_P0_obj);
     cyhal_hwmgr_reserve(&PFET_SNK_CTRL_P1_obj);
     cyhal_hwmgr_reserve(&TEST_LED_1_obj);

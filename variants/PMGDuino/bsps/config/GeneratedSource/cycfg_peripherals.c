@@ -89,43 +89,6 @@ const cy_stc_sar_config_t pass_0_sar_0_config =
         .channel_num = 0,
     };
 #endif //defined (CY_USING_HAL)
-const cy_stc_scb_uart_config_t CYBSP_DBG_UART_config = 
-{
-    .uartMode = CY_SCB_UART_STANDARD,
-    .enableMutliProcessorMode = false,
-    .smartCardRetryOnNack = false,
-    .irdaInvertRx = false,
-    .irdaEnableLowPowerReceiver = false,
-    .enableLinMode = false,
-    .oversample = 8,
-    .enableMsbFirst = false,
-    .dataWidth = 8UL,
-    .parity = CY_SCB_UART_PARITY_NONE,
-    .stopBits = CY_SCB_UART_STOP_BITS_1,
-    .enableInputFilter = false,
-    .breakWidth = 11UL,
-    .dropOnFrameError = false,
-    .dropOnParityError = false,
-    .receiverAddress = 0x0UL,
-    .receiverAddressMask = 0x0UL,
-    .acceptAddrInFifo = false,
-    .enableCts = false,
-    .ctsPolarity = CY_SCB_UART_ACTIVE_LOW,
-    .rtsRxFifoLevel = 0UL,
-    .rtsPolarity = CY_SCB_UART_ACTIVE_LOW,
-    .rxFifoTriggerLevel = 7UL,
-    .rxFifoIntEnableMask = 0UL,
-    .txFifoTriggerLevel = 0UL,
-    .txFifoIntEnableMask = 0UL,
-};
-#if defined (CY_USING_HAL)
-    const cyhal_resource_inst_t CYBSP_DBG_UART_obj = 
-    {
-        .type = CYHAL_RSC_SCB,
-        .block_num = 0U,
-        .channel_num = 0U,
-    };
-#endif //defined (CY_USING_HAL)
 
 const cy_stc_tcpwm_counter_config_t CYBSP_SYS_TCNT_config = 
 {
@@ -258,7 +221,6 @@ void init_cycfg_peripherals(void)
 {
     Cy_CTB_SetPumpClkSource(CTBM0, CY_CTB_CLK_PUMP_HF_DIV_2);
     Cy_SysClk_PeriphAssignDivider(PCLK_PASS0_CLOCK_SAR, CY_SYSCLK_DIV_8_BIT, 8U);
-    Cy_SysClk_PeriphAssignDivider(PCLK_SCB0_CLOCK, CY_SYSCLK_DIV_8_BIT, 11U);
     Cy_SysClk_PeriphAssignDivider(PCLK_SCB4_CLOCK, CY_SYSCLK_DIV_16_BIT, 0U);
     Cy_SysClk_PeriphAssignDivider(PCLK_TCPWM_CLOCKS0, CY_SYSCLK_DIV_8_BIT, 4U);
     Cy_SysClk_PeriphAssignDivider(PCLK_TCPWM_CLOCKS1, CY_SYSCLK_DIV_8_BIT, 4U);
@@ -285,7 +247,6 @@ void reserve_cycfg_peripherals(void)
 {
 #if defined (CY_USING_HAL)
     cyhal_hwmgr_reserve(&pass_0_sar_0_obj);
-    cyhal_hwmgr_reserve(&CYBSP_DBG_UART_obj);
     cyhal_hwmgr_reserve(&pwm0_obj);
     cyhal_hwmgr_reserve(&pwm1_obj);
     cyhal_hwmgr_reserve(&pwm2_obj);
