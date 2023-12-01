@@ -41,6 +41,12 @@
         .block_num = CLK_SYS_TCNT_HW,
         .channel_num = CLK_SYS_TCNT_NUM,
     };
+    const cyhal_resource_inst_t CLK_DBG_UART_obj = 
+    {
+        .type = CYHAL_RSC_CLOCK,
+        .block_num = CLK_DBG_UART_HW,
+        .channel_num = CLK_DBG_UART_NUM,
+    };
     const cyhal_resource_inst_t CLK_PDTX_obj = 
     {
         .type = CYHAL_RSC_CLOCK,

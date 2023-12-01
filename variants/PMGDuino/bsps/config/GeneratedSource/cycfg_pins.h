@@ -97,25 +97,6 @@ extern "C" {
     #define CYBSP_SWDIO_HAL_DIR CYHAL_GPIO_DIR_BIDIRECTIONAL 
     #define CYBSP_SWDIO_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_STRONG
 #endif //defined (CY_USING_HAL)
-#define CYBSP_NMOS_ENABLE_ENABLED 1U
-#define NMOS_ENABLE_PORT GPIO_PRT4
-#define NMOS_ENABLE_PORT_NUM 4U
-#define NMOS_ENABLE_PIN 1U
-#define NMOS_ENABLE_NUM 1U
-#define NMOS_ENABLE_DRIVEMODE CY_GPIO_DM_STRONG
-#define NMOS_ENABLE_INIT_DRIVESTATE 0
-#ifndef ioss_0_port_4_pin_1_HSIOM
-    #define ioss_0_port_4_pin_1_HSIOM HSIOM_SEL_GPIO
-#endif
-#define NMOS_ENABLE_HSIOM ioss_0_port_4_pin_1_HSIOM
-#define NMOS_ENABLE_IRQ ioss_interrupt_gpio_IRQn
-#if defined (CY_USING_HAL)
-    #define NMOS_ENABLE_HAL_PORT_PIN P4_1
-    #define NMOS_ENABLE P4_1
-    #define NMOS_ENABLE_HAL_IRQ CYHAL_GPIO_IRQ_NONE
-    #define NMOS_ENABLE_HAL_DIR CYHAL_GPIO_DIR_BIDIRECTIONAL 
-    #define NMOS_ENABLE_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_STRONG
-#endif //defined (CY_USING_HAL)
 #define PFET_SNK_CTRL_P0_ENABLED 1U
 #define PFET_SNK_CTRL_P0_PORT GPIO_PRT5
 #define PFET_SNK_CTRL_P0_PORT_NUM 5U
@@ -252,7 +233,6 @@ extern const cy_stc_gpio_pin_config_t PFET_SNK_CTRL_P0_config;
 #if defined (CY_USING_HAL)
     extern const cyhal_resource_inst_t PFET_SNK_CTRL_P0_obj;
 #endif //defined (CY_USING_HAL)
-
 extern const cy_stc_gpio_pin_config_t PFET_SNK_CTRL_P1_config;
 #if defined (CY_USING_HAL)
     extern const cyhal_resource_inst_t PFET_SNK_CTRL_P1_obj;
@@ -268,11 +248,6 @@ extern const cy_stc_gpio_pin_config_t CYBSP_USER_LED_config;
 extern const cy_stc_gpio_pin_config_t TEST_LED_config;
 #if defined (CY_USING_HAL)
     extern const cyhal_resource_inst_t TEST_LED_obj;
-#endif //defined (CY_USING_HAL)
-
-extern const cy_stc_gpio_pin_config_t ioss_0_port_2_pin_0_config;
-#if defined (CY_USING_HAL)
-    extern const cyhal_resource_inst_t ioss_0_port_2_pin_0_obj;
 #endif //defined (CY_USING_HAL)
 
 void init_cycfg_pins(void);
