@@ -359,7 +359,7 @@ static void cy_gpio_intr_handler(void)
 	{
 		if (Cy_GPIO_Read(APP_SWITCH_PORT, APP_SWITCH_PIN) == 0)
 		{
-			Cy_SysLib_Delay(500);
+			Cy_SysLib_Delay(200);
 			if (Cy_GPIO_Read(APP_SWITCH_PORT, APP_SWITCH_PIN) == 0)
 			{
 				Cy_GPIO_ClearInterrupt(APP_SWITCH_PORT, APP_SWITCH_NUM);
@@ -852,9 +852,6 @@ int main(void)
     {
         CY_ASSERT(0);
     }
-
-    //Cy_GPIO_Write(BUCK_ENABLE_PORT, BUCK_ENABLE_PIN, 1);
-    //Cy_GPIO_Write(NMOS_ENABLE_PORT, NMOS_ENABLE_PIN, 0);
 
     /*
      * Register the interrupt handler for the watchdog timer. This timer is used to

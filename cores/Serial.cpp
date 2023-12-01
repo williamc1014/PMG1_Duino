@@ -310,3 +310,5 @@ size_t HardwareSerial::write(uint8_t val)
     checkUartTxFifoWrite();
     return (size_t) 1;
 }
+
+HardwareSerial Serial = HardwareSerial();

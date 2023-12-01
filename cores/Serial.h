@@ -194,8 +194,6 @@ public:
     } 
 }; 
 
-static HardwareSerial Serial;
-
 #endif  /* cplusplus */
 
 
