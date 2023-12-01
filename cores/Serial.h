@@ -20,6 +20,19 @@
 #include "config.h"
 
 #ifdef __cplusplus
+extern "C"
+{
+#endif
+
+extern void dbgPrintStr(char *str);
+extern void dbgPrintVal(unsigned int val);
+
+#ifdef __cplusplus
+}
+#endif
+
+
+#ifdef __cplusplus
 #include "Stream.h"
 
 #ifndef UART_BIT_RATE_MAX_NUM
@@ -179,14 +192,7 @@ public:
     {
         return true;
     } 
-    
-#if (0)
-    size_t write(uint8_t val);
-    size_t write(char *str);
-    size_t write(uint8_t *buf, uint8_t size);
-#endif
 }; 
-static HardwareSerial Serial;
 #endif  /* cplusplus */
 
 
@@ -195,12 +201,6 @@ extern HardwareSerial Serial;
 #endif  /* cplusplus */
 
 
-void uart_init(uint8_t inst, uint8_t cfg, uint32_t bitrate);
-#if PMGDUINO_BOARD || (DEBUG_LOG)
-void uart_print(uint8_t inst, const char* string);
-void uart_print_byte(uint8_t inst, uint8_t byte);
-void uart_print_hword(uint8_t inst, uint16_t hword);
-void uart_print_word(uint8_t inst, uint32_t word);
-#endif // PMGDUINO_BOARD || (DEBUG_LOG)
+void uart_init(uint8_t cfg, uint32_t bitrate);
 
 #endif /*__Serial_h__ */

@@ -76,10 +76,6 @@ extern "C" {
 #include "task.h"
 #include "semphr.h"
 
-#if DEBUG_LOG && (0)
-#include "Serial.h"
-#endif
-
 #if CY_PD_EPR_ENABLE
 bool gl_epr_exit = false;
 #endif
@@ -262,12 +258,15 @@ void sln_pd_event_handler(cy_stc_pdstack_context_t* ctx, cy_en_pdstack_app_evt_t
 
     if (waitNegotiationComplete && evt == APP_EVT_PD_CONTRACT_NEGOTIATION_COMPLETE)
     {
+        
         if (waitNegotiationComplete)
         {
             waitNegotiationComplete --;
         
             if (waitNegotiationComplete == 0)
+            {
 		        Cy_DFU_ExecuteApp(0);
+            }
         }
     }
 
@@ -360,7 +359,7 @@ static void cy_gpio_intr_handler(void)
 	{
 		if (Cy_GPIO_Read(APP_SWITCH_PORT, APP_SWITCH_PIN) == 0)
 		{
-			Cy_SysLib_Delay(200);
+			Cy_SysLib_Delay(500);
 			if (Cy_GPIO_Read(APP_SWITCH_PORT, APP_SWITCH_PIN) == 0)
 			{
 				Cy_GPIO_ClearInterrupt(APP_SWITCH_PORT, APP_SWITCH_NUM);
@@ -854,10 +853,6 @@ int main(void)
         CY_ASSERT(0);
     }
 
-#if DEBUG_LOG && (0)
-    uart_init(0, SERIAL_8N1, 115200);
-#endif
-
     //Cy_GPIO_Write(BUCK_ENABLE_PORT, BUCK_ENABLE_PIN, 1);
     //Cy_GPIO_Write(NMOS_ENABLE_PORT, NMOS_ENABLE_PIN, 0);
 
@@ -1045,10 +1040,6 @@ int main(void)
      * Since this application does not have any other function, the PMG1 device can be placed in "deep sleep"
      * mode for power saving whenever the PD stack and drivers are idle.
      */
-#if DEBUG_LOG && (0)
-    uart_print_byte(0, 0xAA);
-    uart_print(0, "FW");
-#endif
 
     vTaskStartScheduler();
 
