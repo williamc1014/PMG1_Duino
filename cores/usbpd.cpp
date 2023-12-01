@@ -55,7 +55,7 @@ void updatePeerSrcPdo(uint8_t port, const cy_stc_pdstack_pd_packet_t* srcCap)
     
     if (port == 0)
     {
-                usbpd0.iPartnerSrcPdoCnt = numPdo;
+        usbpd0.iPartnerSrcPdoCnt = numPdo;
     }
 #if PMGDUINO_BOARD
     else 
@@ -104,67 +104,15 @@ bool enterVBUSSafe5V(uint8_t port)
         }
 
     }
-
-    
 #endif
     return false;
 }
 
-/*
-typedef struct
-{
-    cy_en_pd_sop_t     sop;                         //< Packet type. 
-    uint8_t     len;                                //< Length in data objects. 
-    uint8_t     msg;                                //< Message code. 
-    cy_en_pd_port_role_t     dataRole;              //< Data role. 
-    cy_pd_pd_hdr_t    hdr;                          //< Message header. 
-    cy_pd_pd_do_t     dat[CY_PD_MAX_NO_OF_DO + CY_PD_MAX_NO_OF_EPR_PDO];      //< Data objects associated with the message. 
-} cy_stc_pdstack_pd_packet_t;
-*/
 static void usbPdCmdCbk(cy_stc_pdstack_context_t *ptrPdStackContext,
 					  cy_en_pdstack_resp_status_t resp,
 					  const cy_stc_pdstack_pd_packet_t* pkt_ptr)
 {
 	uint8_t port = ((cy_stc_pdstack_context_t *)ptrPdStackContext)->port;
-    uint8_t numPdo;
-    uint8_t i;
-
-#if (0)
-	if (resp == CY_PDSTACK_RES_RCVD)
-	{
-        if (pkt_ptr->msg == CY_PDSTACK_DATA_MSG_SRC_CAP)
-        {
-            if ((numPdo = pkt_ptr->len) != 0)
-            {
-                for (i=0; i<numPdo; i++)
-                {
-                    if (port == 0)
-                    {
-                        usbpd0.iPartnerSrcPdo[i].val = pkt_ptr->dat[i].val;
-                    }
-#if PMGDUINO_BOARD
-                    else
-                    {
-                        usbpd1.iPartnerSrcPdo[i].val = pkt_ptr->dat[i].val;
-                    }
-#endif
-                }
-            }
-            if (port == 0)
-            {
-                usbpd0.iPartnerSrcPdoCnt = numPdo;
-                usbpd0.usbPdCmdComplete = true;
-            }
-#if PMGDUINO_BOARD
-            else 
-            {
-                usbpd1.iPartnerSrcPdoCnt = numPdo;
-                usbpd1.usbPdCmdComplete = true;
-            }
-#endif
-        }
-	}
-#endif
 }
 
 void USBPD::begin(void)
@@ -365,6 +313,26 @@ bool USBPD::setAugmentedSrcPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t max
     srcCap.src_gen_do_t.supplyType = 3;
 
     return (setSrcPdo(pdoNum, srcCap));
+}
+
+bool USBPD::disableSrcPdo(uint8_t pdoNum)
+{
+    if (pdoNum == 0 || pdoNum > 7)
+        return false;
+
+    iSprSrcMask &= ~(1 << pdoNum);
+
+    if (iSprSrcPdoCnt > 1)
+        iSprSrcPdoCnt --;
+
+    iSprSrcPdo[pdoNum].val = 0;
+
+    return true;
+}
+
+uint8_t USBPD::getSrcPdoNum(void)
+{
+    return iSprSrcPdoCnt;
 }
 
 void USBPD::setSnkDualDataRoleFlag(bool enable)

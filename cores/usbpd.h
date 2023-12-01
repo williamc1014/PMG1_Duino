@@ -221,6 +221,9 @@ public:
     bool setBatSrcPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t maxPower);
     bool setAugmentedSrcPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t maxCurrent);
 
+    bool disableSrcPdo(uint8_t pdoNum);
+    uint8_t getSrcPdoNum(void);
+
     void setSnkDualDataRoleFlag(bool enable);
     void setSnkUnconstrainedPowerFlag(bool enable);
     void setSnkUSBCommFlag(bool enable);
