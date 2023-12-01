@@ -11,9 +11,6 @@
 
 #include "Arduino.h"
 
-#define DEBUG_UART  0
-#define DUINO_UART  1
-
 #define RINGBUFFER_RX_INDEX 0
 #define RINGBUFFER_TX_INDEX 1
 /* Populate configuration structure */
@@ -200,10 +197,6 @@ void uart_init(uint8_t cfg, uint32_t bitrate)
     uint8_t i;
     uint32_t divNum = 0;
 
-    // check if the assigned bitrate supported
-    if (bitrate < brMapping[0].bitRate || bitrate > brMapping[UART_BIT_RATE_MAX_NUM].bitRate)
-        return;
-
     /* Configure and enable the UART peripheral. */
     memcpy((void *)&uart_cfg, (const void *)&serial_config_default, sizeof(cy_stc_scb_uart_config_t));
 
@@ -317,5 +310,3 @@ size_t HardwareSerial::write(uint8_t val)
     checkUartTxFifoWrite();
     return (size_t) 1;
 }
-
-HardwareSerial Serial = HardwareSerial();

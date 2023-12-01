@@ -193,6 +193,9 @@ public:
         return true;
     } 
 }; 
+
+static HardwareSerial Serial;
+
 #endif  /* cplusplus */
 
 
