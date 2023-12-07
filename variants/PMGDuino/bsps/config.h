@@ -43,11 +43,19 @@
 #define _CONFIG_H_
 
 #include "cybsp.h"
+#include "rt6190.h"
 
 #define DEBUG_LOG								(1u)
 #define P1_ENABLE								(1u)
 #define CCG_PROG_SOURCE_ENABLE					(1u)
-#define set_pd_ctrl_voltage(port, mv) {}
+
+#define set_pd_ctrl_voltage(port, mv)       \
+{                                           \
+    pd_ctrl_power_rt6190(port, 1);          \
+    set_pd_ctrl_voltage_rt6190(port, mv);   \
+    set_pd_ocp_rt6190(port, mv);            \
+    pd_ctrl_ocp_rt6190(port, 1);            \
+}                                           \
 
 /*******************************************************************************
  * Power Source (PSOURCE) Configuration.

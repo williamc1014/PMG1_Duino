@@ -50,7 +50,12 @@
 #define APP_PD_SWAP_RESP_NOT_SUPP       (3u)
 
 /* Configure the Swap Responses. Should be REJECT for USBPD Sink-UFP Example */
+#if PMGDUINO_BOARD
+volatile uint8_t pr_swap_response = APP_PD_SWAP_RESP_ACCEPT;
+#else
 volatile uint8_t pr_swap_response = APP_PD_SWAP_RESP_NOT_SUPP;
+#endif
+
 volatile uint8_t dr_swap_response = APP_PD_SWAP_RESP_NOT_SUPP;
 volatile uint8_t vconn_swap_response = APP_PD_SWAP_RESP_NOT_SUPP;
 

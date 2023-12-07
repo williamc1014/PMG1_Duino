@@ -256,6 +256,11 @@ void sln_pd_event_handler(cy_stc_pdstack_context_t* ctx, cy_en_pdstack_app_evt_t
         }
     }
 
+#if PMGDUINO_BOARD
+    //if (waitNegotiationComplete == 0 && evt == APP_EVT_PD_CONTRACT_NEGOTIATION_COMPLETE)
+    //    APP_VBUS_SET_VOLT_P1(5000);
+#endif
+
     if (waitNegotiationComplete && evt == APP_EVT_PD_CONTRACT_NEGOTIATION_COMPLETE)
     {
         
@@ -995,6 +1000,12 @@ int main(void)
     /* Start any timers or tasks associated with application instrumentation. */
     instrumentation_start();
 
+    // setup PMIC I2C master interface
+#if PMGDUINO_BOARD
+    pmicI2cMInit();
+    APP_VBUS_SET_VOLT_P1(5000);
+#endif
+
     // timer counter for mills API
 	Cy_TCPWM_Counter_Init(TCPWM, 6, &CYBSP_SYS_TCNT_config);
     Cy_TCPWM_Counter_Enable(TCPWM, 6);
@@ -1031,6 +1042,7 @@ int main(void)
     Cy_USBPD_Vbus_NgdoSetDriveStrength(&gl_UsbPdPort1Ctx, 0x1C);
     Cy_USBPD_Vbus_NgdoVoltageStrength(&gl_UsbPdPort1Ctx, 0);
 #endif
+
 
     /*
      * After the initialization is complete, keep processing the USB-PD device policy manager task in a loop.

@@ -193,6 +193,7 @@ extern "C" {
     #define TEST_LED_HAL_DIR CYHAL_GPIO_DIR_BIDIRECTIONAL 
     #define TEST_LED_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_STRONG
 #endif //defined (CY_USING_HAL)
+#define PMIC_I2C_SCL_ENABLED 1U
 #define PMIC_I2C_SCL_PORT GPIO_PRT6
 #define PMIC_I2C_SCL_PORT_NUM 6U
 #define PMIC_I2C_SCL_PIN 1U
@@ -200,7 +201,7 @@ extern "C" {
 #define PMIC_I2C_SCL_DRIVEMODE CY_GPIO_DM_OD_DRIVESLOW
 #define PMIC_I2C_SCL_INIT_DRIVESTATE 1
 #ifndef ioss_0_port_6_pin_1_HSIOM
-    #define ioss_0_port_6_pin_1_HSIOM HSIOM_SEL_GPIO
+    #define ioss_0_port_6_pin_1_HSIOM P6_1_SCB6_I2C_SCL
 #endif
 #define PMIC_I2C_SCL_HSIOM ioss_0_port_6_pin_1_HSIOM
 #define PMIC_I2C_SCL_IRQ ioss_interrupt_gpio_IRQn
@@ -211,6 +212,7 @@ extern "C" {
     #define PMIC_I2C_SCL_HAL_DIR CYHAL_GPIO_DIR_BIDIRECTIONAL 
     #define PMIC_I2C_SCL_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_OPENDRAINDRIVESLOW
 #endif //defined (CY_USING_HAL)
+#define PMIC_I2C_SDA_ENABLED 1U
 #define PMIC_I2C_SDA_PORT GPIO_PRT6
 #define PMIC_I2C_SDA_PORT_NUM 6U
 #define PMIC_I2C_SDA_PIN 0U
@@ -218,7 +220,7 @@ extern "C" {
 #define PMIC_I2C_SDA_DRIVEMODE CY_GPIO_DM_OD_DRIVESLOW
 #define PMIC_I2C_SDA_INIT_DRIVESTATE 1
 #ifndef ioss_0_port_6_pin_0_HSIOM
-    #define ioss_0_port_6_pin_0_HSIOM HSIOM_SEL_GPIO
+    #define ioss_0_port_6_pin_0_HSIOM P6_0_SCB6_I2C_SDA
 #endif
 #define PMIC_I2C_SDA_HSIOM ioss_0_port_6_pin_0_HSIOM
 #define PMIC_I2C_SDA_IRQ ioss_interrupt_gpio_IRQn
@@ -229,7 +231,7 @@ extern "C" {
     #define PMIC_I2C_SDA_HAL_DIR CYHAL_GPIO_DIR_BIDIRECTIONAL 
     #define PMIC_I2C_SDA_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_OPENDRAINDRIVESLOW
 #endif //defined (CY_USING_HAL)
-
+#define PMIC0_INTn_ENABLE 1u
 #define PMIC0_INTn_PORT GPIO_PRT6
 #define PMIC0_INTn_PORT_NUM 6U
 #define PMIC0_INTn_PIN 2U
@@ -248,7 +250,7 @@ extern "C" {
     #define PMIC0_INTn_HAL_DIR CYHAL_GPIO_DIR_INPUT 
     #define PMIC0_INTn_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_NONE
 #endif //defined (CY_USING_HAL)
-
+#define PMIC1_INTn_ENABLE 1u
 #define PMIC1_INTn_PORT GPIO_PRT6
 #define PMIC1_INTn_PORT_NUM 6U
 #define PMIC1_INTn_PIN 3U
@@ -304,6 +306,11 @@ extern const cy_stc_gpio_pin_config_t TEST_LED_config;
 #if defined (CY_USING_HAL)
     extern const cyhal_resource_inst_t TEST_LED_obj;
 #endif //defined (CY_USING_HAL)
+
+extern const cy_stc_gpio_pin_config_t PMIC_I2C_SDA_config;
+extern const cy_stc_gpio_pin_config_t PMIC_I2C_SCL_config;
+extern const cy_stc_gpio_pin_config_t PMIC0_INTn_config;
+extern const cy_stc_gpio_pin_config_t PMIC1_INTn_config;
 
 void init_cycfg_pins(void);
 void reserve_cycfg_pins(void);

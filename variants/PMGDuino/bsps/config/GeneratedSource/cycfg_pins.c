@@ -231,6 +231,8 @@ void reserve_cycfg_pins(void)
     cyhal_hwmgr_reserve(&CYBSP_SWCLK_obj);
     cyhal_hwmgr_reserve(&CYBSP_SWDIO_obj);
     cyhal_hwmgr_reserve(&PFET_SNK_CTRL_P0_obj);
+    cyhal_hwmgr_reserve(&PMIC_I2C_SDA_obj);
+    cyhal_hwmgr_reserve(&PMIC_I2C_SCL_obj);
     cyhal_hwmgr_reserve(&PFET_SNK_CTRL_P1_obj);
     cyhal_hwmgr_reserve(&TEST_LED_1_obj);
     cyhal_hwmgr_reserve(&CYBSP_USER_LED_obj);

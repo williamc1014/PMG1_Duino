@@ -57,9 +57,9 @@ extern "C" {
 #define CLK_PWM_ENABLED 1U
 #define CLK_PWM_HW CY_SYSCLK_DIV_8_BIT
 #define CLK_PWM_NUM 4U
-#define CLK_UART_ENABLED 1U
-#define CLK_UART_HW CY_SYSCLK_DIV_16_BIT
-#define CLK_UART_NUM 0U
+#define CLK_PMIC_ENABLED 1U
+#define CLK_PMIC_HW CY_SYSCLK_DIV_8_BIT
+#define CLK_PMIC_NUM 5U
 #define CLK_SPI_ENABLED 1U
 #define CLK_SPI_HW CY_SYSCLK_DIV_8_BIT
 #define CLK_SPI_NUM 6U
@@ -71,6 +71,8 @@ extern "C" {
 #define CLK_ADC_NUM 8U
 #define CLK_PMIC_HW CY_SYSCLK_DIV_8_BIT
 #define CLK_PMIC_NUM 5U
+#define CLK_UART_HW CY_SYSCLK_DIV_16_BIT
+#define CLK_UART_NUM 0U
 
 #if defined (CY_USING_HAL)
     extern const cyhal_resource_inst_t CLK_PDRX_obj;
@@ -79,7 +81,7 @@ extern "C" {
     extern const cyhal_resource_inst_t CLK_PDSAR_obj;
     extern const cyhal_resource_inst_t CLK_FILTER1_obj;
     extern const cyhal_resource_inst_t CLK_PWM_obj;
-    extern const cyhal_resource_inst_t CLK_UART_obj;
+    extern const cyhal_resource_inst_t CLK_PMIC_obj;
     extern const cyhal_resource_inst_t CLK_SPI_obj;
     extern const cyhal_resource_inst_t CLK_I2C_obj;
     extern const cyhal_resource_inst_t CLK_ADC_obj;

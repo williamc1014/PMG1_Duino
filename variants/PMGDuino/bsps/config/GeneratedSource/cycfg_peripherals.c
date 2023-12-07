@@ -124,16 +124,17 @@ const cy_stc_tcpwm_counter_config_t CYBSP_SYS_TCNT_config =
 const cy_stc_scb_i2c_config_t PMIC_I2C_config = 
 {
     .i2cMode = CY_SCB_I2C_MASTER,
-    .useRxFifo = true,
-    .useTxFifo = true,
+    .useRxFifo = false,
+    .useTxFifo = false,
     .slaveAddress = 0U,
     .slaveAddressMask = 0U,
     .acceptAddrInFifo = false,
     .ackGeneralAddr = false,
+    .hsEnable = false,
     .enableWakeFromSleep = false,
     .enableDigitalFilter = false,
-    .lowPhaseDutyCycle = 0,
-    .highPhaseDutyCycle = 0,
+    .lowPhaseDutyCycle = 16,
+    .highPhaseDutyCycle = 16,
     .delayInFifoAddress = 0,
 };
 

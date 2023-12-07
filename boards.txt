@@ -9,7 +9,7 @@ PMGDuino_Kit.upload.speed=115200
 PMGDuino_Kit.upload.resetmethod=ck
 PMGDuino_Kit.serial.disableDTR=true
 PMGDuino_Kit.serial.disableRTS=true
-PMGDuino_Kit.upload.maximum_size=236032
+PMGDuino_Kit.upload.maximum_size=200448
 PMGDuino_Kit.upload.wait_for_upload_port=true
 
 PMGDuino_Kit.communication=usb
@@ -38,7 +38,7 @@ CY7113_Kit.upload.speed=115200
 CY7113_Kit.upload.resetmethod=ck
 CY7113_Kit.serial.disableDTR=true
 CY7113_Kit.serial.disableRTS=true
-CY7113_Kit.upload.maximum_size=236032
+CY7113_Kit.upload.maximum_size=200448
 CY7113_Kit.upload.wait_for_upload_port=true
 
 CY7113_Kit.communication=usb

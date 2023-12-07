@@ -41,6 +41,7 @@
 #include "cy_tcpwm_pwm.h"
 #include "cy_tcpwm_counter.h"
 #include "cy_usbpd_common.h"
+#include "cy_scb_i2c.h"
 
 #if defined(__cplusplus)
 extern "C" {
@@ -94,9 +95,11 @@ extern "C" {
 #define mtb_usbpd_port1_HW_TRIM PDSS_TRIMS1
 #define mtb_usbpd_port1_IRQ usbpd_1_interrupt_IRQn
 #define mtb_usbpd_port1_DS_IRQ usbpd_1_interrupt_wakeup_IRQn
+#define PMIC_I2C_ENABLED 1U
 #define PMIC_I2C_HW SCB6
 #define PMIC_I2C_IRQ scb_6_interrupt_IRQn
 
+extern const cy_stc_scb_i2c_config_t PMIC_I2C_config;
 extern const cy_stc_sar_channel_config_t pass_0_sar_0_channel_0_config;
 extern const cy_stc_sar_channel_config_t pass_0_sar_0_inj_channel_config;
 extern const cy_stc_sar_config_t pass_0_sar_0_config;

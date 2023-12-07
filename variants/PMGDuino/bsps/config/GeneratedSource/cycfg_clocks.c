@@ -71,11 +71,11 @@
         .block_num = CLK_PWM_HW,
         .channel_num = CLK_PWM_NUM,
     };
-    const cyhal_resource_inst_t CLK_UART_obj = 
+    const cyhal_resource_inst_t CLK_PMIC_obj = 
     {
         .type = CYHAL_RSC_CLOCK,
-        .block_num = CLK_UART_HW,
-        .channel_num = CLK_UART_NUM,
+        .block_num = CLK_PMIC_HW,
+        .channel_num = CLK_PMIC_NUM,
     };
     const cyhal_resource_inst_t CLK_SPI_obj = 
     {
@@ -154,7 +154,7 @@ void reserve_cycfg_clocks(void)
     cyhal_hwmgr_reserve(&CLK_PDSAR_obj);
     cyhal_hwmgr_reserve(&CLK_FILTER1_obj);
     cyhal_hwmgr_reserve(&CLK_PWM_obj);
-    cyhal_hwmgr_reserve(&CLK_UART_obj);
+    cyhal_hwmgr_reserve(&CLK_PMIC_obj);
     cyhal_hwmgr_reserve(&CLK_SPI_obj);
     cyhal_hwmgr_reserve(&CLK_I2C_obj);
     cyhal_hwmgr_reserve(&CLK_ADC_obj);
