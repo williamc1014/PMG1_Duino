@@ -201,6 +201,7 @@ public:
     void end(void);
 
     void updateStatus(void);
+    uint8_t getCurrentSrcRdo(void);
     uint8_t getCurrentSinkRdo(void);
 
 #if PMGDUINO_BOARD
@@ -216,12 +217,12 @@ public:
     void setSrcPeakCurrent(uint8_t peakCurrent);
 #endif
 
-    bool setFixedSrcPdo(uint8_t pdoNum, uint32_t voltage, uint32_t maxCurrent, uint8_t peakCurrent);
-    bool setVarSrcPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t maxCurrent);
-    bool setBatSrcPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t maxPower);
-    bool setAugmentedSrcPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t maxCurrent);
+    bool addFixedSrcPdo(uint8_t pdoNum, uint32_t voltage, uint32_t maxCurrent, uint8_t peakCurrent);
+    bool addVarSrcPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t maxCurrent);
+    bool addBatSrcPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t maxPower);
+    bool addAugmentedSrcPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t maxCurrent);
 
-    bool disableSrcPdo(uint8_t pdoNum);
+    bool removeSrcPdo(uint8_t pdoNum);
     uint8_t getSrcPdoNum(void);
 
     void setSnkDualDataRoleFlag(bool enable);
@@ -229,11 +230,11 @@ public:
     void setSnkUSBCommFlag(bool enable);
     void setSnkDualPowerModeFlag(bool enable);
 
-    bool setFixedSnkPdo(uint8_t pdoNum, uint32_t voltage, uint32_t opCurrent);
-    bool setVarSnkPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t opCurrent);
-    bool setBatSnkPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t opPower);
+    bool addFixedSnkPdo(uint8_t pdoNum, uint32_t voltage, uint32_t opCurrent);
+    bool addVarSnkPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t opCurrent);
+    bool addBatSnkPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t opPower);
 
-    bool disableSnkPdo(uint8_t pdoNum);
+    bool removeSnkPdo(uint8_t pdoNum);
     uint8_t getSnkPdoNum(void);
 
     bool updateSrcPdo(void);

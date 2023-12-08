@@ -73,36 +73,67 @@ bool enterVBUSSafe5V(uint8_t port)
     if (port == 0)
     {
         usbpd0.updateStatus();
-        
-        cnt = usbpd0.getSnkPdoNum();
 
-        if (usbpd0.contractExisted && 
-            usbpd0.powerRole == CY_PD_PRT_ROLE_SINK &&
-            usbpd0.getCurrentSinkRdo() != 0)
+        if (usbpd0.powerRole == CY_PD_PRT_ROLE_SINK);  
+            cnt = usbpd0.getSnkPdoNum();
+        else
+            cnt = usbpd0.getSrcPdoNum();
+
+        if ( usbpd0.contractExisted && 
+             (
+             (usbpd0.powerRole == CY_PD_PRT_ROLE_SINK && usbpd0.getCurrentSinkRdo() != 0) ||
+             (usbpd0.powerRole == CY_PD_PRT_ROLE_SOURCE && usbpd0.getCurrentSrcRdo() != 0)
+             )
+           )
         {
-            for (i=1; i<cnt; i++)
-                usbpd0.disableSnkPdo(i);
-            usbpd0.updateSinkPdo();
-            return true;
+            if (usbpd0.powerRole == CY_PD_PRT_ROLE_SINK)
+            {
+                for (i=1; i<cnt; i++)
+                    usbpd0.disableSnkPdo(i);
+                usbpd0.updateSinkPdo();
+                return true;
+            }
+            else
+            {
+                for (i=1; i<cnt; i++)
+                    usbpd0.disableSrcPdo(i);
+                usbpd0.updateSrcPdo();
+                return true;
+            }
         }
     }
 #if PMGDUINO_BOARD
     else
     {
         usbpd1.updateStatus();
-        
-        cnt = usbpd1.getSnkPdoNum();
 
-        if (usbpd1.contractExisted && 
-            usbpd1.powerRole == CY_PD_PRT_ROLE_SINK &&
-            usbpd1.getCurrentSinkRdo() != 0)
+        if (usbpd1.powerRole == CY_PD_PRT_ROLE_SINK);  
+            cnt = usbpd1.getSnkPdoNum();
+        else
+            cnt = usbpd1.getSrcPdoNum();
+
+        if ( usbpd1.contractExisted && 
+             (
+             (usbpd1.powerRole == CY_PD_PRT_ROLE_SINK && usbpd1.getCurrentSinkRdo() != 0) ||
+             (usbpd1.powerRole == CY_PD_PRT_ROLE_SOURCE && usbpd1.getCurrentSrcRdo() != 0)
+             )
+           )
         {
-            for (i=1; i<cnt; i++)
-                usbpd1.disableSnkPdo(i);
-            usbpd1.updateSinkPdo();
-            return true;
+            if (usbpd1.powerRole == CY_PD_PRT_ROLE_SINK)
+            {
+                for (i=1; i<cnt; i++)
+                    usbpd1.disableSnkPdo(i);
+                usbpd1.updateSinkPdo();
+                return true;
+            }
+            else
+            {
+                for (i=1; i<cnt; i++)
+                    usbpd1.disableSrcPdo(i);
+                usbpd1.updateSrcPdo();
+                return true;
+            }
         }
-
     }
 #endif
     return false;
@@ -139,6 +170,25 @@ void USBPD::updateStatus(void)
     contractExisted = ctx->dpmConfig.connect;
     powerRole = ctx->dpmConfig.curPortRole;
     attachedDeviceType = (uint8_t)ctx->dpmConfig.attachedDev;
+}
+
+uint8_t USBPD::getCurrentSrcRdo(void)
+{
+    uint8_t rdoNum = 0xFF;
+
+    if ((ctx->dpmConfig.connect) && (ctx->dpmConfig.curPortRole == CY_PD_PRT_ROLE_SOURCE))
+    {
+        for (uint8_t i=0; i<7; i++)
+        {
+            if (ctx->dpmStat.srcRdo.fixed_src.voltage == ctx->dpmStat.srcPdo[i].fixed_src.voltage)
+            {
+                rdoNum = i;
+                break;
+            }
+        }
+    }
+
+    return rdoNum;
 }
 
 uint8_t USBPD::getCurrentSinkRdo(void)
@@ -215,7 +265,7 @@ bool USBPD::setSinkPdo(uint8_t pdoNum, snk_cap_t snkCap)
 }
 
 
-bool USBPD::setFixedSrcPdo(uint8_t pdoNum, uint32_t voltage, uint32_t maxCurrent, uint8_t peakCurrent)
+bool USBPD::addFixedSrcPdo(uint8_t pdoNum, uint32_t voltage, uint32_t maxCurrent, uint8_t peakCurrent)
 {
     src_cap_t srcCap;
 
@@ -276,7 +326,7 @@ void USBPD::setSrcPeakCurrent(uint8_t peakCurrent)
 }
 #endif
 
-bool USBPD::setVarSrcPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t maxCurrent)
+bool USBPD::addVarSrcPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t maxCurrent)
 {
     src_cap_t srcCap;
 
@@ -289,7 +339,7 @@ bool USBPD::setVarSrcPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltag
     return (setSrcPdo(pdoNum, srcCap));
 }
 
-bool USBPD::setBatSrcPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t maxPower)
+bool USBPD::addBatSrcPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t maxPower)
 {
     src_cap_t srcCap;
 
@@ -302,7 +352,7 @@ bool USBPD::setBatSrcPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltag
     return (setSrcPdo(pdoNum, srcCap));
 }
 
-bool USBPD::setAugmentedSrcPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t maxCurrent)
+bool USBPD::addAugmentedSrcPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t maxCurrent)
 {
     src_cap_t srcCap;
 
@@ -315,7 +365,7 @@ bool USBPD::setAugmentedSrcPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t max
     return (setSrcPdo(pdoNum, srcCap));
 }
 
-bool USBPD::disableSrcPdo(uint8_t pdoNum)
+bool USBPD::removeSrcPdo(uint8_t pdoNum)
 {
     if (pdoNum == 0 || pdoNum > 7)
         return false;
@@ -355,7 +405,7 @@ void USBPD::setSnkDualPowerModeFlag(bool enable)
     iSprSnkPdo[0].fixed_snk_do_t.dualRolePower = enable ? 1 : 0;
 }
 
-bool USBPD::setFixedSnkPdo(uint8_t pdoNum, uint32_t voltage, uint32_t opCurrent)
+bool USBPD::addFixedSnkPdo(uint8_t pdoNum, uint32_t voltage, uint32_t opCurrent)
 {
     snk_cap_t snkCap;
 
@@ -367,7 +417,7 @@ bool USBPD::setFixedSnkPdo(uint8_t pdoNum, uint32_t voltage, uint32_t opCurrent)
     return (setSinkPdo(pdoNum, snkCap));
 }
 
-bool USBPD::setVarSnkPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t opCurrent)
+bool USBPD::addVarSnkPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t opCurrent)
 {
     snk_cap_t snkCap;
 
@@ -380,7 +430,7 @@ bool USBPD::setVarSnkPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltag
     return (setSinkPdo(pdoNum, snkCap));
 }
 
-bool USBPD::setBatSnkPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t opPower)
+bool USBPD::addBatSnkPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t opPower)
 {
     snk_cap_t snkCap;
 
@@ -393,7 +443,7 @@ bool USBPD::setBatSnkPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltag
     return (setSinkPdo(pdoNum, snkCap));
 }
 
-bool USBPD::disableSnkPdo(uint8_t pdoNum)
+bool USBPD::removeSnkPdo(uint8_t pdoNum)
 {
     if (pdoNum == 0 || pdoNum > 7)
         return false;
