@@ -74,7 +74,7 @@ bool enterVBUSSafe5V(uint8_t port)
     {
         usbpd0.updateStatus();
 
-        if (usbpd0.powerRole == CY_PD_PRT_ROLE_SINK);  
+        if (usbpd0.powerRole == CY_PD_PRT_ROLE_SINK)  
             cnt = usbpd0.getSnkPdoNum();
         else
             cnt = usbpd0.getSrcPdoNum();
@@ -89,14 +89,14 @@ bool enterVBUSSafe5V(uint8_t port)
             if (usbpd0.powerRole == CY_PD_PRT_ROLE_SINK)
             {
                 for (i=1; i<cnt; i++)
-                    usbpd0.disableSnkPdo(i);
+                    usbpd0.removeSnkPdo(i);
                 usbpd0.updateSinkPdo();
                 return true;
             }
             else
             {
                 for (i=1; i<cnt; i++)
-                    usbpd0.disableSrcPdo(i);
+                    usbpd0.removeSrcPdo(i);
                 usbpd0.updateSrcPdo();
                 return true;
             }
@@ -107,7 +107,7 @@ bool enterVBUSSafe5V(uint8_t port)
     {
         usbpd1.updateStatus();
 
-        if (usbpd1.powerRole == CY_PD_PRT_ROLE_SINK);  
+        if (usbpd1.powerRole == CY_PD_PRT_ROLE_SINK)
             cnt = usbpd1.getSnkPdoNum();
         else
             cnt = usbpd1.getSrcPdoNum();
@@ -122,14 +122,14 @@ bool enterVBUSSafe5V(uint8_t port)
             if (usbpd1.powerRole == CY_PD_PRT_ROLE_SINK)
             {
                 for (i=1; i<cnt; i++)
-                    usbpd1.disableSnkPdo(i);
+                    usbpd1.removeSnkPdo(i);
                 usbpd1.updateSinkPdo();
                 return true;
             }
             else
             {
                 for (i=1; i<cnt; i++)
-                    usbpd1.disableSrcPdo(i);
+                    usbpd1.removeSrcPdo(i);
                 usbpd1.updateSrcPdo();
                 return true;
             }
@@ -180,7 +180,7 @@ uint8_t USBPD::getCurrentSrcRdo(void)
     {
         for (uint8_t i=0; i<7; i++)
         {
-            if (ctx->dpmStat.srcRdo.fixed_src.voltage == ctx->dpmStat.srcPdo[i].fixed_src.voltage)
+            if (ctx->dpmStat.srcSelPdo.fixed_src.voltage == ctx->dpmStat.srcPdo[i].fixed_src.voltage)
             {
                 rdoNum = i;
                 break;
