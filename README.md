@@ -36,12 +36,12 @@ Please visit also the Wiki for additional information, e.g. datasheets, pin out 
 
 Paste the following URL into the 'Additional Boards Manager URLs' input field under **File** > **Preferences** to add Infineon's microcontroller boards to the Arduino IDE.
 
-https://github.com/williamc1014/PMG1_Duino/releases/download/V0.0.1/package_PMG1_index.json
+https://github.com/williamc1014/PMG1_Duino/releases/download/V0.1.0/package_PMG1_index.json
 
 Easier to copy (no clickable link):
 
 ```
-https://github.com/williamc1014/PMG1_Duino/releases/download/V0.0.1/package_PMG1_index.json
+https://github.com/williamc1014/PMG1_Duino/releases/download/V0.1.0/package_PMG1_index.json
 ```
 
 ![Adding a Board JSON](https://raw.githubusercontent.com/infineon/assets/master/Pictures/Preferences_JSON.png)
