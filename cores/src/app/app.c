@@ -52,6 +52,8 @@
 #include "timer_id.h"
 #include "cy_gpio.h"
 
+#include "Serial.h"
+
 #if BATTERY_CHARGING_ENABLE
 #include <charger_detect.h>
 #endif /* BATTERY_CHARGING_ENABLE */
@@ -386,9 +388,6 @@ void app_event_handler(cy_stc_pdstack_context_t *ptrPdStackContext,
             }
             break;
 
-        case APP_EVT_EPR_MODE_ENTER_SUCCESS:
-            break;
-
         case APP_EVT_PD_CONTRACT_NEGOTIATION_COMPLETE:
             /* Set VDM version based on active PD revision. */
 #if CY_PD_REV3_ENABLE
@@ -487,6 +486,18 @@ void app_event_handler(cy_stc_pdstack_context_t *ptrPdStackContext,
             set_mux (ptrPdStackContext, MUX_CONFIG_SS_ONLY, 0);
             break;
 #endif /* (!CY_PD_SINK_ONLY) */
+
+#if CY_PD_EPR_ENABLE
+        case APP_EVT_EPR_MODE_ENTER_FAILED:
+            break;
+        case APP_EVT_EPR_MODE_ENTER_RECEIVED:
+#if ROLE_PREFERENCE_ENABLE
+            Cy_PdUtils_SwTimer_Stop(ptrPdStackContext->ptrTimerContext, GET_APP_TIMER_ID(ptrPdStackContext, APP_INITIATE_SWAP_TIMER));
+#endif
+            break;
+        case APP_EVT_EPR_MODE_ENTER_SUCCESS:
+            break;
+#endif
 
         default:
             /* Nothing to do. */
@@ -744,10 +755,15 @@ bool eval_epr_mode(cy_stc_pdstack_context_t *ptrPdStackContext, cy_en_pdstack_ep
     (void) eprModeState;
     (void) app_resp_handler;
 
+    dbgPrintStr("E");
+
+    if (ptrPdStackContext != NULL)
+        return true;
+    else
+        return false;
     /* Place holder for customer specific EPR Source preparation
      * It is possible to provide additional checking before sends EPR Mode Enter Acknowledged  */
 
-    return true;
 }
 
 bool send_epr_cap(cy_stc_pdstack_context_t *ptrPdStackContext, cy_pdstack_app_resp_cbk_t app_resp_handler)
@@ -773,5 +789,21 @@ bool send_src_info (struct cy_stc_pdstack_context *ptrPdStackContext)
     return true;
 }
 #endif
+
+#if (CY_PD_USB4_SUPPORT_ENABLE)
+void eval_enter_usb (
+            struct cy_stc_pdstack_context *ptrPdStackContext,               /**< PD port index. */
+            const cy_stc_pdstack_pd_packet_t *eudo_p, 
+            cy_pdstack_app_resp_cbk_t app_resp_handler
+            )
+{
+    (void) ptrPdStackContext;
+    (void) eudo_p;
+    (void) app_resp_handler;
+
+    ptrPdStackContext->peStat.appResp.reqStatus = CY_PDSTACK_REQ_REJECT;
+}
+#endif
+
 
 /* End of File */

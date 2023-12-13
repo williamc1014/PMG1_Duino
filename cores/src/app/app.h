@@ -450,6 +450,10 @@ bool send_epr_cap(cy_stc_pdstack_context_t *ptrPdStackContext, cy_pdstack_app_re
  */
 bool send_src_info (struct cy_stc_pdstack_context *ptrPdStackContext);
 
+#if (CY_PD_USB4_SUPPORT_ENABLE)
+void eval_enter_usb (struct cy_stc_pdstack_context *ptrPdStackContext, const cy_stc_pdstack_pd_packet_t *eudo_p, cy_pdstack_app_resp_cbk_t app_resp_handler);
+#endif
+
 #endif /* _APP_H_ */
 
 /* End of File */
