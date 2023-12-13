@@ -171,9 +171,9 @@ private:
     src_cap_t                   iSprSrcPdo[13] = {0};
     uint8_t                     iSprSrcPdoCnt = 0x01;
     uint8_t                     iSprSrcMask = 0x01;
-#endif
 
     bool setSrcPdo(uint8_t pdoNum, src_cap_t srcCap);
+#endif
     bool setSinkPdo(uint8_t pdoNum, snk_cap_t snkCap);
     
 public:    
@@ -215,7 +215,6 @@ public:
     void setUnchunkedExtMsgFlag(bool enable);
     void setSrcUSBSuspendCapFlag(bool enable);
     void setSrcPeakCurrent(uint8_t peakCurrent);
-#endif
 
     bool addFixedSrcPdo(uint8_t pdoNum, uint32_t voltage, uint32_t maxCurrent, uint8_t peakCurrent);
     bool addVarSrcPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t maxCurrent);
@@ -224,6 +223,7 @@ public:
 
     bool removeSrcPdo(uint8_t pdoNum);
     uint8_t getSrcPdoNum(void);
+#endif
 
     void setSnkDualDataRoleFlag(bool enable);
     void setSnkUnconstrainedPowerFlag(bool enable);

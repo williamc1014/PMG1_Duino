@@ -76,13 +76,17 @@ bool enterVBUSSafe5V(uint8_t port)
 
         if (usbpd0.powerRole == CY_PD_PRT_ROLE_SINK)  
             cnt = usbpd0.getSnkPdoNum();
+#if PMGDUINO_BOARD
         else
             cnt = usbpd0.getSrcPdoNum();
+#endif
 
         if ( usbpd0.contractExisted && 
              (
-             (usbpd0.powerRole == CY_PD_PRT_ROLE_SINK && usbpd0.getCurrentSinkRdo() != 0) ||
-             (usbpd0.powerRole == CY_PD_PRT_ROLE_SOURCE && usbpd0.getCurrentSrcRdo() != 0)
+                (usbpd0.powerRole == CY_PD_PRT_ROLE_SINK && usbpd0.getCurrentSinkRdo() != 0) 
+#if PMGDUINO_BOARD
+             || (usbpd0.powerRole == CY_PD_PRT_ROLE_SOURCE && usbpd0.getCurrentSrcRdo() != 0)
+#endif
              )
            )
         {
@@ -93,6 +97,7 @@ bool enterVBUSSafe5V(uint8_t port)
                 usbpd0.updateSinkPdo();
                 return true;
             }
+#if PMGDUINO_BOARD
             else
             {
                 for (i=1; i<cnt; i++)
@@ -100,6 +105,7 @@ bool enterVBUSSafe5V(uint8_t port)
                 usbpd0.updateSrcPdo();
                 return true;
             }
+#endif
         }
     }
 #if PMGDUINO_BOARD
@@ -210,9 +216,9 @@ uint8_t USBPD::getCurrentSinkRdo(void)
     return rdoNum;
 }
 
+#if PMGDUINO_BOARD  
 bool USBPD::setSrcPdo(uint8_t pdoNum, src_cap_t srcCap)
-{
-#if PMGDUINO_BOARD    
+{  
     if (pdoNum == 0 || pdoNum > 7)
         return false;
 
@@ -233,10 +239,10 @@ bool USBPD::setSrcPdo(uint8_t pdoNum, src_cap_t srcCap)
     }
 
     iSprSrcPdoCnt = pdoCnt;
-#endif
 
     return true;
 }
+#endif
 
 bool USBPD::setSinkPdo(uint8_t pdoNum, snk_cap_t snkCap)
 {
@@ -264,7 +270,7 @@ bool USBPD::setSinkPdo(uint8_t pdoNum, snk_cap_t snkCap)
     return true;
 }
 
-
+#if PMGDUINO_BOARD
 bool USBPD::addFixedSrcPdo(uint8_t pdoNum, uint32_t voltage, uint32_t maxCurrent, uint8_t peakCurrent)
 {
     src_cap_t srcCap;
@@ -278,7 +284,6 @@ bool USBPD::addFixedSrcPdo(uint8_t pdoNum, uint32_t voltage, uint32_t maxCurrent
     return (setSrcPdo(pdoNum, srcCap));
 }
 
-#if PMGDUINO_BOARD
 void USBPD::setSrcUSBCommFlag(bool enable)
 {
     iSprSrcPdo[0].fixed_src_do_t.usbCommCap = enable ? 1 : 0;
@@ -324,7 +329,6 @@ void USBPD::setSrcPeakCurrent(uint8_t peakCurrent)
         return;
     iSprSrcPdo[0].fixed_src_do_t.pkCurrent = peakCurrent;
 }
-#endif
 
 bool USBPD::addVarSrcPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t maxCurrent)
 {
@@ -384,6 +388,7 @@ uint8_t USBPD::getSrcPdoNum(void)
 {
     return iSprSrcPdoCnt;
 }
+#endif
 
 void USBPD::setSnkDualDataRoleFlag(bool enable)
 {
