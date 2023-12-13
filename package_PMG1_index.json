@@ -10,14 +10,14 @@
       },
       "platforms": [
         {
-          "name": "Infineon's PMG1 PD Microcontroller V0.x",
+          "name": "Infineon's PMG1 PD Microcontroller V0.1.x",
           "architecture": "PMG1",
-          "version": "0.0.1",
+          "version": "0.1.0",
           "category": "Contributed",
-          "url": "https://github.com/williamc1014/PMG1_Duino/releases/download/V0.0.1/PMG1_Duino_V0.0.1.zip",
-          "archiveFileName": "PMG1_Duino_V0.0.1.zip",
-          "checksum": "SHA-256:f39d0828af5bdbf5795b829886e967178b45f658ca35dbe17ac46eb218afe720",
-          "size": "11393364",
+          "url": "https://github.com/williamc1014/PMG1_Duino/releases/download/V0.1.0/PMG1_Duino_V0.1.0.zip",
+          "archiveFileName": "PMG1_Duino_V0.1.0.zip",
+          "checksum": "SHA-256:73db1bb7b2dbfacf512b2217e5020bce3457a3e0d82805af3f807aacfe425c98",
+          "size": "10870495",
           "help": {
             "online": "https://github.com/williamc1014/PMG1_Duino/wiki"
           },
