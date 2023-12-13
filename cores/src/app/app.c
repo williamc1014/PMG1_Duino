@@ -755,15 +755,10 @@ bool eval_epr_mode(cy_stc_pdstack_context_t *ptrPdStackContext, cy_en_pdstack_ep
     (void) eprModeState;
     (void) app_resp_handler;
 
-    dbgPrintStr("E");
-
-    if (ptrPdStackContext != NULL)
-        return true;
-    else
-        return false;
     /* Place holder for customer specific EPR Source preparation
      * It is possible to provide additional checking before sends EPR Mode Enter Acknowledged  */
-
+    
+    return true;
 }
 
 bool send_epr_cap(cy_stc_pdstack_context_t *ptrPdStackContext, cy_pdstack_app_resp_cbk_t app_resp_handler)
