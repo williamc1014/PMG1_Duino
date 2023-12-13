@@ -51,8 +51,7 @@
 
 #define set_pd_ctrl_voltage(port, mv)       \
 {                                           \
-    pd_ctrl_power_rt6190(port, 1);          \
-    set_pd_ctrl_voltage_rt6190(port, mv);   \
+    pd_ctrl_power_rt6190(port, mv, 1);      \
     set_pd_ocp_rt6190(port, mv);            \
     pd_ctrl_ocp_rt6190(port, 1);            \
 }                                           \
