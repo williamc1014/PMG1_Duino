@@ -256,11 +256,6 @@ void sln_pd_event_handler(cy_stc_pdstack_context_t* ctx, cy_en_pdstack_app_evt_t
         }
     }
 
-#if PMGDUINO_BOARD
-    //if (waitNegotiationComplete == 0 && evt == APP_EVT_PD_CONTRACT_NEGOTIATION_COMPLETE)
-    //    APP_VBUS_SET_VOLT_P1(5000);
-#endif
-
     if (waitNegotiationComplete && evt == APP_EVT_PD_CONTRACT_NEGOTIATION_COMPLETE)
     {
         
@@ -493,7 +488,7 @@ const cy_stc_pdstack_app_cbk_t app_callback =
 	    psnk_set_current,
 	    psnk_enable,
 	    psnk_disable,
-	    eval_src_cap,
+	    eval_src_cap,      
 	#endif
 
 	#if (!CY_PD_SINK_ONLY)
@@ -509,7 +504,7 @@ const cy_stc_pdstack_app_cbk_t app_callback =
 	    eval_fr_swap,
 	#endif
 
-	    vbus_get_value,
+	vbus_get_value,
 
 	#if (!CY_PD_SINK_ONLY)
 	    psrc_get_voltage,
@@ -945,7 +940,7 @@ int main(void)
     Cy_SysInt_Init(&sys_fw_tick_intr_config, cy_fw_tick_handler);
     NVIC_ClearPendingIRQ(sys_fw_tick_intr_config.intrSrc);
     NVIC_EnableIRQ(sys_fw_tick_intr_config.intrSrc);
-
+ 
     /* Initialize the USBPD driver */
 #if defined(CY_DEVICE_CCG3)
     Cy_USBPD_Init(&gl_UsbPdPort0Ctx, 0, mtb_usbpd_port0_HW, NULL,
