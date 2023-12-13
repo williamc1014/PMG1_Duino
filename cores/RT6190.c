@@ -4,6 +4,7 @@
 #include "config.h"
 #include "rt6190.h"
 
+#if PMGDUINO_BOARD
 #define I2CM_DATA_RATE_HZ           (100000U)
 #define I2CM_TIMER_PERIOD           (10U)
 #define I2CM_RETRY_COUNT			(3u) 
@@ -232,11 +233,15 @@ bool pmicI2cMRegWrite(uint8_t devAddr, uint8_t buffer, uint8_t count,
     return status;
 }
 
-bool pd_ctrl_power_rt6190(uint8_t port, uint8_t state)
+static bool vinVoutRatio0d05[2] = {false, false};
+
+bool pd_ctrl_power_rt6190(uint8_t port, uint16_t volt, uint8_t state)
 {
     uint8_t devAddr = rt6190DeviceAddress[port];
     uint8_t regAddr;
     uint8_t regData;
+    uint8_t regReadData;
+    uint16_t mv = volt + 200; // compensation, optional
     bool return_value = true;
 
     regAddr = RT6190_REG_VREF_SC;
@@ -266,26 +271,79 @@ bool pd_ctrl_power_rt6190(uint8_t port, uint8_t state)
     {
         return_value = false;
     }
-    
+ 
+    regAddr = RT6190_REG_RATIO;
+    if (pmicI2cMRegRead(devAddr, &regData, 1, regAddr, 1) == true)
+    {
+        regReadData = regData;
+        if (regData & (RATIO_REG_VOUT_RATIO_0_0_5VV))
+        {
+            vinVoutRatio0d05[port] = true;
+        }
+        else
+        {
+            regAddr = RT6190_REG_SETTING2;
+            if (pmicI2cMRegRead(devAddr, &regData, 1, regAddr, 1) == true)
+            {
+                if ((regData & SETTING2_REG_EN_PWM) == 0)
+                {
+                    regAddr = RT6190_REG_RATIO;
+                    regData = regReadData | RATIO_REG_VOUT_RATIO_0_0_5VV;
+                    if (pmicI2cMRegWrite(devAddr, regData, 1, regAddr, 1) == true)
+                        vinVoutRatio0d05[port] = true;
+                }
+            }
+                
+        }
+    }
+
     regAddr = RT6190_REG_SETTING2;
-    regData = SETTING2_REG_IR_COMP;//0x83;
+    regData = SETTING2_REG_IR_COMP;
     if(state != 0)
 	{
         regData |= SETTING2_REG_EN_PWM;
     }
-   
     if (pmicI2cMRegWrite(devAddr, regData, 1, regAddr, 1) == false)
     {
         return_value = false;
     }
+
+    regAddr = RT6190_REG_OUTPUT_VOLTAGE_L;
+    if (vinVoutRatio0d05[port] == false)
+        regData = ((mv * 10) / 125u) & 0xFF;
+    else
+        regData = ((mv * 10) / 200u) & 0xFF;
+    pmicI2cMRegWrite(devAddr, regData, 1, regAddr, 1);
     
+    regAddr = RT6190_REG_OUTPUT_VOLTAGE_H;
+    if (vinVoutRatio0d05[port] == false)
+        regData = ((mv * 10) / 125u) >> 8;
+    else
+        regData = ((mv * 10) / 200u) >> 8;
+    pmicI2cMRegWrite(devAddr, regData, 1, regAddr, 1);    
+   
     regAddr = RT6190_REG_FUNCTION;
     regData = MASK_INTERNAL_FUNCTION_FOR_VOLTAGE;
     if (pmicI2cMRegWrite(devAddr, regData, 1, regAddr, 1) == false)
     {
         return_value = false;
 	}
-	
+
+    if (mv == 20000)
+    {
+        regAddr = RT6190_REG_SETTING3;//0x0F;
+        regData = SETTING3_REG_GM_EA_1100UA;//0x30;
+        pmicI2cMRegWrite(devAddr, regData, 1, regAddr, 1);
+    }
+
+    regAddr = RT6190_REG_OUTPUT_CURRENT_L;
+    regData = OUTPUT_CURRENT_L_12A;
+    pmicI2cMRegWrite(devAddr, regData, 1, regAddr, 1);
+    
+    regAddr = RT6190_REG_OUTPUT_CURRENT_H;
+    regData = OUTPUT_CURRENT_H_12A;
+    pmicI2cMRegWrite(devAddr, regData, 1, regAddr, 1);
+
     return return_value;
 }
 
@@ -313,11 +371,17 @@ bool set_pd_ctrl_voltage_rt6190(uint8_t port, uint16_t volt)
     pmicI2cMRegWrite(devAddr, regData, 1, regAddr, 1);
       
     regAddr = RT6190_REG_OUTPUT_VOLTAGE_L;
-    regData = ((mV * 10) / 125u) & 0xFF;
+    if ( vinVoutRatio0d05[port] == false)
+        regData = ((mV * 10) / 125u) & 0xFF;
+    else
+        regData = ((mV * 10) / 200u) & 0xFF;
     pmicI2cMRegWrite(devAddr, regData, 1, regAddr, 1);
     
     regAddr = RT6190_REG_OUTPUT_VOLTAGE_H;
-    regData = ((mV * 10) / 125u) >> 8;
+    if ( vinVoutRatio0d05[port] == false)
+        regData = ((mV * 10) / 125u) >> 8;
+    else
+        regData = ((mV * 10) / 200u) >> 8;
     pmicI2cMRegWrite(devAddr, regData, 1, regAddr, 1);    
     
     return true;
@@ -408,5 +472,5 @@ uint8_t pd_check_pg_rt6190(uint8_t port)
 
     return alert_val;
 }
-
+#endif
 /* [] END OF FILE */

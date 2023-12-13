@@ -90,7 +90,7 @@ extern const uint8_t rt6190DeviceAddress[2];
 #define SETTING2_REG_DIS_INCC				(1u<<6)
 #define SETTING2_REG_DIS_INCV				(1u<<5)
 #define SETTING2_REG_EN_DISCHARGE			(1u<<4)
-#define SETTING2_REG_IR_COMP				(1u<<2)
+#define SETTING2_REG_IR_COMP				(1u<<0)
 
 /* RT6190_REG_SETTING3 (0x0F) */
 #define SETTING3_REG_DT_SEL_30NS			(0u<<6)
@@ -114,6 +114,13 @@ extern const uint8_t rt6190DeviceAddress[2];
 #define SETTING4_REG_ADC_AVG_8_TIMES        (0x80u)
 #define SETTING4_REG_OCP4_TIME_X10_EN       (0x10u)
 #define SETTING4_REG_ADC_EN                 (0x02u)
+
+/* RT6190_REG_SETTING4 (0x11) */
+#define RATIO_REG_SSP_EN                    (1<<7)
+#define RATIO_REG_VIN_RATIO_0_0_8VV         (0<<6)
+#define RATIO_REG_VIN_RATIO_0_0_5VV         (1<<6)
+#define RATIO_REG_VOUT_RATIO_0_0_8VV        (0<<5)
+#define RATIO_REG_VOUT_RATIO_0_0_5VV        (1<<5)
 
 /* RT6910_REG_ALERT2 (0x1F) */
 #define RT6190_REG_ALERT2_PG                (0x40u)
@@ -157,7 +164,7 @@ bool pmicI2cMWrite(uint8_t devAddr, uint8_t *buffer, uint8_t count, uint8_t retr
 bool pmicI2cMRead(uint8_t devAddr, uint8_t *buffer, uint8_t count, uint8_t retry_cnt);
 bool pmicI2cMRegRead(uint8_t devAddr, uint8_t *buffer, uint8_t count, uint8_t regAddr, uint8_t regSize);
 bool pmicI2cMRegWrite(uint8_t devAddr, uint8_t buffer, uint8_t count, uint8_t regAddr, uint8_t regSize);
-bool pd_ctrl_power_rt6190(uint8_t port, uint8_t state);
+bool pd_ctrl_power_rt6190(uint8_t port, uint16_t volt, uint8_t state);
 bool set_pd_ctrl_voltage_rt6190(uint8_t port, uint16_t volt);
 bool set_pd_ocp_rt6190(uint8_t port, uint16_t volt);
 bool pd_ctrl_ocp_rt6190(uint8_t port, uint8_t state);
