@@ -104,3 +104,5 @@ uint16_t SPIClass::transfer16(uint16_t val16)
 
 	return rx_buffer;
 }
+
+SPIClass SPI=SPIClass();

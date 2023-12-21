@@ -78,4 +78,6 @@ public:
   uint16_t transfer16(uint16_t val16);
 };
 
+extern SPIClass SPI;
+
 #endif /* SPI_CLASS_TEST_H_ */
