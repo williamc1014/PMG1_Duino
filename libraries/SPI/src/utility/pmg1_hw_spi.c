@@ -18,9 +18,9 @@ void spiPinInit(void)
 void spiInit(uint32_t rate, bool msbFirst, uint8_t mode)
 {
     uint8_t div = 2;
-    // maximum rate is 48MHx / 2 (DIV) / 4 (Oversample) = 6MHz
-    // Minimum rate is 48MHx / 128 (DIV) / 4 (Oversample) = 93.750kHz
-    if (rate >= 6000000 || rate <= 93750)
+    // maximum rate is 48MHx / 2 (DIV) / 16 (Oversample) = 1.5MHz
+    // Minimum rate is 48MHx / 128 (DIV) / 16 (Oversample) = 23.4375kHz
+    if (rate > 1500000 || rate < 23437)
         return;
 
     if (mode > 3)
@@ -30,10 +30,10 @@ void spiInit(uint32_t rate, bool msbFirst, uint8_t mode)
 
     // SPI clock source configuration
     div = (uint8_t)((3000000 / rate) - 1);
-    Cy_SysClk_PeriphAssignDivider(SPI_CLOCK_BLOCK, CY_SYSCLK_DIV_8_BIT, 6U);
     Cy_SysClk_PeriphDisableDivider(CY_SYSCLK_DIV_8_BIT, 6U);
     Cy_SysClk_PeriphSetDivider(CY_SYSCLK_DIV_8_BIT, 6U, div);
     Cy_SysClk_PeriphEnableDivider(CY_SYSCLK_DIV_8_BIT, 6U);
+    Cy_SysClk_PeriphAssignDivider(SPI_CLOCK_BLOCK, CY_SYSCLK_DIV_8_BIT, 6U);
 
     // configure mode and bit-order
     SPI_config.sclkMode = (cy_en_scb_spi_sclk_mode_t)mode;
@@ -90,4 +90,8 @@ void spiSetPeripheralClock(uint8_t div)
 void spiSendData(uint8_t *txData, uint8_t *rxData, uint8_t size)
 {
     (void)Cy_SCB_SPI_Transfer(SPI_HW, txData, rxData, size, &spiContext);
+    /* Blocking wait for transfer completion */
+    while (0UL != (CY_SCB_SPI_TRANSFER_ACTIVE & Cy_SCB_SPI_GetTransferStatus(SPI_HW, &spiContext)))
+    {
+    }
 }
