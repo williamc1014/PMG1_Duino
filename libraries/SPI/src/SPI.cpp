@@ -101,7 +101,7 @@ void SPIClass::transfer(uint8_t* buffer, uint8_t size)
 	{
 		for (i=0; i<size; i++)
 		{
-			spiSendData(&buffer[i], &rxData, size);
+			spiSendData(&buffer[i], &rxData, 1);
 			buffer[i] = rxData;
 		}
 	}
