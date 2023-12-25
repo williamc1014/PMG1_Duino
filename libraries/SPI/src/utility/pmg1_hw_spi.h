@@ -214,7 +214,7 @@ const cy_stc_sysint_t SPI_SCB_IRQ_cfg =
 #define SPI_BUFFER_MAX_SIZE 32
 
 void spiPinInit(void);
-void spiInit(uint8_t div, bool msbFirst, uint8_t mode);
+bool spiInit(uint8_t div, bool msbFirst, uint8_t mode);
 void spiDeInit(void);
 void spiDisable(void);
 void spiSetPeripheralClock(uint8_t div);

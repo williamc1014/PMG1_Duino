@@ -15,15 +15,16 @@ void spiPinInit(void)
     Cy_GPIO_Pin_Init(SPI_CS_PORT, SPI_CS_PIN, &SPI_CS_config);    
 }
 
-void spiInit(uint8_t div, bool msbFirst, uint8_t mode)
+bool spiInit(uint8_t div, bool msbFirst, uint8_t mode)
 {
     // maximum rate is 48MHx / 2 (DIV) / 16 (Oversample) = 1.5MHz
     // Minimum rate is 48MHx / 128 (DIV) / 16 (Oversample) = 23.4375kHz
-    if ((div > 128) || (div < 2) || (div % 2))
-        return;
+
+    if ((div > 128) || (div < 2))
+        return false;
 
     if (mode > 3)
-        return;
+        return false;
 
     spiPinInit();
 
@@ -38,14 +39,19 @@ void spiInit(uint8_t div, bool msbFirst, uint8_t mode)
     SPI_config.enableMsbFirst = (msbFirst) ? true : false;
 
     /* Configure SPI to operate */
-    (void) Cy_SCB_SPI_Init(SPI_HW, (cy_stc_scb_spi_config_t const *)&SPI_config, &spiContext);
+    if (CY_SCB_SPI_SUCCESS != Cy_SCB_SPI_Init(SPI_HW, (cy_stc_scb_spi_config_t const *)&SPI_config, &spiContext))
+        return false;
 
     /* Hook interrupt service routine and enable interrupt */
-    (void) Cy_SysInt_Init(&SPI_SCB_IRQ_cfg, &SPI_Isr);
+    if (Cy_SysInt_Init(&SPI_SCB_IRQ_cfg, &SPI_Isr) != CY_SYSINT_SUCCESS)
+        return false;
+
     NVIC_EnableIRQ(SPI_SCB_IRQ_cfg.intrSrc);
 
     /* Enable SPI to operate */
     Cy_SCB_SPI_Enable(SPI_HW);
+
+    return true;
 }
 
 void spiDeInit(void)

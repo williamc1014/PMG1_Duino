@@ -17,8 +17,10 @@ void SPIClass::beginTransaction(SPISettings settings)
 	spiParameter.dataMode = checkValidSpiMode(settings.dataMode);
 
 	uint8_t div = SPI_SYSTEM_RATE / spiParameter.clockFreq / SPI_OVERSAMPLE_COUNT;
-	spiInit(div, spiParameter.bitOrder, spiParameter.dataMode);
-	spiHwInitaited = true;
+	if (spiInit(div, spiParameter.bitOrder, spiParameter.dataMode))
+		spiHwInitaited = true;
+	else
+		spiHwInitaited = false;
 }
 
 void SPIClass::endTransaction(void)
@@ -94,8 +96,6 @@ void SPIClass::transfer(uint8_t* buffer, uint8_t size)
 {
 	uint8_t i;
 	uint8_t rxData;
-
-	memset((void *)buffer, 0x00, (size_t)size);
 	
 	if(spiHwInitaited)
 	{
@@ -104,6 +104,10 @@ void SPIClass::transfer(uint8_t* buffer, uint8_t size)
 			spiSendData(&buffer[i], &rxData, size);
 			buffer[i] = rxData;
 		}
+	}
+	else
+	{
+		memset((void *)buffer, 0, (size_t)size);
 	}
 }
 
