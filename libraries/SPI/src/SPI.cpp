@@ -29,25 +29,31 @@ void SPIClass::endTransaction(void)
 
 void SPIClass::setBitOrder(uint8_t order)
 {
-	if (checkValidBitOrder(spiParameter.bitOrder) != order && spiHwInitaited)
+	if (checkValidBitOrder(spiParameter.bitOrder) != order)
 	{
 		spiParameter.bitOrder = checkValidBitOrder(order);
-		spiDeInit();
-		delay(1);
-		uint8_t div = SPI_SYSTEM_RATE / spiParameter.clockFreq / SPI_OVERSAMPLE_COUNT;
-		spiInit(div, spiParameter.bitOrder, spiParameter.dataMode);
+		if (spiHwInitaited)
+		{
+			spiDeInit();
+			delay(1);
+			uint8_t div = SPI_SYSTEM_RATE / spiParameter.clockFreq / SPI_OVERSAMPLE_COUNT;
+			spiInit(div, spiParameter.bitOrder, spiParameter.dataMode);
+		}
 	}
 }
 
 void SPIClass::setDataMode(uint8_t mode)
 {
-	if (checkValidSpiMode(spiParameter.dataMode) != mode && spiHwInitaited)
+	if (checkValidSpiMode(spiParameter.dataMode) != mode)
 	{
 		spiParameter.dataMode = checkValidSpiMode(mode);
-		spiDeInit();
-		delay(1);
-		uint8_t div = SPI_SYSTEM_RATE / spiParameter.clockFreq / SPI_OVERSAMPLE_COUNT;
-		spiInit(div, spiParameter.bitOrder, spiParameter.dataMode);
+		if (spiHwInitaited)
+		{
+			spiDeInit();
+			delay(1);
+			uint8_t div = SPI_SYSTEM_RATE / spiParameter.clockFreq / SPI_OVERSAMPLE_COUNT;
+			spiInit(div, spiParameter.bitOrder, spiParameter.dataMode);
+		}
 	}
 }
 
@@ -58,12 +64,15 @@ void SPIClass::setClockDivider(uint8_t div)
 
 	uint32_t newRate = SPI_SYSTEM_RATE / div / SPI_OVERSAMPLE_COUNT;
 
-	if (checkValidBitRate(newRate) != spiParameter.clockFreq && spiHwInitaited)
+	if (checkValidBitRate(newRate) != spiParameter.clockFreq)
 	{
 		spiParameter.clockFreq = checkValidBitRate(newRate);
-		spiDeInit();
-		delay(1);
-		spiInit(div, spiParameter.bitOrder, spiParameter.dataMode);
+		if (spiHwInitaited)
+		{
+			spiDeInit();
+			delay(1);
+			spiInit(div, spiParameter.bitOrder, spiParameter.dataMode);
+		}
 	}
 }
 
