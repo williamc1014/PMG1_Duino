@@ -15,12 +15,11 @@ void spiPinInit(void)
     Cy_GPIO_Pin_Init(SPI_CS_PORT, SPI_CS_PIN, &SPI_CS_config);    
 }
 
-void spiInit(uint32_t rate, bool msbFirst, uint8_t mode)
+void spiInit(uint8_t div, bool msbFirst, uint8_t mode)
 {
-    uint8_t div = 2;
     // maximum rate is 48MHx / 2 (DIV) / 16 (Oversample) = 1.5MHz
     // Minimum rate is 48MHx / 128 (DIV) / 16 (Oversample) = 23.4375kHz
-    if (rate > 1500000 || rate < 23437)
+    if ((div > 128) || (div < 2) || (div % 2))
         return;
 
     if (mode > 3)
@@ -29,9 +28,8 @@ void spiInit(uint32_t rate, bool msbFirst, uint8_t mode)
     spiPinInit();
 
     // SPI clock source configuration
-    div = (uint8_t)((3000000 / rate) - 1);
     Cy_SysClk_PeriphDisableDivider(CY_SYSCLK_DIV_8_BIT, 6U);
-    Cy_SysClk_PeriphSetDivider(CY_SYSCLK_DIV_8_BIT, 6U, div);
+    Cy_SysClk_PeriphSetDivider(CY_SYSCLK_DIV_8_BIT, 6U, div-1);
     Cy_SysClk_PeriphEnableDivider(CY_SYSCLK_DIV_8_BIT, 6U);
     Cy_SysClk_PeriphAssignDivider(SPI_CLOCK_BLOCK, CY_SYSCLK_DIV_8_BIT, 6U);
 

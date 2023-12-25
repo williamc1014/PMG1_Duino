@@ -1,20 +1,9 @@
 #ifndef SPI_H_
 #define SPI_H_
 
-/*
-#include "cy_pdl.h"
-
-#if defined(__cplusplus)
-extern "C" {
-#endif
-	uint32_t initMaster(bool);
-	uint32_t sendPacket(uint8_t *, uint8_t *, uint32_t);
-	uint32_t sendPacketEx(uint8_t *, uint8_t *, uint32_t);
-	uint8_t getBitOrder(void);
-#if defined(__cplusplus)
-}
-#endif
-*/
+#define checkValidBitRate(rate) (((uint32_t)rate > 1500000 || (uint32_t)rate < 23437) ? (uint32_t)1000000 : (uint32_t)rate)
+#define checkValidBitOrder(order) (((uint8_t)order > 1) ? (uint8_t)MSBFIRST : (uint8_t)order)
+#define checkValidSpiMode(mode) (((uint8_t)mode > 3) ? (uint8_t)SPI_MODE0 : (uint8_t)mode)
 
 typedef enum {
   SPI_MODE0 = 0,
@@ -41,7 +30,7 @@ class SPISettings {
 
   SPISettings()
   {
-    clockFreq   = 4000000;
+    clockFreq   = 1000000;
     bitOrder    = MSBFIRST;
     dataMode    = SPI_MODE0;
   }
@@ -54,6 +43,9 @@ class SPISettings {
 
 class SPIClass
 {
+private:
+  bool spiHwInitaited = false;
+
 public:
   SPISettings spiParameter;
 

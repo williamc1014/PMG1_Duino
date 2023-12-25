@@ -1,6 +1,9 @@
 #include <cy_gpio.h>
 #include <cy_scb_spi.h>
 
+#define SPI_SYSTEM_RATE         48000000
+#define SPI_OVERSAMPLE_COUNT    16
+
 #if CY7113_BOARD
 #define SPI_HW SCB3
 #define SPI_IRQ scb_3_interrupt_IRQn
@@ -169,7 +172,7 @@ cy_stc_scb_spi_config_t SPI_config =
     .sclkMode = CY_SCB_SPI_CPHA0_CPOL0,
     .parity = CY_SCB_SPI_PARITY_NONE,
     .dropOnParityError = false,
-    .oversample = 16,
+    .oversample = SPI_OVERSAMPLE_COUNT,
     .rxDataWidth = 8UL,
     .txDataWidth = 8UL,
     .enableMsbFirst = true,
@@ -211,7 +214,7 @@ const cy_stc_sysint_t SPI_SCB_IRQ_cfg =
 #define SPI_BUFFER_MAX_SIZE 32
 
 void spiPinInit(void);
-void spiInit(uint32_t rate, bool msbFirst, uint8_t mode);
+void spiInit(uint8_t div, bool msbFirst, uint8_t mode);
 void spiDeInit(void);
 void spiDisable(void);
 void spiSetPeripheralClock(uint8_t div);
