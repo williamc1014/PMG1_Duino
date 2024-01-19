@@ -17,9 +17,6 @@ build.variant.config_path ={runtime.platform.path}/variants/{build.variant}/bsps
 build.flash_ld_path ={build.variant.path}/bsps/{build.flash_ld}
 build.assembly_file ={build.commlib.path}/mtb-pdl-cat2/release-v2.5.0/drivers/source/COMPONENT_CM0P/TOOLCHAIN_GCC_ARM/cy_syslib_gcc.S
 
-#build.assembly_file ={build.variant.path}/mtb_shared/mtb-pdl-cat2/release-v2.5.0/drivers/source/COMPONENT_CM0P/TOOLCHAIN_GCC_ARM/cy_syslib_gcc.S
-
-
 # Arduino boards.txt & Arduino IDE menu related definitions
 # This can be overwritten/changed in boards.txt
 # ---------
@@ -52,19 +49,10 @@ compiler.cmsis_inc.path="-I{build.commlib.path}/cmsis/release-v5.8.0/Core/Includ
 compiler.rtos_inc.path="-I{build.commlib.path}/freertos/release-v10.4.305/Source/include" "-I{build.commlib.path}/freertos/release-v10.4.305/Source" "-I{build.commlib.path}/freertos/release-v10.4.305" "-I{build.commlib.path}/freertos/release-v10.4.305/Source/portable/COMPONENT_CM0P" "-I{build.commlib.path}/freertos/release-v10.4.305/Source/portable" "-I{build.commlib.path}/freertos/release-v10.4.305/Source/portable/COMPONENT_CM0P/TOOLCHAIN_GCC_ARM" "-I{build.commlib.path}/abstraction-rtos/release-v1.7.3/include" "-I{build.commlib.path}/abstraction-rtos/release-v1.7.3" "-I{build.commlib.path}/abstraction-rtos/release-v1.7.3/include/COMPONENT_FREERTOS"
 compiler.clib_inc.path="-I{build.commlib.path}/clib-support/release-v1.3.0" "-I{build.commlib.path}/clib-support/release-v1.3.0/TOOLCHAIN_GCC_ARM"
 compiler.pdl_inc.path="-I{build.commlib.path}/mtb-pdl-cat2/release-v2.5.0/devices/include" "-I{build.commlib.path}/mtb-pdl-cat2/release-v2.5.0/devices" "-I{build.commlib.path}/mtb-pdl-cat2/release-v2.5.0" "-I{build.commlib.path}/mtb-pdl-cat2/release-v2.5.0/devices/include/ip" "-I{build.commlib.path}/mtb-pdl-cat2/release-v2.5.0/drivers/include" "-I{build.commlib.path}/mtb-pdl-cat2/release-v2.5.0/drivers"
-compiler.pdstack_inc.path="-I{build.commlib.path}/pdstack/release-v3.20.0" "-I{build.commlib.path}/pdutils\release-v1.10.0"
-compiler.corelib_inc.path="-I{build.commlib.path}/core-lib/release-v1.4.0\include" "-I{build.commlib.path}/core-lib/release-v1.4.0"
+compiler.pdstack_inc.path="-I{build.commlib.path}/pdstack/release-v3.20.0" "-I{build.commlib.path}/pdutils/release-v1.10.0"
+compiler.corelib_inc.path="-I{build.commlib.path}/core-lib/release-v1.4.0/include" "-I{build.commlib.path}/core-lib/release-v1.4.0"
 compiler.pdstack_lib.path="-L{build.commlib.path}/pdstack/release-v3.20.0/{pdlib.link.path}/TOOLCHAIN_GCC_ARM"
 compiler.pdstack_lib.file="-l{pdlib.link.lib}"
-
-#compiler.cmsis_inc.path="-I{build.variant.path}/mtb_shared/cmsis/release-v5.8.0/Core/Include" "-I{build.variant.path}/mtb_shared/cmsis/release-v5.8.0/Core" "-I{build.variant.path}/mtb_shared/cmsis/release-v5.8.0"
-#compiler.rtos_inc.path="-I{build.variant.path}/mtb_shared/freertos/release-v10.4.305/Source/include" "-I{build.variant.path}/mtb_shared/freertos/release-v10.4.305/Source" "-I{build.variant.path}/mtb_shared/freertos/release-v10.4.305" "-I{build.variant.path}/mtb_shared/freertos/release-v10.4.305/Source/portable/COMPONENT_CM0P" "-I{build.variant.path}/mtb_shared/freertos/release-v10.4.305/Source/portable" "-I{build.variant.path}/mtb_shared/freertos/release-v10.4.305/Source/portable/COMPONENT_CM0P/TOOLCHAIN_GCC_ARM" "-I{build.variant.path}/mtb_shared/abstraction-rtos/release-v1.7.3/include" "-I{build.variant.path}/mtb_shared/abstraction-rtos/release-v1.7.3" "-I{build.variant.path}/mtb_shared/abstraction-rtos/release-v1.7.3/include/COMPONENT_FREERTOS"
-#compiler.clib_inc.path="-I{build.variant.path}/mtb_shared/clib-support/release-v1.3.0" "-I{build.variant.path}/mtb_shared/clib-support/release-v1.3.0/TOOLCHAIN_GCC_ARM"
-#compiler.pdl_inc.path="-I{build.variant.path}/mtb_shared/mtb-pdl-cat2/release-v2.5.0/devices/include" "-I{build.variant.path}/mtb_shared/mtb-pdl-cat2/release-v2.5.0/devices" "-I{build.variant.path}/mtb_shared/mtb-pdl-cat2/release-v2.5.0" "-I{build.variant.path}/mtb_shared/mtb-pdl-cat2/release-v2.5.0/devices/include/ip" "-I{build.variant.path}/mtb_shared/mtb-pdl-cat2/release-v2.5.0/drivers/include" "-I{build.variant.path}/mtb_shared/mtb-pdl-cat2/release-v2.5.0/drivers"
-#compiler.pdstack_inc.path="-I{build.variant.path}/mtb_shared/pdstack/release-v3.10.0" "-I{build.variant.path}/mtb_shared/pdutils\release-v1.10.0"
-#compiler.corelib_inc.path="-I{build.variant.path}/mtb_shared/core-lib/release-v1.4.0\include" "-I{build.variant.path}/mtb_shared/core-lib/release-v1.4.0"
-#compiler.pdstack_lib.path="-L{build.variant.path}/mtb_shared/pdstack/release-v3.20.0/COMPONENT_PMG1_PD3_DRP_EPR/TOOLCHAIN_GCC_ARM"
-#compiler.pdstack_lib.file="-lpmg1_pd3_drp_epr"
 
 # USB Flags
 build.usb_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid} -DUSBCON '-DUSB_MANUFACTURER={build.usb_manufacturer}' '-DUSB_PRODUCT={build.usb_product}'
