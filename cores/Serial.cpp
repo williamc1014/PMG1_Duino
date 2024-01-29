@@ -13,12 +13,6 @@
 
 #define RINGBUFFER_RX_INDEX 0
 #define RINGBUFFER_TX_INDEX 1
-/* Populate configuration structure */
-cy_stc_sysint_t uartIntrConfig =
-{
-    .intrSrc      = UART_IRQ,
-    .intrPriority = 3,
-};
 
 static cy_stc_scb_uart_context_t duinoUartContext;
 
@@ -30,33 +24,31 @@ uint8_t txData[16] = {0};
 
 void dbgPrintStr(char *str)
 {
-    Serial.print(str);
+    if (Serial.getUartInitiated())
+        Serial.print(str);
 }
 
 void dbgPrintVal(unsigned int val)
 {
-    Serial.print(val);
+    if (Serial.getUartInitiated())
+        Serial.print(val);
 }
 
 void initRingBuffer(ringbuffer_t *buff)
 {
-    noInterrupts();
     memset((void *)buff->buffer, 0, sizeof(uint8_t) * UART_BUFFER_SIZE);
     buff->head = 0;
     buff->tail = 0;
-    interrupts();
 }
 
 uint8_t getRingBufferSpace(ringbuffer_t *buff)
 {
     uint8_t size;
 
-    noInterrupts();
     if (buff->head >= buff->tail)
         size = UART_BUFFER_SIZE - 1 - buff->head + buff->tail;
     else
         size = buff->tail - buff->head - 1;
-    interrupts();
 
     return size;
 }
@@ -65,12 +57,10 @@ uint8_t getRingBufferOccupied(ringbuffer_t *buff)
 {
     uint8_t size;
 
-    noInterrupts();
     if (buff->head >= buff->tail)
         size = buff->head - buff->tail; 
     else
         size = UART_BUFFER_SIZE - buff->tail + buff->head;
-    interrupts();
 
     return size;
 }
@@ -79,12 +69,10 @@ uint8_t peekRingBuffer(ringbuffer_t *buff)
 {
     uint8_t data;
 
-    noInterrupts();
     if (buff->head == buff->tail)
         data = 0xFF;
     else 
         data = buff->buffer[buff->tail];
-    interrupts();
 
     return data;
 }
@@ -93,7 +81,6 @@ void queueRingBuffer(ringbuffer_t *buff, uint8_t data)
 {
     uint8_t pos;
 
-    noInterrupts();
     pos = buff->head + 1;
     if (pos >= UART_BUFFER_SIZE)
         pos = 0;
@@ -103,14 +90,12 @@ void queueRingBuffer(ringbuffer_t *buff, uint8_t data)
         buff->buffer[buff->head] = data;
         buff->head = pos;
     }
-    interrupts();
 }
 
 uint8_t dequeueRingBuffer(ringbuffer_t *buff)
 {
     uint8_t data;
 
-    noInterrupts();
     if (buff->head == buff->tail)
         data = 0xFF;
     
@@ -118,7 +103,6 @@ uint8_t dequeueRingBuffer(ringbuffer_t *buff)
     buff->tail ++;
     if (buff->tail >= UART_BUFFER_SIZE)
         buff->tail = 0;
-    interrupts();
 
     return data;
 }
@@ -143,9 +127,7 @@ bool isRingBufferEmpty(ringbuffer_t *buff)
 {
     bool empty;
 
-    noInterrupts();
     empty = ((buff->head == buff->tail) ? true : false);
-    interrupts();
 
     return empty;
 }
@@ -191,7 +173,7 @@ void handleUartEvent(uint32_t event)
     }   
 }
 
-void uart_init(uint8_t cfg, uint32_t bitrate)
+bool uart_init(uint8_t cfg, uint32_t bitrate)
 {
     cy_stc_scb_uart_config_t uart_cfg;
     uint8_t i;
@@ -221,7 +203,7 @@ void uart_init(uint8_t cfg, uint32_t bitrate)
     {
         Cy_GPIO_SetDrivemode(UART_RX_PORT, UART_RX_PIN_NUM, CY_GPIO_DM_HIGHZ);
         Cy_GPIO_SetDrivemode(UART_TX_PORT, UART_TX_PIN_NUM, CY_GPIO_DM_HIGHZ);
-        return;
+        return false;
     }
 
     Cy_SysClk_PeriphSetDivider(CY_SYSCLK_DIV_16_BIT, CLK_UART_NUM, divNum);
@@ -237,7 +219,17 @@ void uart_init(uint8_t cfg, uint32_t bitrate)
     Cy_SCB_SetRxInterruptMask(UART_HW, CY_SCB_RX_INTR_NOT_EMPTY);
     
     /* Hook interrupt service routine and enable interrupt */
-    (void) Cy_SysInt_Init(&uartIntrConfig, &UART_Isr);
+    if (Cy_SysInt_Init(&uartIntrConfig, &UART_Isr) != CY_SYSINT_SUCCESS)
+    {
+        Cy_SCB_UART_DeInit(UART_HW);
+        Cy_GPIO_SetDrivemode(UART_RX_PORT, UART_RX_PIN_NUM, CY_GPIO_DM_HIGHZ);
+        Cy_GPIO_SetDrivemode(UART_TX_PORT, UART_TX_PIN_NUM, CY_GPIO_DM_HIGHZ);
+        Cy_SCB_ClearTxInterrupt(UART_HW, CY_SCB_UART_TX_DONE);
+        Cy_SCB_ClearRxInterrupt(UART_HW, CY_SCB_RX_INTR_NOT_EMPTY);
+
+        return false;
+    }
+
     NVIC_EnableIRQ(UART_IRQ);
     // setup the callback function point in the context
     Cy_SCB_UART_RegisterCallback(UART_HW, handleUartEvent, &duinoUartContext);
@@ -246,22 +238,32 @@ void uart_init(uint8_t cfg, uint32_t bitrate)
 
     // start to receive
     Cy_SCB_UART_Receive(UART_HW, &rxData, 1, &duinoUartContext);
+
+    return true;
 }
 
 HardwareSerial::HardwareSerial()
 {
     initRingBuffer(&uartRxRingBuff);
     initRingBuffer(&uartTxRingBuff);
+    uartInitiated = false;
+}
+
+bool HardwareSerial::getUartInitiated(void)
+{
+    return uartInitiated;
 }
 
 void HardwareSerial::begin(uint32_t speed)
 {
-    begin(speed, SERIAL_8N1);
+    if (uart_init((uint8_t)SERIAL_8N1, speed))
+        uartInitiated = true;
 }
 
 void HardwareSerial::begin(uint32_t speed, uart_cfg_idx_t config)
 {
-    uart_init((uint8_t)config, speed);
+    if (uart_init((uint8_t)config, speed))
+        uartInitiated = true;
 }
 
 void HardwareSerial::end(void)
@@ -272,43 +274,62 @@ void HardwareSerial::end(void)
     Cy_GPIO_SetDrivemode(UART_TX_PORT, UART_TX_PIN_NUM, CY_GPIO_DM_HIGHZ);
     Cy_SCB_UART_Disable(UART_HW, &duinoUartContext);
     Cy_SCB_UART_DeInit(UART_HW);
+     uartInitiated = false;
 }
 
 int HardwareSerial::available(void)
 {
-    return (int)getRingBufferOccupied(&uartRxRingBuff);
+    if (uartInitiated)
+        return (int)getRingBufferOccupied(&uartRxRingBuff);
+    else
+        return 0;
 }
 
 int HardwareSerial::availableForWrite(void)
 {
-    return (int)getRingBufferSpace(&uartTxRingBuff);
+    if (uartInitiated)
+        return (int)getRingBufferSpace(&uartTxRingBuff);
+    else
+        return 0;
 }
 
 int HardwareSerial::peek(void)
 {
-    return (int)peekRingBuffer(&uartRxRingBuff);
+    if (uartInitiated)
+        return (int)peekRingBuffer(&uartRxRingBuff);
+    else
+        return 0;
 }
 
 int HardwareSerial::read(void)
 {
-    return (int)dequeueRingBuffer(&uartRxRingBuff);
+    if (uartInitiated)
+        return (int)dequeueRingBuffer(&uartRxRingBuff);
+    else
+        return 0;
 }
 
 void HardwareSerial::flush(void)
 {
-    noInterrupts();
-    while (uartTxRingBuff.head == uartTxRingBuff.tail);
-    while (!(CY_SCB_UART_TRANSMIT_ACTIVE & duinoUartContext.txStatus));
-    interrupts();
+    if (uartInitiated)
+    {
+        while (uartTxRingBuff.head == uartTxRingBuff.tail);
+        while (!(CY_SCB_UART_TRANSMIT_ACTIVE & duinoUartContext.txStatus));
+    }
 }
 
 size_t HardwareSerial::write(uint8_t val)
 {
-    while (getRingBufferSpace(&uartTxRingBuff) < 1) {}
+    if (uartInitiated)
+    {
+        while (getRingBufferSpace(&uartTxRingBuff) < 1) {}
 
-    queueRingBuffer(&uartTxRingBuff, val);
-    checkUartTxFifoWrite();
-    return (size_t) 1;
+        queueRingBuffer(&uartTxRingBuff, val);
+        checkUartTxFifoWrite();
+        return (size_t) 1;
+    }
+    else
+        return 0;
 }
 
 HardwareSerial Serial = HardwareSerial();

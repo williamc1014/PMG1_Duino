@@ -48,7 +48,20 @@ void i2cEventHandler(uint32_t events)
     /* Ignore all other events */
 }
 
-void i2cInit(uint8_t address)
+void i2cDeInitPin(void)
+{
+    Cy_GPIO_Pin_Init(I2C_SDA_PORT, I2C_SDA_PIN, &DEFAULT_GPIO_HZ_CONFIG);
+    Cy_GPIO_Pin_Init(I2C_SCL_PORT, I2C_SCL_PIN, &DEFAULT_GPIO_HZ_CONFIG);
+}
+
+void i2cDeInit(void)
+{
+    i2cDeInitPin();   
+    Cy_SCB_I2C_Disable(I2C_HW, &I2C_context);
+    Cy_SCB_I2C_DeInit(I2C_HW);
+}
+
+bool i2cInit(uint8_t address)
 {
     cy_en_scb_i2c_status_t initStatus;
     cy_en_sysint_status_t sysStatus;
@@ -74,16 +87,18 @@ void i2cInit(uint8_t address)
 
     /* Initialize and enable the I2C in master mode */
     initStatus = Cy_SCB_I2C_Init(I2C_HW, &I2C_config, &I2C_context);
-    if(initStatus != CY_SCB_I2C_SUCCESS)
+    if (initStatus != CY_SCB_I2C_SUCCESS)
     {
-        return;
+        i2cDeInitPin();
+        return false;
     }
 
     /* Hook interrupt service routine */
     sysStatus = Cy_SysInt_Init(&I2C_SCB_IRQ_cfg, &I2C_Interrupt);
-    if(sysStatus != CY_SYSINT_SUCCESS)
+    if (sysStatus != CY_SYSINT_SUCCESS)
     {
-        return;
+        i2cDeInit();
+        return false;
     }
     NVIC_EnableIRQ((IRQn_Type) I2C_SCB_IRQ_cfg.intrSrc);
 
@@ -98,6 +113,8 @@ void i2cInit(uint8_t address)
     Cy_SCB_I2C_Enable(I2C_HW, &I2C_context);
 
     Cy_SCB_I2C_RegisterEventCallback(I2C_HW, i2cEventHandler, &I2C_context);
+
+    return true;
 }
 
 void setPeripheralClock(uint32_t rate)

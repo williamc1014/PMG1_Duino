@@ -5,6 +5,8 @@
 #define checkValidBitOrder(order) (((uint8_t)order > 1) ? (uint8_t)MSBFIRST : (uint8_t)order)
 #define checkValidSpiMode(mode) (((uint8_t)mode > 3) ? (uint8_t)SPI_MODE0 : (uint8_t)mode)
 
+#ifdef __cplusplus
+
 typedef enum {
   SPI_MODE0 = 0,
   SPI_MODE1 = 1,
@@ -71,5 +73,7 @@ public:
 };
 
 extern SPIClass SPI;
+
+#endif /*__cplusplus*/
 
 #endif /* SPI_CLASS_TEST_H_ */

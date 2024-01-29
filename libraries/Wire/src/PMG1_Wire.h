@@ -1,7 +1,7 @@
 #ifndef TwoWire_h
 #define TwoWire_h
 
-
+#ifdef __cplusplus
 
 #include "Stream.h"
 
@@ -31,6 +31,8 @@ class TwoWire : public Stream
     //static void onRequestService(void);
     //static void onReceiveService(uint8_t*, int);
     //static void slaveStatus(void);
+
+    bool twoWireInitiazed;
   public:
     TwoWire();
     void begin();
@@ -67,5 +69,6 @@ class TwoWire : public Stream
 };
 
 extern TwoWire Wire;
+#endif
 
 #endif

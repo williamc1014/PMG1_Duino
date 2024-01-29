@@ -82,7 +82,8 @@ extern bool timeoutFlag;
 extern uint8_t i2cRxBufIdx;
 extern uint8_t i2cTxBufIdx;
 
-void i2cInit(uint8_t address);
+bool i2cInit(uint8_t address);
+void i2cDeInit(void);
 void setPeripheralClock(uint32_t rate);
 
 cy_en_scb_i2c_status_t i2cSendStart(uint8_t address, uint32_t timeoutMs);

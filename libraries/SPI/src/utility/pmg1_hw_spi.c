@@ -1,6 +1,18 @@
-//#include "pmg1_hw_spi.h"
+#include <cy_gpio.h>
+#include <cy_scb_spi.h>
+#include <cy_sysint.h>
+#include <cy_sysclk.h>
+#include <Arduino.h>
 
 cy_stc_scb_spi_context_t spiContext;
+
+void spiDeInitPin()
+{
+    Cy_GPIO_Pin_Init(SPI_CK_PORT, SPI_CK_PIN, &DEFAULT_GPIO_HZ_CONFIG);
+    Cy_GPIO_Pin_Init(SPI_COPI_PORT, SPI_COPI_PIN, &DEFAULT_GPIO_HZ_CONFIG);
+    Cy_GPIO_Pin_Init(SPI_CIPO_PORT, SPI_CIPO_PIN, &DEFAULT_GPIO_HZ_CONFIG);
+    Cy_GPIO_Pin_Init(SPI_CS_PORT, SPI_CS_PIN, &DEFAULT_GPIO_HZ_CONFIG);   
+}
 
 void SPI_Isr(void)
 {
@@ -17,6 +29,7 @@ void spiPinInit(void)
 
 bool spiInit(uint8_t div, bool msbFirst, uint8_t mode)
 {
+    cy_stc_scb_spi_config_t SPI_config;
     // maximum rate is 48MHx / 2 (DIV) / 16 (Oversample) = 1.5MHz
     // Minimum rate is 48MHx / 128 (DIV) / 16 (Oversample) = 23.4375kHz
 
@@ -34,17 +47,24 @@ bool spiInit(uint8_t div, bool msbFirst, uint8_t mode)
     Cy_SysClk_PeriphEnableDivider(CY_SYSCLK_DIV_8_BIT, 6U);
     Cy_SysClk_PeriphAssignDivider(SPI_CLOCK_BLOCK, CY_SYSCLK_DIV_8_BIT, 6U);
 
+    memcpy((void *)&SPI_config, (const void *)&default_SPI_config, sizeof(cy_stc_scb_spi_config_t));
     // configure mode and bit-order
     SPI_config.sclkMode = (cy_en_scb_spi_sclk_mode_t)mode;
     SPI_config.enableMsbFirst = (msbFirst) ? true : false;
 
     /* Configure SPI to operate */
     if (CY_SCB_SPI_SUCCESS != Cy_SCB_SPI_Init(SPI_HW, (cy_stc_scb_spi_config_t const *)&SPI_config, &spiContext))
+    {
+        spiDeInitPin();
         return false;
+    }
 
     /* Hook interrupt service routine and enable interrupt */
     if (Cy_SysInt_Init(&SPI_SCB_IRQ_cfg, &SPI_Isr) != CY_SYSINT_SUCCESS)
+    {
+        spiDeInit();
         return false;
+    }
 
     NVIC_EnableIRQ(SPI_SCB_IRQ_cfg.intrSrc);
 
@@ -58,10 +78,7 @@ void spiDeInit(void)
 {
     Cy_SCB_SPI_Disable(SPI_HW, &spiContext);
     Cy_SCB_SPI_DeInit(SPI_HW);
-    Cy_GPIO_Pin_Init(SPI_CK_PORT, SPI_CK_PIN, &SPI_GPIO_HIZ_config);
-    Cy_GPIO_Pin_Init(SPI_COPI_PORT, SPI_COPI_PIN, &SPI_GPIO_HIZ_config);
-    Cy_GPIO_Pin_Init(SPI_CIPO_PORT, SPI_CIPO_PIN, &SPI_GPIO_HIZ_config);
-    Cy_GPIO_Pin_Init(SPI_CS_PORT, SPI_CS_PIN, &SPI_GPIO_HIZ_config);      
+    spiDeInitPin();     
 }
 
 void spiEnable(void)

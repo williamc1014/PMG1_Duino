@@ -156,9 +156,13 @@ void checkUartRxFifoRead(void);
 //****************************************************************************
 class HardwareSerial: public Stream
 {
+private:
+    bool uartInitiated;
 public:
     HardwareSerial();
 	
+    bool getUartInitiated(void);
+
     void begin(uint32_t speed);
     void begin(uint32_t speed, uart_cfg_idx_t config);
     void end(void);
@@ -194,14 +198,10 @@ public:
     } 
 }; 
 
-#endif  /* cplusplus */
-
-
-#ifdef __cplusplus
 extern HardwareSerial Serial;
+
 #endif  /* cplusplus */
 
-
-void uart_init(uint8_t cfg, uint32_t bitrate);
+bool uart_init(uint8_t cfg, uint32_t bitrate);
 
 #endif /*__Serial_h__ */
