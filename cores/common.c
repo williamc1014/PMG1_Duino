@@ -275,6 +275,8 @@ uint16_t analogRead(uint8_t pin)
 
     SAR0->CHAN_EN &= ~(1UL << adcPin); 
 
+    // configure pin
+	Cy_GPIO_SetDrivemode(gpio_pin_mapping[pin].port, gpio_pin_mapping[pin].pin, CY_GPIO_DM_HIGHZ);					
     return val;
 }
 void analogReference(uint8_t type)

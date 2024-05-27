@@ -274,7 +274,7 @@ void HardwareSerial::end(void)
     Cy_GPIO_SetDrivemode(UART_TX_PORT, UART_TX_PIN_NUM, CY_GPIO_DM_HIGHZ);
     Cy_SCB_UART_Disable(UART_HW, &duinoUartContext);
     Cy_SCB_UART_DeInit(UART_HW);
-     uartInitiated = false;
+    uartInitiated = false;
 }
 
 int HardwareSerial::available(void)

@@ -261,11 +261,14 @@ void sln_pd_event_handler(cy_stc_pdstack_context_t* ctx, cy_en_pdstack_app_evt_t
         
         if (waitNegotiationComplete)
         {
-            waitNegotiationComplete --;
-        
-            if (waitNegotiationComplete == 0)
+            if (waitNegotiationComplete != 0)
             {
-		        Cy_DFU_ExecuteApp(0);
+                waitNegotiationComplete --;
+        
+                if (waitNegotiationComplete == 0)
+                {
+		            Cy_DFU_ExecuteApp(0);
+                }
             }
         }
     }

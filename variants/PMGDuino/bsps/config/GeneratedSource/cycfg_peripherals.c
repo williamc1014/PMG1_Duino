@@ -41,6 +41,71 @@ const cy_stc_sar_channel_config_t pass_0_sar_0_channel_0_config =
     .satIntrEn = false,
 };
 
+const cy_stc_sar_channel_config_t pass_0_sar_0_channel_1_config = 
+{
+    .addr = (cy_en_sar_chan_config_port_pin_addr_t)(SAR0_VPLUS1_PIN | (SAR0_VPLUS0_PORT << SAR_CHAN_CONFIG_PORT_ADDR_Pos)),
+    .differential = false,
+    .resolution = CY_SAR_MAX_RES,
+    .avgEn = true,
+    .sampleTimeSel = CY_SAR_SAMPLE_TIME_0,
+    .rangeIntrEn = false,
+    .satIntrEn = false,
+};
+
+const cy_stc_sar_channel_config_t pass_0_sar_0_channel_2_config = 
+{
+    .addr = (cy_en_sar_chan_config_port_pin_addr_t)(SAR0_VPLUS2_PIN | (SAR0_VPLUS0_PORT << SAR_CHAN_CONFIG_PORT_ADDR_Pos)),
+    .differential = false,
+    .resolution = CY_SAR_MAX_RES,
+    .avgEn = true,
+    .sampleTimeSel = CY_SAR_SAMPLE_TIME_0,
+    .rangeIntrEn = false,
+    .satIntrEn = false,
+};
+
+const cy_stc_sar_channel_config_t pass_0_sar_0_channel_3_config = 
+{
+    .addr = (cy_en_sar_chan_config_port_pin_addr_t)(SAR0_VPLUS3_PIN | (SAR0_VPLUS0_PORT << SAR_CHAN_CONFIG_PORT_ADDR_Pos)),
+    .differential = false,
+    .resolution = CY_SAR_MAX_RES,
+    .avgEn = true,
+    .sampleTimeSel = CY_SAR_SAMPLE_TIME_0,
+    .rangeIntrEn = false,
+    .satIntrEn = false,
+};
+
+const cy_stc_sar_channel_config_t pass_0_sar_0_channel_4_config = 
+{
+    .addr = (cy_en_sar_chan_config_port_pin_addr_t)(SAR0_VPLUS4_PIN | (SAR0_VPLUS0_PORT << SAR_CHAN_CONFIG_PORT_ADDR_Pos)),
+    .differential = false,
+    .resolution = CY_SAR_MAX_RES,
+    .avgEn = true,
+    .sampleTimeSel = CY_SAR_SAMPLE_TIME_0,
+    .rangeIntrEn = false,
+    .satIntrEn = false,
+};
+
+const cy_stc_sar_channel_config_t pass_0_sar_0_channel_5_config = 
+{
+    .addr = (cy_en_sar_chan_config_port_pin_addr_t)(SAR0_VPLUS5_PIN | (SAR0_VPLUS0_PORT << SAR_CHAN_CONFIG_PORT_ADDR_Pos)),
+    .differential = false,
+    .resolution = CY_SAR_MAX_RES,
+    .avgEn = true,
+    .sampleTimeSel = CY_SAR_SAMPLE_TIME_0,
+    .rangeIntrEn = false,
+    .satIntrEn = false,
+};
+
+const cy_stc_sar_channel_config_t pass_0_sar_0_channel_6_config = 
+{
+    .addr = (cy_en_sar_chan_config_port_pin_addr_t)(SAR0_VPLUS6_PIN | (SAR0_VPLUS0_PORT << SAR_CHAN_CONFIG_PORT_ADDR_Pos)),
+    .differential = false,
+    .resolution = CY_SAR_MAX_RES,
+    .avgEn = true,
+    .sampleTimeSel = CY_SAR_SAMPLE_TIME_0,
+    .rangeIntrEn = false,
+    .satIntrEn = false,
+};																  
 const cy_stc_sar_channel_config_t pass_0_sar_0_inj_channel_config = 
 {
     .addr = (cy_en_sar_chan_config_port_pin_addr_t)(SAR0_VPLUS16_PIN | (SAR0_VPLUS16_PORT << SAR_CHAN_CONFIG_PORT_ADDR_Pos)),
@@ -77,8 +142,10 @@ const cy_stc_sar_config_t pass_0_sar_0_config =
     .rangeThresHigh = 0UL,
     .rangeCond = CY_SAR_RANGE_COND_BELOW,
     .chanEn = 65537UL,
-    .channelConfig = {&pass_0_sar_0_channel_0_config, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &pass_0_sar_0_inj_channel_config},
-    .routingConfig = NULL,
+    .channelConfig = {&pass_0_sar_0_channel_0_config, &pass_0_sar_0_channel_1_config, &pass_0_sar_0_channel_2_config, 
+	  &pass_0_sar_0_channel_3_config, &pass_0_sar_0_channel_4_config, &pass_0_sar_0_channel_5_config, &pass_0_sar_0_channel_6_config, 
+	  NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &pass_0_sar_0_inj_channel_config},
+	.routingConfig = NULL,
     .vrefMvValue = pass_0_sar_0_VREF_MV,
 };
 #if defined (CY_USING_HAL)
@@ -97,7 +164,7 @@ const cy_stc_tcpwm_counter_config_t CYBSP_SYS_TCNT_config =
     .runMode = CY_TCPWM_COUNTER_CONTINUOUS,
     .countDirection = CY_TCPWM_COUNTER_COUNT_UP,
     .compareOrCapture = CY_TCPWM_COUNTER_MODE_CAPTURE,
-    .compare0 = 16384,
+    .compare0 = 1000,
     .compare1 = 16384,
     .enableCompareSwap = false,
     .interruptSources = CY_TCPWM_INT_NONE,

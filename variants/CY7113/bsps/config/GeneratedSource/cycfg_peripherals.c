@@ -40,13 +40,17 @@ const cy_stc_sar_channel_config_t pass_0_sar_0_channel_0_config =
     .rangeIntrEn = false,
     .satIntrEn = false,
 };
+
 const cy_stc_sar_channel_config_t pass_0_sar_0_channel_1_config = 
 {
-    .addr = (cy_en_sar_chan_config_port_pin_addr_t)(SAR0_VPLUS1_PIN | (SAR0_VPLUS1_PORT << SAR_CHAN_CONFIG_PORT_ADDR_Pos)),
+    .addr = (cy_en_sar_chan_config_port_pin_addr_t)(SAR0_VPLUS1_PIN | (SAR0_VPLUS0_PORT << SAR_CHAN_CONFIG_PORT_ADDR_Pos)),
     .differential = false,
     .resolution = CY_SAR_MAX_RES,
     .avgEn = true,
-    .sampleTimeSel = CY_SAR_SAMPLE_TIME_1,
+    .sampleTimeSel = CY_SAR_SAMPLE_TIME_0,
+    .rangeIntrEn = false,
+    .satIntrEn = false,
+};
     .rangeIntrEn = false,
     .satIntrEn = false,
 };
@@ -63,8 +67,8 @@ const cy_stc_sar_channel_config_t pass_0_sar_0_inj_channel_config =
 
 const cy_stc_sar_config_t pass_0_sar_0_config = 
 {
-    .vrefSel = CY_SAR_VREF_SEL_BGR,
-    .vrefBypCapEn = true,
+    .vrefSel = CY_SAR_VREF_SEL_VDDA_DIV_2,
+    .vrefBypCapEn = false,
     .negSel = CY_SAR_NEG_SEL_VREF,
     .negVref = CY_SAR_NEGVREF_HW,
     .boostPump = false,
