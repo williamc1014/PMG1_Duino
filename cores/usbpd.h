@@ -163,9 +163,11 @@ class USBPD
 private:
     uint8_t                     portIdx;
     cy_stc_pdstack_context_t    *ctx;
-    snk_cap_t                   iSprSnkPdo[13] = {0};
+    snk_cap_t                   iSprSnkPdo[7] = {0};
     uint8_t                     iSprSnkPdoCnt = 0x01;
     uint8_t                     iSprSnkMask = 0x01;
+
+    bool                        portInitated[2] = {false, false};
 
 #if PMGDUINO_BOARD 
     src_cap_t                   iSprSrcPdo[13] = {0};
@@ -174,7 +176,7 @@ private:
 
     bool setSrcPdo(uint8_t pdoNum, src_cap_t srcCap);
 #endif
-    bool setSinkPdo(uint8_t pdoNum, snk_cap_t snkCap);
+    bool setSnkPdo(uint8_t pdoNum, snk_cap_t snkCap);
     
 public:    
     bool        attached;
@@ -202,7 +204,7 @@ public:
 
     void updateStatus(void);
     uint8_t getCurrentSrcRdo(void);
-    uint8_t getCurrentSinkRdo(void);
+    uint8_t getCurrentSnkPdo(void);
 
 #if PMGDUINO_BOARD
     void setSrcUSBCommFlag(bool enable);
@@ -238,7 +240,7 @@ public:
     uint8_t getSnkPdoNum(void);
 
     bool updateSrcPdo(void);
-    bool updateSinkPdo(void);
+    bool updateSnkPdo(void);
 
     void registerEvent(uint8_t event, void (*userFunc)(void));
     void unRegisterEvent(uint8_t event);

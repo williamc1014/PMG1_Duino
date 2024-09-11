@@ -83,7 +83,7 @@ bool enterVBUSSafe5V(uint8_t port)
 
         if ( usbpd0.contractExisted && 
              (
-                (usbpd0.powerRole == CY_PD_PRT_ROLE_SINK && usbpd0.getCurrentSinkRdo() != 0) 
+                (usbpd0.powerRole == CY_PD_PRT_ROLE_SINK && usbpd0.getCurrentSnkPdo() != 0) 
 #if PMGDUINO_BOARD
              || (usbpd0.powerRole == CY_PD_PRT_ROLE_SOURCE && usbpd0.getCurrentSrcRdo() != 0)
 #endif
@@ -94,7 +94,7 @@ bool enterVBUSSafe5V(uint8_t port)
             {
                 for (i=1; i<cnt; i++)
                     usbpd0.removeSnkPdo(i);
-                usbpd0.updateSinkPdo();
+                usbpd0.updateSnkPdo();
                 return true;
             }
 #if PMGDUINO_BOARD
@@ -120,7 +120,7 @@ bool enterVBUSSafe5V(uint8_t port)
 
         if ( usbpd1.contractExisted && 
              (
-             (usbpd1.powerRole == CY_PD_PRT_ROLE_SINK && usbpd1.getCurrentSinkRdo() != 0) ||
+             (usbpd1.powerRole == CY_PD_PRT_ROLE_SINK && usbpd1.getCurrentSnkPdo() != 0) ||
              (usbpd1.powerRole == CY_PD_PRT_ROLE_SOURCE && usbpd1.getCurrentSrcRdo() != 0)
              )
            )
@@ -129,7 +129,7 @@ bool enterVBUSSafe5V(uint8_t port)
             {
                 for (i=1; i<cnt; i++)
                     usbpd1.removeSnkPdo(i);
-                usbpd1.updateSinkPdo();
+                usbpd1.updateSnkPdo();
                 return true;
             }
             else
@@ -162,6 +162,7 @@ void USBPD::begin(void)
     iSprSrcMask = ctx->dpmStat.srcPdoMask;
     iSprSrcPdoCnt = ctx->dpmStat.srcPdoCount;
 #endif
+    portInitated[portIdx] = true;
 }
 
 void USBPD::end(void)
@@ -197,7 +198,7 @@ uint8_t USBPD::getCurrentSrcRdo(void)
     return rdoNum;
 }
 
-uint8_t USBPD::getCurrentSinkRdo(void)
+uint8_t USBPD::getCurrentSnkPdo(void)
 {
     uint8_t rdoNum = 0xFF;
 
@@ -244,7 +245,7 @@ bool USBPD::setSrcPdo(uint8_t pdoNum, src_cap_t srcCap)
 }
 #endif
 
-bool USBPD::setSinkPdo(uint8_t pdoNum, snk_cap_t snkCap)
+bool USBPD::setSnkPdo(uint8_t pdoNum, snk_cap_t snkCap)
 {
     uint8_t i;
     uint8_t pdoCnt = 0;
@@ -419,7 +420,7 @@ bool USBPD::addFixedSnkPdo(uint8_t pdoNum, uint32_t voltage, uint32_t opCurrent)
     snkCap.fixed_snk_do_t.opCurrent = opCurrent / 10;
     snkCap.fixed_snk_do_t.supplyType = 0;
 
-    return (setSinkPdo(pdoNum, snkCap));
+    return (setSnkPdo(pdoNum, snkCap));
 }
 
 bool USBPD::addVarSnkPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t opCurrent)
@@ -432,7 +433,7 @@ bool USBPD::addVarSnkPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltag
     snkCap.var_snk_do_t.minVoltage = minVoltage / 50;
     snkCap.var_snk_do_t.supplyType = 2;
 
-    return (setSinkPdo(pdoNum, snkCap));
+    return (setSnkPdo(pdoNum, snkCap));
 }
 
 bool USBPD::addBatSnkPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltage, uint32_t opPower)
@@ -445,7 +446,7 @@ bool USBPD::addBatSnkPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltag
     snkCap.bat_snk_do_t.minVoltage = minVoltage / 50;
     snkCap.bat_snk_do_t.supplyType = 1;
 
-    return (setSinkPdo(pdoNum, snkCap));
+    return (setSnkPdo(pdoNum, snkCap));
 }
 
 bool USBPD::removeSnkPdo(uint8_t pdoNum)
@@ -477,6 +478,9 @@ bool USBPD::updateSrcPdo(void)
 #if PMGDUINO_BOARD
     cy_en_pdstack_status_t status;
     cy_pd_pd_do_t srcPdo[7];
+
+    if (portInitated[portIdx] == false)
+        return false;
 
     for (uint8_t i=0; i<iSprSrcPdoCnt; i++)
         srcPdo[i].val = iSprSrcPdo[i].val;
@@ -546,11 +550,14 @@ bool USBPD::updateSrcPdo(void)
     return true;
 }
 
-bool USBPD::updateSinkPdo(void)
+bool USBPD::updateSnkPdo(void)
 {
     cy_en_pdstack_status_t status;
     cy_pd_pd_do_t snkPdo[7];
 
+    if (portInitated[portIdx] == false)
+        return false;
+        
     for (uint8_t i=0; i<iSprSnkPdoCnt; i++)
         snkPdo[i].val = iSprSnkPdo[i].val;
 
