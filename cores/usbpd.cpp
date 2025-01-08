@@ -154,7 +154,7 @@ static void usbPdCmdCbk(cy_stc_pdstack_context_t *ptrPdStackContext,
 
 void USBPD::begin(void)
 {
-    memcpy((void *)iSprSnkPdo, (const void *)ctx->dpmStat.snkPdo, sizeof(cy_pd_pd_do_t)*7);
+    memcpy((void *)iSprSnkPdo, (const void *)ctx->dpmStat.snkPdo, sizeof(cy_pd_pd_do_t)*CY_PD_MAX_SPR_PDO_NUM);
     iSprSnkMask = ctx->dpmStat.snkPdoMask;
     iSprSnkPdoCnt = ctx->dpmStat.snkPdoCount;
 #if PMGDUINO_BOARD
@@ -185,7 +185,7 @@ uint8_t USBPD::getCurrentSrcRdo(void)
 
     if ((ctx->dpmConfig.connect) && (ctx->dpmConfig.curPortRole == CY_PD_PRT_ROLE_SOURCE))
     {
-        for (uint8_t i=0; i<7; i++)
+        for (uint8_t i=0; i<CY_PD_MAX_SPR_PDO_NUM; i++)
         {
             if (ctx->dpmStat.srcSelPdo.fixed_src.voltage == ctx->dpmStat.srcPdo[i].fixed_src.voltage)
             {
@@ -204,7 +204,7 @@ uint8_t USBPD::getCurrentSnkPdo(void)
 
     if ((ctx->dpmConfig.connect) && (ctx->dpmConfig.curPortRole == CY_PD_PRT_ROLE_SINK))
     {
-        for (uint8_t i=0; i<7; i++)
+        for (uint8_t i=0; i<CY_PD_MAX_SPR_PDO_NUM; i++)
         {
             if (ctx->dpmStat.snkSelPdo.fixed_snk.voltage == ctx->dpmStat.snkPdo[i].fixed_snk.voltage)
             {
@@ -220,20 +220,20 @@ uint8_t USBPD::getCurrentSnkPdo(void)
 #if PMGDUINO_BOARD  
 bool USBPD::setSrcPdo(uint8_t pdoNum, src_cap_t srcCap)
 {  
-    if (pdoNum == 0 || pdoNum > 7)
+    if (pdoNum == 0 || pdoNum > CY_PD_MAX_SPR_PDO_NUM)
         return false;
 
     uint8_t i;
     uint8_t pdoCnt = 0;
 
-    if (pdoNum > 7)
+    if (pdoNum > CY_PD_MAX_SPR_PDO_NUM)
         return false;
     
     memcpy((void *)&iSprSrcPdo[pdoNum], (const void *)&srcCap, sizeof(uint32_t));
     
     iSprSrcMask |= (1 << pdoNum);
 
-    for (i=0; i<7; i++)
+    for (i=0; i<CY_PD_MAX_SPR_PDO_NUM; i++)
     {
         if (iSprSrcMask & (1 << i))
             pdoCnt ++;
@@ -250,14 +250,14 @@ bool USBPD::setSnkPdo(uint8_t pdoNum, snk_cap_t snkCap)
     uint8_t i;
     uint8_t pdoCnt = 0;
 
-    if (pdoNum == 0 || pdoNum > 7)
+    if (pdoNum == 0 || pdoNum > CY_PD_MAX_SPR_PDO_NUM)
         return false;
     
     memcpy((void *)&iSprSnkPdo[pdoNum], (const void*)&snkCap, sizeof(uint32_t));
     
     iSprSnkMask |= (1 << pdoNum);
 
-    for (i=0; i<7; i++)
+    for (i=0; i<CY_PD_MAX_SPR_PDO_NUM; i++)
     {
         if (iSprSnkMask & (1 << i))
             pdoCnt ++;
@@ -372,7 +372,7 @@ bool USBPD::addAugmentedSrcPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t max
 
 bool USBPD::removeSrcPdo(uint8_t pdoNum)
 {
-    if (pdoNum == 0 || pdoNum > 7)
+    if (pdoNum == 0 || pdoNum > CY_PD_MAX_SPR_PDO_NUM)
         return false;
 
     iSprSrcMask &= ~(1 << pdoNum);
@@ -451,7 +451,7 @@ bool USBPD::addBatSnkPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltag
 
 bool USBPD::removeSnkPdo(uint8_t pdoNum)
 {
-    if (pdoNum == 0 || pdoNum > 7)
+    if (pdoNum == 0 || pdoNum > CY_PD_MAX_SPR_PDO_NUM)
         return false;
 
     iSprSnkMask &= ~(1 << pdoNum);
@@ -477,7 +477,7 @@ bool USBPD::updateSrcPdo(void)
 
 #if PMGDUINO_BOARD
     cy_en_pdstack_status_t status;
-    cy_pd_pd_do_t srcPdo[7];
+    cy_pd_pd_do_t srcPdo[CY_PD_MAX_SPR_PDO_NUM];
 
     if (portInitated[portIdx] == false)
         return false;
@@ -553,7 +553,7 @@ bool USBPD::updateSrcPdo(void)
 bool USBPD::updateSnkPdo(void)
 {
     cy_en_pdstack_status_t status;
-    cy_pd_pd_do_t snkPdo[7];
+    cy_pd_pd_do_t snkPdo[CY_PD_MAX_SPR_PDO_NUM];
 
     if (portInitated[portIdx] == false)
         return false;

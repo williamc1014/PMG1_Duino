@@ -158,19 +158,23 @@ typedef union
 #define CY_PD_SNKCAP_FLAGS_0_DUAL_ROLE_DATA     (1U << 5U)
 #endif
 
+#ifndef CY_PD_MAX_SPR_PDO_NUM
+#define CY_PD_MAX_SPR_PDO_NUM                   (7U)
+#endif
+
 class USBPD
 {
 private:
     uint8_t                     portIdx;
     cy_stc_pdstack_context_t    *ctx;
-    snk_cap_t                   iSprSnkPdo[7] = {0};
+    snk_cap_t                   iSprSnkPdo[CY_PD_MAX_SPR_PDO_NUM] = {0};
     uint8_t                     iSprSnkPdoCnt = 0x01;
     uint8_t                     iSprSnkMask = 0x01;
 
     bool                        portInitated[2] = {false, false};
 
 #if PMGDUINO_BOARD 
-    src_cap_t                   iSprSrcPdo[13] = {0};
+    src_cap_t                   iSprSrcPdo[CY_PD_MAX_SPR_PDO_NUM] = {0};
     uint8_t                     iSprSrcPdoCnt = 0x01;
     uint8_t                     iSprSrcMask = 0x01;
 
@@ -187,10 +191,10 @@ public:
 
     bool        usbPdCmdComplete = false;       
 
-    src_cap_t   iPartnerSrcPdo[13] = {0};
+    src_cap_t   iPartnerSrcPdo[CY_PD_MAX_SPR_PDO_NUM] = {0};
     uint8_t     iPartnerSrcPdoCnt = 0x00;    
 
-    src_cap_t   iPartnerSnkPdo[13] = {0};
+    src_cap_t   iPartnerSnkPdo[CY_PD_MAX_SPR_PDO_NUM] = {0};
     uint8_t     iPartnerSnkPdoCnt = 0x00; 
 
     USBPD() {}
