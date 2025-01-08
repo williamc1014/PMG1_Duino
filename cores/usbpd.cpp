@@ -6,6 +6,8 @@ void srcCapChangeRetryCbk(cy_timer_id_t id, void *ptrContext)
 {
     cy_stc_pdstack_context_t *ptrPdStackContext = (cy_stc_pdstack_context_t*) ptrContext;
 
+    Cy_PdUtils_SwTimer_Stop(ptrPdStackContext->ptrTimerContext, GET_USER_TIMER_ID(ptrPdStackContext, SRC_CAP_CHANGE_RETRY_TIMER));
+
     if(Cy_PdStack_Dpm_SendPdCommand(ptrPdStackContext, CY_PDSTACK_DPM_CMD_SRC_CAP_CHNG, NULL, false, NULL) != CY_PDSTACK_STAT_SUCCESS)
     {
     	Cy_PdUtils_SwTimer_Start(ptrPdStackContext->ptrTimerContext, 
@@ -20,6 +22,8 @@ void snkCapChangeRetryCbk(cy_timer_id_t id, void *ptrContext)
 {
     cy_stc_pdstack_context_t *ptrPdStackContext = (cy_stc_pdstack_context_t*) ptrContext;
 
+    Cy_PdUtils_SwTimer_Stop(ptrPdStackContext->ptrTimerContext, GET_USER_TIMER_ID(ptrPdStackContext, SNK_CAP_CHANGE_RETRY_TIMER));
+
     if(Cy_PdStack_Dpm_SendPdCommand(ptrPdStackContext, CY_PDSTACK_DPM_CMD_SNK_CAP_CHNG, NULL, false, NULL) != CY_PDSTACK_STAT_SUCCESS)
     {
     	Cy_PdUtils_SwTimer_Start(ptrPdStackContext->ptrTimerContext, 
@@ -29,6 +33,7 @@ void snkCapChangeRetryCbk(cy_timer_id_t id, void *ptrContext)
                                  snkCapChangeRetryCbk);
     }
 }
+
 
 void updatePeerSrcPdo(uint8_t port, const cy_stc_pdstack_pd_packet_t* srcCap)
 {
@@ -154,7 +159,7 @@ static void usbPdCmdCbk(cy_stc_pdstack_context_t *ptrPdStackContext,
 
 void USBPD::begin(void)
 {
-    memcpy((void *)iSprSnkPdo, (const void *)ctx->dpmStat.snkPdo, sizeof(cy_pd_pd_do_t)*CY_PD_MAX_SPR_PDO_NUM);
+    memcpy((void *)iSprSnkPdo, (const void *)ctx->dpmStat.snkPdo, sizeof(cy_pd_pd_do_t)*7);
     iSprSnkMask = ctx->dpmStat.snkPdoMask;
     iSprSnkPdoCnt = ctx->dpmStat.snkPdoCount;
 #if PMGDUINO_BOARD
@@ -182,16 +187,70 @@ void USBPD::updateStatus(void)
 uint8_t USBPD::getCurrentSrcRdo(void)
 {
     uint8_t rdoNum = 0xFF;
+    uint8_t pdoType;
+    bool    pdoMatched = false;
+
+    pdoType = (ctx->dpmStat.srcSelPdo.val >> 30) & 0x03;
 
     if ((ctx->dpmConfig.connect) && (ctx->dpmConfig.curPortRole == CY_PD_PRT_ROLE_SOURCE))
     {
-        for (uint8_t i=0; i<CY_PD_MAX_SPR_PDO_NUM; i++)
+        for (uint8_t i=0; i<13; i++)
         {
-            if (ctx->dpmStat.srcSelPdo.fixed_src.voltage == ctx->dpmStat.srcPdo[i].fixed_src.voltage)
+            switch(pdoType)
             {
-                rdoNum = i;
-                break;
+                case 0: // fixed pdo
+                    if ((ctx->dpmStat.srcSelPdo.val & 0xFFC00) == (ctx->dpmStat.curSrcPdo[i].val & 0xFFC00))
+                    {
+                        rdoNum = i;
+                        pdoMatched = true;
+                    }
+                    break;
+                case 1: // battery
+                case 2: // variable
+                    if ((ctx->dpmStat.srcSelPdo.val & 0x3FFFFC00) == (ctx->dpmStat.curSrcPdo[i].val & 0x3FFFFC00))
+                    {
+                        rdoNum = i;
+                        pdoMatched = true;
+                    }
+                    break;
+                case 3: // Augmented
+                    switch (((ctx->dpmStat.srcSelPdo.val >> 28) & 0x03))
+                    {
+                        case 0: // SPR programmable
+                            if ((ctx->dpmStat.srcSelPdo.val & 0x1FEFF00) == (ctx->dpmStat.curSrcPdo[i].val & 0x1FEFF00))
+                            {
+                                rdoNum = i;
+                                pdoMatched = true;
+                            }
+                            break;                                            
+                        case 1: // EPR AVS
+                            if ((ctx->dpmStat.srcSelPdo.val & 0x3FEFF00) == (ctx->dpmStat.curSrcPdo[i].val & 0x3FEFF00))
+                            {
+                                rdoNum = i;
+                                pdoMatched = true;
+                            }
+                            break;                                            
+
+                        case 2: // SPR AVS
+                            if ((ctx->dpmStat.srcSelPdo.val & 0xFFFFF) == (ctx->dpmStat.curSrcPdo[i].val & 0xFFFFF))
+                            {
+                                rdoNum = i;
+                                pdoMatched = true;
+                            }
+                            break;      
+                        default:
+                            pdoMatched = true;
+                            break;
+                    }
+                    break;
+                default:
+                    pdoMatched = true;
+                    break;
+
             }
+            
+            if (pdoMatched)
+                break;
         }
     }
 
@@ -200,40 +259,94 @@ uint8_t USBPD::getCurrentSrcRdo(void)
 
 uint8_t USBPD::getCurrentSnkPdo(void)
 {
-    uint8_t rdoNum = 0xFF;
+    uint8_t pdoNum = 0xFF;
+    uint8_t pdoType;
+    bool    pdoMatched = false;
+
+    pdoType = (ctx->dpmStat.snkSelPdo.val >> 30) & 0x03;
 
     if ((ctx->dpmConfig.connect) && (ctx->dpmConfig.curPortRole == CY_PD_PRT_ROLE_SINK))
     {
-        for (uint8_t i=0; i<CY_PD_MAX_SPR_PDO_NUM; i++)
+        for (uint8_t i=0; i<13; i++)
         {
-            if (ctx->dpmStat.snkSelPdo.fixed_snk.voltage == ctx->dpmStat.snkPdo[i].fixed_snk.voltage)
+            switch(pdoType)
             {
-                rdoNum = i;
-                break;
+                case 0: // fixed pdo
+                    if ((ctx->dpmStat.snkSelPdo.val & 0xFFC00) == (ctx->dpmStat.curSnkPdo[i].val & 0xFFC00))
+                    {
+                        pdoNum = i;
+                        pdoMatched = true;
+                    }
+                    break;
+                case 1: // battery
+                case 2: // variable
+                    if ((ctx->dpmStat.snkSelPdo.val & 0x3FFFFC00) == (ctx->dpmStat.curSnkPdo[i].val & 0x3FFFFC00))
+                    {
+                        pdoNum = i;
+                        pdoMatched = true;
+                    }
+                    break;
+                case 3: // Augmented
+                    switch (((ctx->dpmStat.snkSelPdo.val >> 28) & 0x03))
+                    {
+                        case 0: // SPR programmable
+                            if ((ctx->dpmStat.snkSelPdo.val & 0x1FEFF00) == (ctx->dpmStat.curSnkPdo[i].val & 0x1FEFF00))
+                            {
+                                pdoNum = i;
+                                pdoMatched = true;
+                            }
+                            break;                                            
+                        case 1: // EPR AVS
+                            if ((ctx->dpmStat.snkSelPdo.val & 0x3FEFF00) == (ctx->dpmStat.curSnkPdo[i].val & 0x3FEFF00))
+                            {
+                                pdoNum = i;
+                                pdoMatched = true;
+                            }
+                            break;                                            
+
+                        case 2: // SPR AVS
+                            if ((ctx->dpmStat.snkSelPdo.val & 0xFFFFF) == (ctx->dpmStat.curSnkPdo[i].val & 0xFFFFF))
+                            {
+                                pdoNum = i;
+                                pdoMatched = true;
+                            }
+                            break;      
+                        default:
+                            pdoMatched = true;
+                            break;
+                    }
+                    break;
+                default:
+                    pdoMatched = true;
+                    break;
+
             }
+
+            if (pdoMatched)
+                break;
         }
     }
 
-    return rdoNum;
+    return pdoNum;
 }
 
 #if PMGDUINO_BOARD  
 bool USBPD::setSrcPdo(uint8_t pdoNum, src_cap_t srcCap)
 {  
-    if (pdoNum == 0 || pdoNum > CY_PD_MAX_SPR_PDO_NUM)
+    if (pdoNum == 0 || pdoNum > 7)
         return false;
 
     uint8_t i;
     uint8_t pdoCnt = 0;
 
-    if (pdoNum > CY_PD_MAX_SPR_PDO_NUM)
+    if (pdoNum > 7)
         return false;
     
     memcpy((void *)&iSprSrcPdo[pdoNum], (const void *)&srcCap, sizeof(uint32_t));
     
     iSprSrcMask |= (1 << pdoNum);
 
-    for (i=0; i<CY_PD_MAX_SPR_PDO_NUM; i++)
+    for (i=0; i<7; i++)
     {
         if (iSprSrcMask & (1 << i))
             pdoCnt ++;
@@ -250,14 +363,14 @@ bool USBPD::setSnkPdo(uint8_t pdoNum, snk_cap_t snkCap)
     uint8_t i;
     uint8_t pdoCnt = 0;
 
-    if (pdoNum == 0 || pdoNum > CY_PD_MAX_SPR_PDO_NUM)
+    if (pdoNum == 0 || pdoNum > 7)
         return false;
     
     memcpy((void *)&iSprSnkPdo[pdoNum], (const void*)&snkCap, sizeof(uint32_t));
     
     iSprSnkMask |= (1 << pdoNum);
 
-    for (i=0; i<CY_PD_MAX_SPR_PDO_NUM; i++)
+    for (i=0; i<7; i++)
     {
         if (iSprSnkMask & (1 << i))
             pdoCnt ++;
@@ -308,9 +421,78 @@ void USBPD::setSrcUnconstrainedPowerFlag(bool enable)
 }
 
 #if CY_PD_EPR_ENABLE
+
+#if 0
+void exitSrcEprRetryCbk(cy_timer_id_t id, void *ptrContext)
+{
+    cy_stc_pdstack_context_t *ptrPdStackContext = (cy_stc_pdstack_context_t*) ptrContext;
+    cy_stc_pdstack_dpm_pd_cmd_buf_t cmdBuf;
+    cy_pd_pd_do_t cmdDo;
+
+    Cy_PdUtils_SwTimer_Stop(ptrPdStackContext->ptrTimerContext, GET_USER_TIMER_ID(ptrPdStackContext, EPR_EXIT_MODE_RETRY_TIMER));
+                
+    memset((void *)&cmdBuf, 0, sizeof(cy_stc_pdstack_dpm_pd_cmd_buf_t));
+    memset((void *)&cmdDo, 0, sizeof(cy_pd_pd_do_t));
+    cmdDo.val = ((0x05) << 24);
+    cmdBuf.cmdSop = CY_PD_SOP;
+    cmdBuf.noOfCmdDo = 1;
+    cmdBuf.cmdDo[0] = cmdDo;
+    if (Cy_PdStack_Dpm_SendPdCommand(ptrPdStackContext, CY_PDSTACK_DPM_CMD_SEND_EPR_MODE, &cmdBuf, false, NULL) != CY_PDSTACK_STAT_SUCCESS)
+    {
+    	Cy_PdUtils_SwTimer_Start(ptrPdStackContext->ptrTimerContext, ptrPdStackContext,
+    							 GET_USER_TIMER_ID(ptrPdStackContext, EPR_EXIT_MODE_RETRY_TIMER), 
+                                 EPR_EXIT_MODE_RETRY_TIMER_PERIOD, 
+                                 exitSrcEprRetryCbk);                       
+    }
+    
+}
+#endif
+
+void USBPD::enableSrcEprPdo(bool enable)
+{
+    if (enable)
+    {
+        ctx->dpmExtStat.epr.srcPdoMask = 0x03;
+    }
+    else
+    {
+        ctx->dpmExtStat.epr.srcPdoMask = 0x00;
+    }
+}
+
 void USBPD::setSrcEPRFlag(bool enable)
 {
     iSprSrcPdo[0].fixed_src_do_t.eprModeCapable = enable ? 1 : 0;
+
+    if (enable)
+    {
+        ctx->dpmExtStat.epr.srcPdoMask = 0x03;
+    }
+    else
+    {
+        ctx->dpmExtStat.epr.srcPdoMask = 0x00;
+#if 0
+        if ((true == ctx->dpmExtStat.eprActive))
+        {
+            cy_stc_pdstack_dpm_pd_cmd_buf_t cmdBuf;
+            cy_pd_pd_do_t cmdDo;
+                
+            memset((void *)&cmdBuf, 0, sizeof(cy_stc_pdstack_dpm_pd_cmd_buf_t));
+            memset((void *)&cmdDo, 0, sizeof(cy_pd_pd_do_t));
+            cmdDo.val = ((0x05) << 24);
+            cmdBuf.cmdSop = CY_PD_SOP;
+            cmdBuf.noOfCmdDo = 1;
+            cmdBuf.cmdDo[0] = cmdDo;
+            if (Cy_PdStack_Dpm_SendPdCommand(ctx, CY_PDSTACK_DPM_CMD_SEND_EPR_MODE, &cmdBuf, false, NULL) != CY_PDSTACK_STAT_SUCCESS)
+            {
+    			Cy_PdUtils_SwTimer_Start(ctx->ptrTimerContext, ctx,
+    									 GET_USER_TIMER_ID(ctx, EPR_EXIT_MODE_RETRY_TIMER), 
+                                         EPR_EXIT_MODE_RETRY_TIMER_PERIOD, 
+                                         exitSrcEprRetryCbk);                       
+            }
+        }
+#endif
+    }
 }
 #endif
 
@@ -372,7 +554,7 @@ bool USBPD::addAugmentedSrcPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t max
 
 bool USBPD::removeSrcPdo(uint8_t pdoNum)
 {
-    if (pdoNum == 0 || pdoNum > CY_PD_MAX_SPR_PDO_NUM)
+    if (pdoNum == 0 || pdoNum > 7)
         return false;
 
     iSprSrcMask &= ~(1 << pdoNum);
@@ -451,7 +633,7 @@ bool USBPD::addBatSnkPdo(uint8_t pdoNum, uint32_t minVoltage, uint32_t maxVoltag
 
 bool USBPD::removeSnkPdo(uint8_t pdoNum)
 {
-    if (pdoNum == 0 || pdoNum > CY_PD_MAX_SPR_PDO_NUM)
+    if (pdoNum == 0 || pdoNum > 7)
         return false;
 
     iSprSnkMask &= ~(1 << pdoNum);
@@ -477,7 +659,7 @@ bool USBPD::updateSrcPdo(void)
 
 #if PMGDUINO_BOARD
     cy_en_pdstack_status_t status;
-    cy_pd_pd_do_t srcPdo[CY_PD_MAX_SPR_PDO_NUM];
+    cy_pd_pd_do_t srcPdo[7];
 
     if (portInitated[portIdx] == false)
         return false;
@@ -553,7 +735,7 @@ bool USBPD::updateSrcPdo(void)
 bool USBPD::updateSnkPdo(void)
 {
     cy_en_pdstack_status_t status;
-    cy_pd_pd_do_t snkPdo[CY_PD_MAX_SPR_PDO_NUM];
+    cy_pd_pd_do_t snkPdo[7];
 
     if (portInitated[portIdx] == false)
         return false;
@@ -605,7 +787,250 @@ bool USBPD::updateSnkPdo(void)
         }
     }
 
-    return (status == CY_PDSTACK_STAT_SUCCESS) ? true : false;
+    return true;
+}
+
+#if CY_PD_EPR_ENABLE
+bool USBPD::getEprModeActive(void)
+{
+    return (ctx->dpmExtStat.eprActive);
+}
+
+void USBPD::enableSnkEprPdo(bool enable)
+{
+    if (enable)
+        ctx->dpmExtStat.epr.snkPdoMask = 0x01;
+    else
+        ctx->dpmExtStat.epr.snkPdoMask = 0x00;
+}
+
+#if 0
+void enterEprRetryCbk(cy_timer_id_t id, void *ptrContext)
+{
+    cy_stc_pdstack_context_t *ptrPdStackContext = (cy_stc_pdstack_context_t*) ptrContext;
+
+    Cy_PdUtils_SwTimer_Stop(ptrPdStackContext->ptrTimerContext, GET_USER_TIMER_ID(ptrPdStackContext, EPR_ENTER_MODE_RETRY_TIMER));
+
+    if(Cy_PdStack_Dpm_SendPdCommand(ptrPdStackContext, CY_PDSTACK_DPM_CMD_SNK_EPR_MODE_ENTRY, NULL, false, NULL) != CY_PDSTACK_STAT_SUCCESS)
+    {
+    	Cy_PdUtils_SwTimer_Start(ptrPdStackContext->ptrTimerContext, 
+                                 ptrPdStackContext, 
+                                 GET_USER_TIMER_ID(ptrPdStackContext, EPR_ENTER_MODE_RETRY_TIMER), 
+                                 EPR_ENTER_MODE_RETRY_TIMER_PERIOD, 
+                                 enterEprRetryCbk);
+    }
+   
+}
+
+void exitEprRetryCbk(cy_timer_id_t id, void *ptrContext)
+{
+    cy_stc_pdstack_context_t *ptrPdStackContext = (cy_stc_pdstack_context_t*) ptrContext;
+    cy_stc_pdstack_dpm_pd_cmd_buf_t cmdBuf;
+    cy_pd_pd_do_t cmdDo;
+
+    Cy_PdUtils_SwTimer_Stop(ptrPdStackContext->ptrTimerContext, GET_USER_TIMER_ID(ptrPdStackContext, EPR_EXIT_MODE_RETRY_TIMER));
+                
+    memset((void *)&cmdBuf, 0, sizeof(cy_stc_pdstack_dpm_pd_cmd_buf_t));
+    memset((void *)&cmdDo, 0, sizeof(cy_pd_pd_do_t));
+    cmdDo.val = ((0x05) << 24);
+    cmdBuf.cmdSop = CY_PD_SOP;
+    cmdBuf.noOfCmdDo = 1;
+    cmdBuf.cmdDo[0] = cmdDo;
+    if (Cy_PdStack_Dpm_SendPdCommand(ptrPdStackContext, CY_PDSTACK_DPM_CMD_SEND_EPR_MODE, &cmdBuf, false, NULL) != CY_PDSTACK_STAT_SUCCESS)
+    {
+    	Cy_PdUtils_SwTimer_Start(ptrPdStackContext->ptrTimerContext, ptrPdStackContext,
+    							 GET_USER_TIMER_ID(ptrPdStackContext, EPR_EXIT_MODE_RETRY_TIMER), 
+                                 EPR_EXIT_MODE_RETRY_TIMER_PERIOD, 
+                                 exitEprRetryCbk);                       
+    }
+    
+}
+
+void USBPD::enableSnkEprMode(bool enable)
+{
+    if (portInitated[portIdx] == false)
+        return;
+
+    ctx->dpmExtStat.epr.snkEnable = enable;
+
+    if ((ctx->dpmConfig.curPortRole == CY_PD_PRT_ROLE_SINK) && ctx->dpmConfig.connect)
+    {
+        if (enable)
+        {
+            
+            if ((false == ctx->dpmExtStat.eprActive) &&
+                (usbpd0.iPartnerSrcPdo[0].fixed_src_do_t.eprModeCapable == true) &&
+                (ctx->dpmExtStat.epr.snkEnable == true))
+            {
+
+                if (Cy_PdStack_Dpm_SendPdCommand(ctx, CY_PDSTACK_DPM_CMD_SNK_EPR_MODE_ENTRY, NULL, false, NULL) != CY_PDSTACK_STAT_SUCCESS)
+                {
+    				Cy_PdUtils_SwTimer_Start(ctx->ptrTimerContext, ctx,
+    										 GET_USER_TIMER_ID(ctx, EPR_ENTER_MODE_RETRY_TIMER), 
+                                             EPR_ENTER_MODE_RETRY_TIMER_PERIOD, 
+                                             enterEprRetryCbk);                    
+                }
+            }
+        }
+        else
+        {
+            if ((true == ctx->dpmExtStat.eprActive) &&
+                (ctx->dpmExtStat.epr.snkEnable == false))
+            {
+                cy_stc_pdstack_dpm_pd_cmd_buf_t cmdBuf;
+                cy_pd_pd_do_t cmdDo;
+                
+                memset((void *)&cmdBuf, 0, sizeof(cy_stc_pdstack_dpm_pd_cmd_buf_t));
+                memset((void *)&cmdDo, 0, sizeof(cy_pd_pd_do_t));
+                cmdDo.val = ((0x05) << 24);
+                cmdBuf.cmdSop = CY_PD_SOP;
+                cmdBuf.noOfCmdDo = 1;
+                cmdBuf.cmdDo[0] = cmdDo;
+                if (Cy_PdStack_Dpm_SendPdCommand(ctx, CY_PDSTACK_DPM_CMD_SEND_EPR_MODE, &cmdBuf, false, NULL) != CY_PDSTACK_STAT_SUCCESS)
+                {
+    				Cy_PdUtils_SwTimer_Start(ctx->ptrTimerContext, ctx,
+    										 GET_USER_TIMER_ID(ctx, EPR_EXIT_MODE_RETRY_TIMER), 
+                                             EPR_EXIT_MODE_RETRY_TIMER_PERIOD, 
+                                             exitEprRetryCbk);                       
+                }
+            }
+
+        }
+    }
+}
+#endif
+#endif
+
+void getPartnerPortSrcPdo_cb(cy_stc_pdstack_context* ptrPdStackContext, cy_en_pdstack_resp_status_t resp, const cy_stc_pdstack_pd_packet_t *respDat)
+{
+    if (resp == CY_PDSTACK_RES_RCVD)
+    {
+        if (ptrPdStackContext->port == 0)
+        {
+            for (uint8_t i=0; i<respDat->len; i++)
+                usbpd0.iPartnerSrcPdo[i].val = respDat->dat[i].val;
+        }
+#if PMGDUINO_BOARD        
+        else
+        {
+            for (uint8_t i=0; i<respDat->len; i++)
+                usbpd1.iPartnerSrcPdo[i].val = respDat->dat[i].val;
+        }
+#endif
+    }
+}
+
+void getPartnerSrcPdoRetryCbk(cy_timer_id_t id, void *ptrContext)
+{
+    cy_stc_pdstack_context_t *ptrPdStackContext = (cy_stc_pdstack_context_t*) ptrContext;
+
+    Cy_PdUtils_SwTimer_Stop(ptrPdStackContext->ptrTimerContext, GET_USER_TIMER_ID(ptrPdStackContext, GET_PARTNER_PORT_SRC_PDO_TIMER));
+
+    if(Cy_PdStack_Dpm_SendPdCommand(ptrPdStackContext, CY_PDSTACK_DPM_CMD_GET_SRC_CAP, NULL, false, getPartnerPortSrcPdo_cb) != CY_PDSTACK_STAT_SUCCESS)
+    {
+    	Cy_PdUtils_SwTimer_Start(ptrPdStackContext->ptrTimerContext, 
+                                 ptrPdStackContext, 
+                                 GET_USER_TIMER_ID(ptrPdStackContext, GET_PARTNER_PORT_SRC_PDO_TIMER), 
+                                 GET_PARTNER_PORT_SRC_PDO_TIMER_PERIOD, 
+                                 getPartnerSrcPdoRetryCbk);
+    }
+}
+
+
+void USBPD::getPartnerPortSrcPdo(void)
+{
+    if ((ctx->dpmConfig.connect) && portInitated[portIdx])
+    {
+        if (Cy_PdStack_Dpm_SendPdCommand(ctx, CY_PDSTACK_DPM_CMD_GET_SRC_CAP, NULL, false, getPartnerPortSrcPdo_cb) != CY_PDSTACK_STAT_SUCCESS)
+        {
+    		Cy_PdUtils_SwTimer_Start(   ctx->ptrTimerContext, ctx,
+    								    GET_USER_TIMER_ID(ctx, GET_PARTNER_PORT_SRC_PDO_TIMER), 
+                                        GET_PARTNER_PORT_SRC_PDO_TIMER_PERIOD, 
+                                        getPartnerSrcPdoRetryCbk);            
+        }
+    }
+}
+
+void getPartnerPortSnkPdo_cb(cy_stc_pdstack_context* ptrPdStackContext, cy_en_pdstack_resp_status_t resp, const cy_stc_pdstack_pd_packet_t *respDat)
+{
+    if (resp == CY_PDSTACK_RES_RCVD)
+    {
+        if (ptrPdStackContext->port == 0)
+        {
+            for (uint8_t i=0; i<respDat->len; i++)
+                usbpd0.iPartnerSnkPdo[i].val = respDat->dat[i].val;
+        }
+#if PMGDUINO_BOARD        
+        else
+        {
+            for (uint8_t i=0; i<respDat->len; i++)
+                usbpd1.iPartnerSnkPdo[i].val = respDat->dat[i].val;
+        }
+#endif
+    }
+}
+
+void getPartnerSnkPdoRetryCbk(cy_timer_id_t id, void *ptrContext)
+{
+    cy_stc_pdstack_context_t *ptrPdStackContext = (cy_stc_pdstack_context_t*) ptrContext;
+
+    Cy_PdUtils_SwTimer_Stop(ptrPdStackContext->ptrTimerContext, GET_USER_TIMER_ID(ptrPdStackContext, GET_PARTNER_PORT_SNK_PDO_TIMER));
+
+    if(Cy_PdStack_Dpm_SendPdCommand(ptrPdStackContext, CY_PDSTACK_DPM_CMD_GET_SNK_CAP, NULL, false, getPartnerPortSnkPdo_cb) != CY_PDSTACK_STAT_SUCCESS)
+    {
+    	Cy_PdUtils_SwTimer_Start(ptrPdStackContext->ptrTimerContext, 
+                                 ptrPdStackContext, 
+                                 GET_USER_TIMER_ID(ptrPdStackContext, GET_PARTNER_PORT_SNK_PDO_TIMER), 
+                                 GET_PARTNER_PORT_SNK_PDO_TIMER_PERIOD, 
+                                 getPartnerSnkPdoRetryCbk);
+    }
+}
+
+void USBPD::getPartnerPortSnkPdo(void)
+{
+    if ((ctx->dpmConfig.connect) && portInitated[portIdx])
+    {
+        if (Cy_PdStack_Dpm_SendPdCommand(ctx, CY_PDSTACK_DPM_CMD_GET_SNK_CAP, NULL, false, getPartnerPortSnkPdo_cb) != CY_PDSTACK_STAT_SUCCESS)
+        {
+            Cy_PdUtils_SwTimer_Start(ctx->ptrTimerContext, 
+                                    ctx, 
+                                    GET_USER_TIMER_ID(ctx, GET_PARTNER_PORT_SNK_PDO_TIMER), 
+                                    GET_PARTNER_PORT_SNK_PDO_TIMER_PERIOD, 
+                                    getPartnerSnkPdoRetryCbk);            
+        }
+    }
+}
+
+void doPwrRoleSwapRetryCbk(cy_timer_id_t id, void *ptrContext)
+{
+    cy_stc_pdstack_context_t *ptrPdStackContext = (cy_stc_pdstack_context_t*) ptrContext;
+
+    Cy_PdUtils_SwTimer_Stop(ptrPdStackContext->ptrTimerContext, GET_USER_TIMER_ID(ptrPdStackContext, POWER_ROLE_SWAP_RETRY_TIMER));
+    
+    if(Cy_PdStack_Dpm_SendPdCommand(ptrPdStackContext, CY_PDSTACK_DPM_CMD_SEND_PR_SWAP, NULL, false, NULL) != CY_PDSTACK_STAT_SUCCESS)
+    {
+    	Cy_PdUtils_SwTimer_Start(ptrPdStackContext->ptrTimerContext, 
+                                 ptrPdStackContext, 
+                                 GET_USER_TIMER_ID(ptrPdStackContext, POWER_ROLE_SWAP_RETRY_TIMER), 
+                                 POWER_ROLE_SWAP_RETRY_TIMER_PERIOD, 
+                                 doPwrRoleSwapRetryCbk);
+    }
+}
+
+
+void USBPD::doPwrRoleSwap(void)
+{
+    if ((ctx->dpmConfig.connect) && portInitated[portIdx])
+    {
+        if (Cy_PdStack_Dpm_SendPdCommand(ctx, CY_PDSTACK_DPM_CMD_SEND_PR_SWAP, NULL, false, NULL) != CY_PDSTACK_STAT_SUCCESS)
+        {
+            Cy_PdUtils_SwTimer_Start(ctx->ptrTimerContext, 
+                                    ctx, 
+                                    GET_USER_TIMER_ID(ctx, POWER_ROLE_SWAP_RETRY_TIMER), 
+                                    POWER_ROLE_SWAP_RETRY_TIMER_PERIOD, 
+                                    doPwrRoleSwapRetryCbk);
+        }
+    }
 }
 
 void USBPD::registerEvent(uint8_t event, void (*userFunc)(void))

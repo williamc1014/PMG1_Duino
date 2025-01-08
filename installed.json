@@ -4,19 +4,19 @@
       "name": "Infineon",
       "maintainer": "Infineon Technologies AG",
       "websiteUrl": "https://www.infineon.com",
-      "Url": "https://github.com/williamc1014/PMG1_Duino/releases/download/V0.1.0/package_PMG1_index.json",
+      "Url": "https://github.com/williamc1014/PMG1_Duino/releases/download/V0.1.2/package_PMG1_index.json",
       "email": "",
       "platforms": [
         {
           "name": "Infineon's PMG1 PD Microcontroller V0.1.x",
           "architecture": "PMG1",
-          "version": "0.1.0",
+          "version": "0.1.2",
           "deprecated": false,
           "category": "Contributed",
-          "url": "https://github.com/williamc1014/PMG1_Duino/releases/download/V0.1.0/PMG1_Duino_V0.1.0.zip",
-          "archiveFileName": "PMG1_Duino_V0.1.0.zip",
-          "checksum": "SHA-256:7c5f1e9e871f4d126199e3c19f2bb4a36a8d20797d9fa8a94f2c4f1bd1ebb460",
-          "size": "10864094",
+          "url": "https://github.com/williamc1014/PMG1_Duino/releases/download/V0.1.2/PMG1_Duino_V0.1.2.zip",
+          "archiveFileName": "PMG1_Duino_V0.1.2.zip",
+          "checksum": "SHA-256:f5a042952b28edaef57ae42c9671883fd41f8273bea4da200b249c6a238827bc",
+          "size": "10863521",
           "boards": [
             {
               "name": "PMGDuino_Kit"
@@ -51,11 +51,6 @@
       ],
       "tools": [
         {
-          "name": "XMCFlasher",
-          "version": "1.2.1",
-          "systems": []
-        },
-        {
           "name": "arm-none-eabi-gcc",
           "version": "10.3-2021.10",
           "systems": [
@@ -88,6 +83,13 @@
           "systems": [
             {
               "host": "x86_64-mingw32",
+              "url": "https://github.com/williamc1014/PMG1_Duino/releases/download/V0.0.1/python-3.11.6-embed-amd64-20231003a.zip",
+              "archiveFileName": "python-3.11.6-embed-amd64-20231003a.zip",
+              "size": "11642060",
+              "checksum": "SHA-256:c7fb70eeae618c2b01696106ad6baaecd6f4881d4f1c429acc330b7d5b0e754b"
+            },
+            {
+              "host": "x86_64-apple-darwin",
               "url": "https://github.com/williamc1014/PMG1_Duino/releases/download/V0.0.1/python-3.11.6-embed-amd64-20231003a.zip",
               "archiveFileName": "python-3.11.6-embed-amd64-20231003a.zip",
               "size": "11642060",
@@ -142,6 +144,11 @@
               "checksum": "SHA-256:8004f0af8a08b76c53a8a5da9f63a35515def871acab531cc369a4787a91f9be"
             }
           ]
+        },
+        {
+          "name": "XMCFlasher",
+          "version": "1.2.1",
+          "systems": []
         }
       ],
       "help": {

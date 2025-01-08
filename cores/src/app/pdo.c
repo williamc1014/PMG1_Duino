@@ -441,7 +441,8 @@ void eval_src_cap(cy_stc_pdstack_context_t* context, const cy_stc_pdstack_pd_pac
     uint8_t src_pdo_len = srcCap->len;
     uint8_t snk_pdo_len = dpm->curSnkPdocount;
 
-    updatePeerSrcPdo(port, srcCap);
+    uint8_t selPdo = 0;
+    //updatePeerSrcPdo(port, srcCap);
 
 #if (CY_PD_EPR_ENABLE)
     bool eprActive = false;
@@ -547,6 +548,7 @@ void eval_src_cap(cy_stc_pdstack_context_t* context, const cy_stc_pdstack_pd_pac
                     snkRdo = form_rdo(context, (src_pdo_index + 1u), false,
                             (context->dpmStat.curSnkMaxMin[snk_pdo_index] & CY_PD_GIVE_BACK_MASK), srcCap);
                     match = true;
+                    
                 }
             }
 #if (CY_PD_EPR_ENABLE)
@@ -598,6 +600,7 @@ void eval_src_cap(cy_stc_pdstack_context_t* context, const cy_stc_pdstack_pd_pac
 #endif /* !CY_PD_EPR_ENABLE */
     (app_get_resp_buf(port))->respDo = snkRdo;
     app_resp_handler(context, app_get_resp_buf(context->port));
+    updatePeerSrcPdo(port, srcCap);
 }
 
 #endif /* (!(CY_PD_SOURCE_ONLY)) */
