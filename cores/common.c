@@ -247,6 +247,8 @@ void noTone(uint8_t pin)
         return;
 
     Cy_TCPWM_PWM_Disable(TCPWM, pwmNum);
+
+    Cy_GPIO_SetDrivemode(gpio_pin_mapping[pin].port, gpio_pin_mapping[pin].pin, CY_GPIO_DM_HIGHZ);	
 }
 
 uint16_t analogRead(uint8_t pin)

@@ -245,17 +245,18 @@ static uint8_t waitNegotiationComplete = 0;
 void sln_pd_event_handler(cy_stc_pdstack_context_t* ctx, cy_en_pdstack_app_evt_t evt, const void *data)
 {
     (void)ctx;
-
+    /*
     if(evt == APP_EVT_HANDLE_EXTENDED_MSG)
     {
         cy_stc_pd_packet_extd_t * ext_mes = (cy_stc_pd_packet_extd_t * )data;
         if ((ext_mes->msg != CY_PDSTACK_EXTD_MSG_SECURITY_RESP) && (ext_mes->msg != CY_PDSTACK_EXTD_MSG_FW_UPDATE_RESP))
         {
-            /* Send Not supported message */
+            // Send Not supported message 
             Cy_PdStack_Dpm_SendPdCommand(ctx, CY_PDSTACK_DPM_CMD_SEND_NOT_SUPPORTED, NULL, true, NULL);
         }
     }
-
+    */
+   
     if (waitNegotiationComplete && evt == APP_EVT_PD_CONTRACT_NEGOTIATION_COMPLETE)
     {
         
@@ -274,7 +275,7 @@ void sln_pd_event_handler(cy_stc_pdstack_context_t* ctx, cy_en_pdstack_app_evt_t
     }
 
     if (usbpd_ebent_handler[evt] !=NULL) 
-        (*usbpd_ebent_handler[evt])();
+        (*usbpd_ebent_handler[evt])(ctx->port);
 }
 
 void instrumentation_cb(uint8_t port, uint8_t evt)

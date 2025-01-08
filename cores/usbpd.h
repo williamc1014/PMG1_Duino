@@ -258,7 +258,7 @@ public:
 
     void doPwrRoleSwap(void);
 
-    void registerEvent(uint8_t event, void (*userFunc)(void));
+    void registerEvent(uint8_t event, void (*userFunc)(uint8_t portIndex));
     void unRegisterEvent(uint8_t event);
 };
 
@@ -267,6 +267,6 @@ extern USBPD usbpd0;
 extern USBPD usbpd1;
 #endif
 
-extern void (*usbpd_ebent_handler[APP_TOTAL_EVENTS])(void);
+extern void (*usbpd_ebent_handler[APP_TOTAL_EVENTS])(uint8_t portIndex);
 
 #endif

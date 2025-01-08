@@ -1,6 +1,6 @@
 #include <usbpd.h>
 
-void (*usbpd_ebent_handler[APP_TOTAL_EVENTS])(void) = {NULL};
+void (*usbpd_ebent_handler[APP_TOTAL_EVENTS])(uint8_t portIndex) = {NULL};
 
 void srcCapChangeRetryCbk(cy_timer_id_t id, void *ptrContext)
 {
@@ -1033,7 +1033,7 @@ void USBPD::doPwrRoleSwap(void)
     }
 }
 
-void USBPD::registerEvent(uint8_t event, void (*userFunc)(void))
+void USBPD::registerEvent(uint8_t event, void (*userFunc)(uint8_t portIndex))
 {
     usbpd_ebent_handler[event] = userFunc;
 }
