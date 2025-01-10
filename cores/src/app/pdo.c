@@ -442,7 +442,7 @@ void eval_src_cap(cy_stc_pdstack_context_t* context, const cy_stc_pdstack_pd_pac
     uint8_t snk_pdo_len = dpm->curSnkPdocount;
 
     uint8_t selPdo = 0;
-    //updatePeerSrcPdo(port, srcCap);
+    updatePeerSrcPdo(port, srcCap);
 
 #if (CY_PD_EPR_ENABLE)
     bool eprActive = false;
@@ -600,7 +600,6 @@ void eval_src_cap(cy_stc_pdstack_context_t* context, const cy_stc_pdstack_pd_pac
 #endif /* !CY_PD_EPR_ENABLE */
     (app_get_resp_buf(port))->respDo = snkRdo;
     app_resp_handler(context, app_get_resp_buf(context->port));
-    updatePeerSrcPdo(port, srcCap);
 }
 
 #endif /* (!(CY_PD_SOURCE_ONLY)) */

@@ -7,6 +7,7 @@ extern "C" {
 #include "cy_pdstack_common.h"
 #include "cy_usbpd_typec.h"
 #include "cy_pdstack_dpm.h"
+#include "cy_usbpd_defines.h"
 #include "cy_usbpd_vbus_ctrl.h"
 #include "cy_usbpd_phy.h"
 #include "cy_pdutils_sw_timer.h"
@@ -188,10 +189,12 @@ public:
 
     bool        usbPdCmdComplete = false;       
 
-    src_cap_t   iPartnerSrcPdo[7] = {0};
+    bool        iPartnerSrcPdoUpdated = false;
+    src_cap_t   iPartnerSrcPdo[13] = {0};
     uint8_t     iPartnerSrcPdoCnt = 0x00;    
 
-    src_cap_t   iPartnerSnkPdo[7] = {0};
+    bool        iPartnerSnkPdoUpdated = false;
+    snk_cap_t   iPartnerSnkPdo[13] = {0};
     uint8_t     iPartnerSnkPdoCnt = 0x00; 
 
     USBPD() {}
